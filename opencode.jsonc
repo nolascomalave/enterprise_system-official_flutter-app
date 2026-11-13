@@ -1,0 +1,8 @@
+{
+  "agents": {
+    "mockup": {
+      "model": "opencode-go/glm-5.3-flash",
+      "description": "Genera mockups de UI en HTML/CSS interactivo para la app Flutter."
+    }
+  }
+}
