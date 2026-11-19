@@ -1,0 +1,63 @@
+{
+  "@@locale": "en",
+  "appTitle": "Enterprise App",
+  "@appTitle": {
+    "description": "Application title"
+  },
+  "loginTitle": "Welcome back",
+  "@loginTitle": {
+    "description": "Login screen title"
+  },
+  "loginSubtitle": "Sign in to access your workspace",
+  "@loginSubtitle": {
+    "description": "Login screen subtitle"
+  },
+  "emailLabel": "Email",
+  "@emailLabel": {
+    "description": "Email field label"
+  },
+  "passwordLabel": "Password",
+  "@passwordLabel": {
+    "description": "Password field label"
+  },
+  "organizationLabel": "Organization",
+  "@organizationLabel": {
+    "description": "Tenant selector label"
+  },
+  "signIn": "Sign in",
+  "@signIn": {
+    "description": "Primary login button"
+  },
+  "forgotPassword": "Forgot your password?",
+  "@forgotPassword": {
+    "description": "Password recovery link"
+  },
+  "registerCompany": "Register new company",
+  "@registerCompany": {
+    "description": "Onboarding link"
+  },
+  "dashboardTitle": "Dashboard",
+  "@dashboardTitle": {
+    "description": "Dashboard screen title"
+  },
+  "dashboardSubtitle": "General overview of Acme Corporation",
+  "@dashboardSubtitle": {
+    "description": "Dashboard screen subtitle"
+  },
+  "comingSoon": "Coming soon",
+  "@comingSoon": {
+    "description": "Placeholder note"
+  },
+  "tenantLabel": "Organization",
+  "tenantHint": "Organization UUID",
+  "brandHeadline": "Built to operate at the level of your ambition.",
+  "brandSubtitle": "Enterprise-grade data depth with an experience that feels inevitable.",
+  "statParties": "Parties",
+  "statUptime": "Uptime",
+  "twoFactorTitle": "Two-factor verification",
+  "twoFactorSubtitle": "Enter the 6-digit code from your authenticator app",
+  "codeLabel": "Verification code",
+  "verify": "Verify",
+  "backToLogin": "Back to sign in",
+  "errorGeneric": "Something went wrong. Please try again."
+}
