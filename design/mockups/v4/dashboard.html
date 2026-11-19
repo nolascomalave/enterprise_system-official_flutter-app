@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard V4 — Enterprise App (SaaS Premium)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = { darkMode: 'class' };
+  </script>
+  <style>
+    body { font-family: 'Inter', -apple-system, 'SF Pro', Roboto, sans-serif; }
+
+    /* ── Scrollbars personalizados (6px, track transparente, thumb slate) ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 999px; }            /* slate-300 */
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }                             /* slate-700 */
+    .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    * { scrollbar-width: thin; scrollbar-color: #CBD5E1 transparent; }
+    .dark * { scrollbar-color: #334155 transparent; }
+
+    /* ── Árbol recursivo del menú ── */
+    .menu-group > ul[data-children] { display: none; }
+    .menu-group.open > ul[data-children] { display: block; }
+    .menu-group > button [data-chevron] { transition: transform .2s ease; }
+    .menu-group.open > button [data-chevron] { transform: rotate(90deg); }
+
+    /* ── Estado activo: opción (píldora) y categoría padre (borde izquierdo sutil) ──
+       El borde de 2px se reserva en TODOS los botones (transparente) para no desplazar contenido */
+    #sidebar .menu-group > button, #drawer-nav .menu-group > button { border-left: 2px solid transparent; }
+    .menu-group > button.parent-active { color: #0F172A; border-left-color: #6366F1; }        /* indigo-500 */
+    .dark .menu-group > button.parent-active { color: #FFFFFF; border-left-color: #818CF8; }  /* indigo-400 */
+
+    /* ── Bottom nav (móvil): píldora activa ── */
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+      padding: 8px 14px; border-radius: 9999px;
+      color: #64748B; transition: background-color .2s ease, color .2s ease;
+    }
+    .dark .nav-item { color: #94A3B8; }
+    .nav-item:hover { color: #4F46E5; }
+    .dark .nav-item:hover { color: #818CF8; }
+    .nav-item.active { background: #E0E7FF; color: #4F46E5; }                 /* indigo-100 / indigo-600 */
+    .dark .nav-item.active { background: rgba(99,102,241,.10); color: #818CF8; }
+
+    /* ── Sidebar colapsado: textos por opacidad, iconos centrados ── */
+    #sidebar .gname, #sidebar .sidebar-hide, #sidebar .user-text, #sidebar [data-chevron] {
+      white-space: nowrap; transition: opacity .2s ease;
+    }
+    body.sidebar-collapsed #sidebar { width: 80px; }
+    body.sidebar-collapsed #sidebar .gname,
+    body.sidebar-collapsed #sidebar .sidebar-hide,
+    body.sidebar-collapsed #sidebar .user-text { opacity: 0; flex: 0 0 0%; width: 0; min-width: 0; overflow: hidden; }
+    body.sidebar-collapsed #sidebar [data-chevron] { opacity: 0; flex: 0 0 0%; width: 0; min-width: 0; overflow: hidden; }
+    body.sidebar-collapsed #sidebar .menu-group > button { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; border-left-width: 0; }
+    body.sidebar-collapsed #sidebar .user-card { justify-content: center; padding-left: 0; padding-right: 0; }
+    body.sidebar-collapsed #sidebar .sidebar-head { padding-left: 10px; padding-right: 10px; }
+    body.sidebar-collapsed #sidebar .user-foot { padding-left: 10px; padding-right: 10px; }
+    body.sidebar-collapsed #sidebar nav ul[data-children] { display: none !important; }
+    .search-box { overflow: hidden; transition: max-height .3s ease-in-out, opacity .2s ease, padding .3s ease-in-out; max-height: 76px; }
+    body.sidebar-collapsed #sidebar .search-box { max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0; }
+
+    /* ── Popover del sidebar colapsado (fixed, equivalente a absolute left-full ml-2 sin recortes) ── */
+    .sidebar-popover {
+      position: fixed; z-index: 50; width: 250px;
+      opacity: 0; pointer-events: none; transform: translateX(-6px);
+      transition: opacity .15s ease, transform .15s ease;
+    }
+    .sidebar-popover.show { opacity: 1; pointer-events: auto; transform: translateX(0); }
+    .sidebar-popover .pop-header {
+      padding: 4px 10px 8px; margin-bottom: 4px;
+      font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+      color: #94A3B8; border-bottom: 1px solid #E2E8F0;
+    }
+    .dark .sidebar-popover .pop-header { color: #64748B; border-color: #334155; }
+
+    /* ── Bottom sheet (drawer móvil) ── */
+    @keyframes sheet-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    #drawer .sheet-panel { animation: sheet-up .25s ease-out; }
+
+    a:focus-visible, button:focus-visible { outline: 2px solid #6366F1; outline-offset: 2px; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body class="h-screen overflow-hidden bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100 flex flex-col md:flex-row">
+
+  <!--
+    ═══════════════════════════════════════════════════════════════
+    MENÚ (mock) — estructura del backend:
+    GET /api/v1/rbac/my-menu?app_client_id={uuid} → MenuTreeEnvelope
+    MenuTreeNode { id, code, name, sort_order, children[], options[] }
+    MenuTreeOption { id, code, name, icon, route, sort_order }
+    Recursivo: .menu-group (node) > ul[data-children] > li > (a | .menu-group)
+    ═══════════════════════════════════════════════════════════════
+  -->
+
+  <!-- ═══════════════ SIDEBAR (desktop ≥768px) ═══════════════ -->
+  <aside id="sidebar"
+         class="relative z-30 hidden w-[280px] shrink-0 flex-col overflow-x-hidden border-r border-slate-200 bg-white transition-all duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-900 md:flex">
+    <!-- Logo -->
+    <div class="sidebar-head flex h-16 shrink-0 items-center justify-between gap-2 border-b border-slate-200 px-4 dark:border-slate-800">
+      <div class="flex min-w-0 items-center gap-2.5">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+        </span>
+        <span class="sidebar-hide truncate text-[15px] font-semibold tracking-tight text-slate-900 dark:text-white">Enterprise App</span>
+      </div>
+      <button type="button" id="sidebar-collapse" aria-label="Colapsar menú"
+              class="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+        <svg id="chev-left" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+        <svg id="chev-right" class="hidden h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+
+    <!-- Buscador -->
+    <div class="search-box shrink-0 px-4 pt-4">
+      <div class="flex h-10 items-center gap-2 rounded-xl bg-slate-100 px-3 transition-colors focus-within:ring-2 focus-within:ring-indigo-500 dark:bg-slate-800">
+        <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="menu-search" type="search" placeholder="Buscar en el menú…" aria-label="Buscar en el menú"
+               class="h-full w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100" />
+      </div>
+    </div>
+
+    <!-- Menú recursivo -->
+    <nav id="sidebar-nav" class="flex-1 space-y-1 overflow-x-hidden overflow-y-auto px-3 pb-4 pt-3 text-sm" aria-label="Menú principal">
+      <!-- L1: Inicio -->
+      <div class="menu-group open" data-code="home">
+        <button type="button" data-group-toggle aria-expanded="true"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 22V12h6v10"/></svg>
+          <span class="gname flex-1 text-left">Inicio</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <li><a href="#" aria-current="page" class="active flex items-center gap-2.5 rounded-lg bg-indigo-50 px-3 py-2 font-medium text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            Dashboard</a></li>
+        </ul>
+      </div>
+
+      <!-- L1: Party → L2: Listado → L3: Tipos (recursivo, 4 niveles) -->
+      <div class="menu-group" data-code="party">
+        <button type="button" data-group-toggle aria-expanded="false"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span class="gname flex-1 text-left">Party</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <!-- L2: Listado -->
+          <li>
+            <div class="menu-group" data-code="parties">
+              <button type="button" data-group-toggle aria-expanded="false"
+                      class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M12 3v18"/><path d="M8 8h8"/><path d="M8 16h8"/></svg>
+                <span class="gname flex-1 text-left">Listado</span>
+                <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+                <!-- L3 -->
+                <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                  <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                  Parties</a></li>
+                <!-- L3: Tipos de Party (grupo) -->
+                <li>
+                  <div class="menu-group" data-code="party-types">
+                    <button type="button" data-group-toggle aria-expanded="false"
+                            class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                      <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></svg>
+                      <span class="gname flex-1 text-left">Tipos de Party</span>
+                      <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+                      <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                        <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Personas</a></li>
+                      <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                        <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+                        Organizaciones</a></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- L1: Empleados -->
+      <div class="menu-group" data-code="employees">
+        <button type="button" data-group-toggle aria-expanded="false"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          <span class="gname flex-1 text-left">Empleados</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+            <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            Empleados</a></li>
+          <li>
+            <div class="menu-group" data-code="jobs">
+              <button type="button" data-group-toggle aria-expanded="false"
+                      class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                <span class="gname flex-1 text-left">Puestos</span>
+                <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+                <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Familias de puesto</a></li>
+                <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Puestos de trabajo</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- L1: Departamentos -->
+      <div class="menu-group" data-code="departments">
+        <button type="button" data-group-toggle aria-expanded="false"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+          <span class="gname flex-1 text-left">Departamentos</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Departamentos</a></li>
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Grupos corporativos</a></li>
+        </ul>
+      </div>
+
+      <!-- L1: Relaciones Corporativas -->
+      <div class="menu-group" data-code="corporate-relations">
+        <button type="button" data-group-toggle aria-expanded="false"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+          <span class="gname flex-1 text-left">Relaciones Corporativas</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <li>
+            <div class="menu-group" data-code="relations">
+              <button type="button" data-group-toggle aria-expanded="false"
+                      class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg>
+                <span class="gname flex-1 text-left">Relaciones</span>
+                <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+              </button>
+              <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+                <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Listado de relaciones</a></li>
+                <li>
+                  <div class="menu-group" data-code="relationship-types">
+                    <button type="button" data-group-toggle aria-expanded="false"
+                            class="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+                      <svg class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                      <span class="gname flex-1 text-left">Tipos de relación</span>
+                      <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+                    </button>
+                    <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+                      <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Roles de relación</a></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- L1: Configuración -->
+      <div class="menu-group" data-code="settings">
+        <button type="button" data-group-toggle aria-expanded="false"
+                class="flex w-full items-center gap-2.5 rounded-xl border-l-2 border-transparent px-3 py-2.5 font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span class="gname flex-1 text-left">Configuración</span>
+          <svg data-chevron class="h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <ul data-children class="ml-4 mt-1 space-y-1 border-l border-slate-200 pl-3 dark:border-slate-800">
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Catálogos</a></li>
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Aplicaciones cliente</a></li>
+          <li><a href="#" class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">Seguridad y MFA</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Usuario -->
+    <div class="user-foot shrink-0 border-t border-slate-200 p-3 dark:border-slate-800">
+      <button type="button" class="user-card flex w-full cursor-pointer items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-slate-100 dark:hover:bg-slate-800">
+        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white" aria-hidden="true">AG</span>
+        <span class="user-text min-w-0 flex-1">
+          <span class="block truncate text-[13px] font-semibold leading-4 text-slate-900 dark:text-white">Ana García</span>
+          <span class="block truncate text-[11px] leading-4 text-slate-500">Acme Corporation</span>
+        </span>
+        <svg class="user-text h-4 w-4 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18 6-6-6-6"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ═══════════════ CONTENIDO ═══════════════ -->
+  <main class="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+    <!-- Header -->
+    <div class="sticky top-0 z-20 flex items-center justify-between gap-4 border-b border-slate-200 bg-slate-50/80 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-950/80 md:px-8 md:py-4">
+      <div class="min-w-0">
+        <h1 class="truncate text-2xl font-semibold text-slate-900 dark:text-white">Dashboard</h1>
+        <p class="truncate text-sm text-slate-500">Resumen general de Acme Corporation</p>
+      </div>
+      <div class="flex shrink-0 items-center gap-2">
+        <button type="button" id="theme-toggle" aria-label="Cambiar a modo oscuro"
+                class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200">
+          <svg id="icon-moon" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+          <svg id="icon-sun" class="hidden h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+        <button type="button" aria-label="Perfil de usuario" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-shadow hover:shadow-md">
+          <span class="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 text-xs font-semibold text-white" aria-hidden="true">AG</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mx-auto max-w-6xl space-y-6 px-4 pb-32 pt-6 dark:md:pb-10 md:px-8 md:pt-8">
+      <!-- KPIs -->
+      <section class="grid grid-cols-1 gap-6 md:grid-cols-3" aria-label="Indicadores clave">
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500">Total Parties</p>
+              <p class="mt-1 text-3xl font-semibold text-slate-900 dark:text-white">1.248</p>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400" aria-hidden="true">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 17h6v6"/></svg>
+              +12.4%
+            </span>
+            <span class="text-xs text-slate-500">esta semana</span>
+          </div>
+        </article>
+
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500">Empleados</p>
+              <p class="mt-1 text-3xl font-semibold text-slate-900 dark:text-white">86</p>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400" aria-hidden="true">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 17h6v6"/></svg>
+              +3.2%
+            </span>
+            <span class="text-xs text-slate-500">este mes</span>
+          </div>
+        </article>
+
+        <article class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div class="flex items-start justify-between">
+            <div>
+              <p class="text-sm text-slate-500">Departamentos</p>
+              <p class="mt-1 text-3xl font-semibold text-slate-900 dark:text-white">12</p>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400" aria-hidden="true">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">
+              <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/><path d="M16 17h6v6"/></svg>
+              +8.3%
+            </span>
+            <span class="text-xs text-slate-500">en el trimestre</span>
+          </div>
+        </article>
+      </section>
+
+      <!-- Últimos registros -->
+      <section aria-label="Últimos registros">
+        <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+          <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
+            <h2 class="text-base font-semibold text-slate-900 dark:text-white">Últimos registros</h2>
+            <a href="#" class="flex h-9 items-center text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Ver todos</a>
+          </div>
+
+          <!-- Tabla (≥768px) -->
+          <div class="hidden overflow-x-auto md:block">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="border-b border-slate-200 dark:border-slate-800">
+                  <th class="px-5 py-3 text-xs font-medium uppercase tracking-wider text-slate-500">Nombre</th>
+                  <th class="px-5 py-3 text-xs font-medium uppercase tracking-wider text-slate-500">Tipo</th>
+                  <th class="px-5 py-3 text-xs font-medium uppercase tracking-wider text-slate-500">Departamento</th>
+                  <th class="px-5 py-3 text-xs font-medium uppercase tracking-wider text-slate-500">Estado</th>
+                  <th class="px-5 py-3 text-xs font-medium uppercase tracking-wider text-slate-500">Fecha</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-xs font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">JP</span><span class="font-medium text-slate-900 dark:text-white">Juan Pérez</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Empleado</td>
+                  <td class="px-5 py-3.5 text-slate-500">Ventas</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400"><span class="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>Activo</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">18 nov 2026</td>
+                </tr>
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-violet-100 text-xs font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">AC</span><span class="font-medium text-slate-900 dark:text-white">Acme Corp</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Organización</td>
+                  <td class="px-5 py-3.5 text-slate-500">Cliente</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400"><span class="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>Activo</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">17 nov 2026</td>
+                </tr>
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-xs font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">MG</span><span class="font-medium text-slate-900 dark:text-white">María García</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Empleado</td>
+                  <td class="px-5 py-3.5 text-slate-500">Tecnología</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400"><span class="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>Activo</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">16 nov 2026</td>
+                </tr>
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-xs font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">GI</span><span class="font-medium text-slate-900 dark:text-white">Globex Industries</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Organización</td>
+                  <td class="px-5 py-3.5 text-slate-500">Proveedor</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400"><span class="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400"></span>Activo</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">15 nov 2026</td>
+                </tr>
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-rose-100 text-xs font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">LF</span><span class="font-medium text-slate-900 dark:text-white">Lucía Fernández</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Empleado</td>
+                  <td class="px-5 py-3.5 text-slate-500">Recursos Humanos</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"><span class="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400"></span>Vacaciones</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">14 nov 2026</td>
+                </tr>
+                <tr class="cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                  <td class="px-5 py-3.5"><div class="flex items-center gap-3"><span class="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-xs font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">IS</span><span class="font-medium text-slate-900 dark:text-white">Initech Solutions</span></div></td>
+                  <td class="px-5 py-3.5 text-slate-500">Organización</td>
+                  <td class="px-5 py-3.5 text-slate-500">Socio</td>
+                  <td class="px-5 py-3.5"><span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400"><span class="h-1.5 w-1.5 rounded-full bg-red-500 dark:bg-red-400"></span>Inactivo</span></td>
+                  <td class="px-5 py-3.5 text-slate-500">12 nov 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Lista móvil (<768px) -->
+          <ul class="divide-y divide-slate-200 md:hidden dark:divide-slate-800">
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[11px] font-semibold text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">JP</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">Juan Pérez</p>
+                <p class="truncate text-xs text-slate-500">Empleado · Ventas · 18 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Activo</span>
+            </li>
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-100 text-[11px] font-semibold text-violet-700 dark:bg-violet-500/10 dark:text-violet-300">AC</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">Acme Corp</p>
+                <p class="truncate text-xs text-slate-500">Organización · Cliente · 17 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Activo</span>
+            </li>
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300">MG</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">María García</p>
+                <p class="truncate text-xs text-slate-500">Empleado · Tecnología · 16 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Activo</span>
+            </li>
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[11px] font-semibold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">GI</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">Globex Industries</p>
+                <p class="truncate text-xs text-slate-500">Organización · Proveedor · 15 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400">Activo</span>
+            </li>
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-[11px] font-semibold text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">LF</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">Lucía Fernández</p>
+                <p class="truncate text-xs text-slate-500">Empleado · RRHH · 14 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:bg-amber-500/10 dark:text-amber-400">Vacaciones</span>
+            </li>
+            <li class="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 text-[11px] font-semibold text-sky-700 dark:bg-sky-500/10 dark:text-sky-300">IS</span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-slate-900 dark:text-white">Initech Solutions</p>
+                <p class="truncate text-xs text-slate-500">Organización · Socio · 12 nov</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-500/10 dark:text-red-400">Inactivo</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <p class="text-center text-xs text-slate-400 dark:text-slate-500 md:text-left">Mockup interactivo · design/mockups/v4/dashboard.html · menú según <code class="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">GET /api/v1/rbac/my-menu</code></p>
+    </div>
+  </main>
+
+  <!-- ═══════════════ BOTTOM NAV (móvil <768px) ═══════════════ -->
+  <nav class="fixed bottom-6 left-6 right-6 z-40 flex h-16 items-center justify-around rounded-full bg-white/90 px-2 shadow-lg ring-1 ring-slate-200 backdrop-blur-md dark:bg-slate-900/90 dark:ring-slate-800 md:hidden" aria-label="Navegación principal">
+    <button type="button" data-nav="home" aria-current="page" class="nav-item active">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M9 22V12h6v10"/></svg>
+      <span class="text-[11px] font-medium">Inicio</span>
+    </button>
+    <button type="button" data-nav="party" class="nav-item">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="text-[11px] font-medium">Party</span>
+    </button>
+    <button type="button" data-nav="employees" class="nav-item">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      <span class="text-[11px] font-medium">Empleados</span>
+    </button>
+    <button type="button" data-nav="departments" class="nav-item">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+      <span class="text-[11px] font-medium">Equipos</span>
+    </button>
+    <button type="button" data-nav="menu" aria-controls="drawer" class="nav-item">
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+      <span class="text-[11px] font-medium">Menú</span>
+    </button>
+  </nav>
+
+  <!-- ═══════════════ FAB Ask AI ═══════════════ -->
+  <button type="button" id="ask-ai" aria-label="Preguntar a la IA"
+          class="fixed bottom-24 right-6 z-40 flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition-all hover:shadow-xl hover:shadow-indigo-500/30 hover:scale-105 active:scale-95 md:bottom-8">
+    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>
+    Ask AI
+  </button>
+
+  <!-- ═══════════════ DRAWER / BOTTOM SHEET (móvil) ═══════════════ -->
+  <div id="drawer" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+    <div id="drawer-backdrop" class="absolute inset-0 bg-slate-950/50 backdrop-blur-sm"></div>
+    <div class="sheet-panel absolute inset-x-0 bottom-0 max-h-[75vh] overflow-y-auto rounded-t-3xl bg-white p-4 pb-10 ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800">
+      <div class="mx-auto mb-3 h-1.5 w-10 rounded-full bg-slate-200 dark:bg-slate-700" aria-hidden="true"></div>
+      <div class="mb-2 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+          </span>
+          <span class="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">Enterprise App</span>
+        </div>
+        <button type="button" id="drawer-close" aria-label="Cerrar menú"
+                class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <!-- Clona del árbol recursivo (1:1 con /rbac/my-menu) -->
+      <nav id="drawer-nav" class="space-y-1 text-sm" aria-label="Menú principal (móvil)"></nav>
+    </div>
+  </div>
+
+  <!-- Popover del sidebar colapsado (contenido generado por JS) -->
+  <div id="sidebar-popover" class="sidebar-popover rounded-2xl bg-white shadow-lg ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-800" role="menu" aria-hidden="true"></div>
+
+  <script>
+    // ── Tema claro/oscuro (inicializa según el sistema) ──
+    const root = document.documentElement;
+    function applyTheme(dark) {
+      root.classList.toggle('dark', dark);
+      document.getElementById('icon-moon').classList.toggle('hidden', dark);
+      document.getElementById('icon-sun').classList.toggle('hidden', !dark);
+      document.getElementById('theme-toggle').setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+    }
+    applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.getElementById('theme-toggle').addEventListener('click', () => applyTheme(!root.classList.contains('dark')));
+
+    // ── Árbol recursivo: toggle de subcategorías (chevron 90°) ──
+    function bindTree(container) {
+      container.querySelectorAll('[data-group-toggle]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const group = btn.closest('.menu-group');
+          const open = group.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(open));
+        });
+      });
+    }
+    const sidebarNav = document.getElementById('sidebar-nav');
+    bindTree(sidebarNav);
+    sidebarNav.querySelectorAll('.menu-group').forEach(g => g.dataset.wasOpen = g.classList.contains('open') ? '1' : '0');
+
+    // ── Estado activo: marca categorías padre de la opción activa ──
+    function markParentActive(nav) {
+      const actives = nav.querySelectorAll('a.active');
+      console.info('[menú] opciones activas encontradas:', actives.length);
+      actives.forEach(a => {
+        let node = a;
+        while ((node = node.parentElement && node.parentElement.closest('.menu-group'))) {
+          const btn = node.querySelector(':scope > button');
+          if (btn) { btn.classList.add('parent-active'); console.info('[menú] parent-active →', btn.querySelector('.gname').textContent.trim()); }
+        }
+      });
+    }
+    markParentActive(sidebarNav);
+
+    // ── Colapsar / expandir (280px ↔ 80px) ──
+    const collapseBtn = document.getElementById('sidebar-collapse');
+    collapseBtn.addEventListener('click', () => {
+      const collapsed = document.body.classList.toggle('sidebar-collapsed');
+      document.getElementById('chev-left').classList.toggle('hidden', collapsed);
+      document.getElementById('chev-right').classList.toggle('hidden', !collapsed);
+      collapseBtn.setAttribute('aria-label', collapsed ? 'Expandir menú' : 'Colapsar menú');
+      hidePopover();
+    });
+
+    // ── Buscador: filtra el árbol recursivamente ──
+    const searchInput = document.getElementById('menu-search');
+    function filterGroup(group, q) {
+      const name = group.querySelector(':scope > button .gname').textContent.trim().toLowerCase();
+      const selfMatch = q && name.includes(q);
+      const ul = group.querySelector(':scope > ul[data-children]');
+      let childMatch = false;
+      if (ul) {
+        for (const li of ul.querySelectorAll(':scope > li')) {
+          const sub = li.querySelector(':scope > .menu-group');
+          const link = li.querySelector(':scope > a');
+          let m = false;
+          if (sub) { m = filterGroup(sub, q); li.style.display = m ? '' : 'none'; }
+          else if (link) { m = !q || link.textContent.trim().toLowerCase().includes(q); li.style.display = m ? '' : 'none'; }
+          childMatch = childMatch || m;
+        }
+      }
+      const visible = !q || Boolean(selfMatch) || childMatch;
+      group.style.display = visible ? '' : 'none';
+      if (q && visible) group.classList.add('open');
+      return visible;
+    }
+    function resetFilter() {
+      sidebarNav.querySelectorAll('.menu-group').forEach(g => { g.style.display = ''; g.classList.toggle('open', g.dataset.wasOpen === '1'); });
+      sidebarNav.querySelectorAll('li').forEach(li => li.style.display = '');
+    }
+    searchInput.addEventListener('input', () => {
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) { resetFilter(); return; }
+      for (const g of sidebarNav.querySelectorAll(':scope > .menu-group')) filterGroup(g, q);
+    });
+
+    // ── Popover del sidebar colapsado (clic en el icono → menú flotante) ──
+    const pop = document.getElementById('sidebar-popover');
+    let popCurrentBtn = null;
+    function openPopover(btn) {
+      if (!document.body.classList.contains('sidebar-collapsed')) return;
+      const group = btn.closest('.menu-group');
+      const name = btn.querySelector('.gname').textContent.trim();
+      const ul = group.querySelector(':scope > ul[data-children]');
+      pop.innerHTML = '<div class="pop-header">' + name + '</div><div class="menu-group open">' + (ul ? ul.innerHTML : '') + '</div>';
+      pop.querySelectorAll('.menu-group').forEach(g => g.classList.add('open'));
+      bindTree(pop);
+      pop.querySelectorAll('a').forEach(a => a.addEventListener('click', (e) => { e.preventDefault(); hidePopover(); }));
+      const r = btn.getBoundingClientRect();
+      pop.style.visibility = 'hidden';
+      pop.style.left = (r.right + 8) + 'px';
+      pop.style.top = '0px';
+      const ph = pop.offsetHeight, vh = window.innerHeight;
+      pop.style.top = Math.min(Math.max(16, r.top - 8), Math.max(16, vh - ph - 16)) + 'px';
+      pop.style.visibility = '';
+      pop.classList.add('show');
+      pop.setAttribute('aria-hidden', 'false');
+      popCurrentBtn = btn;
+    }
+    function hidePopover() {
+      pop.classList.remove('show');
+      pop.setAttribute('aria-hidden', 'true');
+      popCurrentBtn = null;
+    }
+    document.querySelectorAll('#sidebar .menu-group > button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (pop.classList.contains('show') && popCurrentBtn === btn) hidePopover();
+        else openPopover(btn);
+      });
+    });
+    document.addEventListener('click', (e) => {
+      if (pop.classList.contains('show') && !pop.contains(e.target) && !(popCurrentBtn && popCurrentBtn.contains(e.target))) hidePopover();
+    });
+
+    // ── Drawer móvil (bottom sheet) ──
+    const drawer = document.getElementById('drawer');
+    const drawerNav = document.getElementById('drawer-nav');
+    drawerNav.innerHTML = sidebarNav.innerHTML;
+    bindTree(drawerNav);
+    function openDrawer() { drawer.classList.remove('hidden'); document.body.style.overflow = 'hidden'; }
+    function closeDrawer() { drawer.classList.add('hidden'); document.body.style.overflow = ''; }
+    document.getElementById('drawer-close').addEventListener('click', closeDrawer);
+    document.getElementById('drawer-backdrop').addEventListener('click', closeDrawer);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { hidePopover(); closeDrawer(); } });
+
+    // ── Bottom nav móvil: píldora activa + Menú abre el drawer ──
+    const navBtns = document.querySelectorAll('[data-nav]');
+    navBtns.forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.nav === 'menu') { openDrawer(); return; }
+      navBtns.forEach(x => x.classList.toggle('active', x === b));
+    }));
+  </script>
+</body>
+</html>

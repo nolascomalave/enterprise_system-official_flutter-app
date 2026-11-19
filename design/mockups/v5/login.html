@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login V5 — Enterprise App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script> tailwind.config = { darkMode: 'class' }; </script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    /* ═══ Scrollbars: invisibles · 4px · aparecen al hover ═══ */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+    *:hover::-webkit-scrollbar-thumb { background: #D4D4D8; }
+    .dark *:hover::-webkit-scrollbar-thumb { background: #3F3F46; }
+    * { scrollbar-width: thin; scrollbar-color: transparent transparent; }
+    *:hover { scrollbar-color: #D4D4D8 transparent; }
+    .dark *:hover { scrollbar-color: #3F3F46 transparent; }
+
+    /* ═══ Sombra premium ═══ */
+    .shadow-premium {
+      box-shadow: 0 0 0 1px rgba(0, 0, 0, .03), 0 2px 4px rgba(0, 0, 0, .05), 0 12px 24px rgba(0, 0, 0, .05);
+    }
+    .dark .shadow-premium {
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, .05), 0 0 0 1px rgba(255, 255, 255, .05), 0 20px 40px -10px rgba(0, 0, 0, .5);
+    }
+
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid #6366F1; outline-offset: 2px; border-radius: 8px; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#F4F4F5] text-zinc-950 antialiased dark:bg-[#09090B] dark:text-zinc-50">
+
+  <div class="flex min-h-screen w-full">
+
+    <!-- ═══════════════ BRAND (izquierda) ═══════════════ -->
+    <aside class="relative hidden w-1/2 flex-col justify-between overflow-hidden border-r border-white/5 bg-[#09090B] p-12 text-white md:flex">
+      <!-- Resplandor radial -->
+      <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-indigo-900/20 via-[#09090B] to-[#09090B]" aria-hidden="true"></div>
+      <div class="pointer-events-none absolute inset-0 opacity-[0.035]" aria-hidden="true">
+        <svg class="h-full w-full">
+          <defs><pattern id="v5-grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0v44" fill="none" stroke="white" stroke-width="1"/></pattern></defs>
+          <rect width="100%" height="100%" fill="url(#v5-grid)"/>
+        </svg>
+      </div>
+
+      <!-- Logo -->
+      <div class="relative flex items-center gap-2.5">
+        <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25" aria-hidden="true">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/></svg>
+        </span>
+        <span class="text-[15px] font-semibold tracking-tight">Enterprise App</span>
+      </div>
+
+      <!-- Mensaje -->
+      <div class="relative max-w-md">
+        <h2 class="max-w-sm text-4xl font-semibold leading-[1.15] tracking-tight xl:text-[2.6rem]">
+          Diseñado para operar<br/>al nivel de tu<br/><span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">ambición.</span>
+        </h2>
+        <p class="mt-5 max-w-sm text-[15px] leading-7 text-zinc-400">La infraestructura de gestión empresarial que combina profundidad de datos con una experiencia que se siente inevitable.</p>
+
+        <div class="mt-10 grid max-w-sm grid-cols-2 gap-4">
+          <div class="shadow-premium rounded-xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm">
+            <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-500">Parties</p>
+            <p class="mt-1.5 text-2xl font-semibold tracking-tight">1.248</p>
+          </div>
+          <div class="shadow-premium rounded-xl border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm">
+            <p class="text-[11px] font-medium uppercase tracking-widest text-zinc-500">Uptime</p>
+            <p class="mt-1.5 text-2xl font-semibold tracking-tight">99,99%</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="relative text-xs text-zinc-600">© 2026 Enterprise App · V5</p>
+    </aside>
+
+    <!-- ═══════════════ FORMULARIO (derecha) ═══════════════ -->
+    <main class="relative flex w-full items-center justify-center p-8 md:w-1/2">
+
+      <!-- Toggle tema -->
+      <button type="button" id="theme-toggle" aria-label="Cambiar a modo oscuro"
+              class="absolute right-5 top-5 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full text-zinc-500 transition-all duration-200 hover:bg-black/5 hover:text-zinc-900 active:scale-95 dark:hover:bg-white/5 dark:hover:text-zinc-100">
+        <svg id="icon-moon" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <svg id="icon-sun" class="hidden h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+      </button>
+
+      <section class="w-full max-w-sm" aria-labelledby="login-title">
+
+        <!-- Logo móvil -->
+        <div class="mb-8 flex items-center gap-2.5 md:hidden">
+          <span class="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/></svg>
+          </span>
+          <span class="text-[15px] font-semibold tracking-tight">Enterprise App</span>
+        </div>
+
+        <h1 id="login-title" class="text-2xl font-semibold tracking-tight">Bienvenido de nuevo</h1>
+        <p class="mt-1 text-sm text-zinc-500">Inicia sesión para acceder a tu espacio de trabajo</p>
+
+        <form id="login-form" class="mt-8 space-y-5" novalidate>
+
+          <!-- Email -->
+          <div>
+            <label for="email" class="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Correo electrónico</label>
+            <div class="flex items-center gap-3">
+              <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="nombre@empresa.com"
+                     class="w-full rounded-xl border border-black/10 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-100 dark:placeholder-zinc-500" aria-describedby="email-error" />
+            </div>
+            <p id="email-error" class="mt-1.5 hidden items-center gap-1.5 text-xs text-red-500 dark:text-red-400" role="alert">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+              Introduce un correo válido
+            </p>
+          </div>
+
+          <!-- Contraseña -->
+          <div>
+            <div class="mb-1.5 flex items-center justify-between">
+              <label for="password" class="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Contraseña</label>
+              <a href="#" class="text-xs font-medium text-indigo-500 transition-colors hover:text-indigo-400 dark:text-indigo-400">¿Olvidaste tu contraseña?</a>
+            </div>
+            <div class="relative">
+              <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••••"
+                     class="w-full rounded-xl border border-black/10 bg-white px-4 py-3 pr-12 text-sm text-zinc-900 placeholder-zinc-400 transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-100 dark:placeholder-zinc-500" aria-describedby="password-error" />
+              <button type="button" id="toggle-password" aria-label="Mostrar contraseña" aria-pressed="false"
+                      class="absolute right-1 top-1/2 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-lg text-zinc-400 transition-all duration-200 hover:text-zinc-600 active:scale-95 dark:hover:text-zinc-200">
+                <svg id="eye-open" class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg id="eye-closed" class="hidden h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 11s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>
+              </button>
+            </div>
+            <p id="password-error" class="mt-1.5 hidden items-center gap-1.5 text-xs text-red-500 dark:text-red-400" role="alert">
+              <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+              La contraseña es obligatoria
+            </p>
+          </div>
+
+          <!-- Organización -->
+          <div>
+            <label for="tenant" class="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Organización</label>
+            <div class="relative">
+              <select id="tenant" name="tenant" required
+                      class="w-full cursor-pointer appearance-none rounded-xl border border-black/10 bg-white px-4 py-3 pr-10 text-sm text-zinc-900 transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 dark:border-white/10 dark:bg-zinc-900/50 dark:text-zinc-100">
+                <option value="" selected disabled>Selecciona tu organización</option>
+                <option value="acme">Acme Corporation</option>
+                <option value="globex">Globex Industries</option>
+                <option value="initech">Initech Solutions</option>
+              </select>
+              <svg class="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+
+          <!-- Botón principal (blanco premium) -->
+          <button type="submit" id="submit-btn"
+                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-black/5 bg-white py-3 text-sm font-semibold text-black shadow-premium transition-all duration-200 hover:bg-zinc-100 active:scale-95 dark:border-white/10 dark:bg-white dark:hover:bg-zinc-200">
+            <span id="submit-label">Iniciar sesión</span>
+            <svg id="submit-spinner" class="hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12a9 9 0 1 1-6.219-8.56" stroke-linecap="round"/></svg>
+          </button>
+          <p id="form-alert" class="hidden items-center gap-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-[13px] text-red-600 dark:text-red-400" role="alert">
+            <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+            Revisa los campos marcados antes de continuar.
+          </p>
+        </form>
+
+        <!-- Divisor -->
+        <div class="mt-8 flex items-center gap-3" aria-hidden="true">
+          <span class="h-px flex-1 bg-black/5 dark:bg-white/5"></span>
+          <span class="text-[11px] font-medium uppercase tracking-widest text-zinc-500">¿Primera vez?</span>
+          <span class="h-px flex-1 bg-black/5 dark:bg-white/5"></span>
+        </div>
+
+        <!-- Onboarding -->
+        <a href="#"
+           class="mt-4 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-black/5 bg-white py-3 text-sm font-medium text-zinc-900 shadow-premium transition-all duration-200 hover:border-indigo-500/30 hover:text-indigo-600 active:scale-[0.98] dark:border-white/10 dark:bg-transparent dark:text-zinc-100 dark:hover:border-indigo-500/40 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+          Registrar nueva empresa
+        </a>
+
+        <p class="mt-6 text-center text-xs leading-4 text-zinc-500">
+          Al continuar aceptas los
+          <a href="#" class="font-medium text-zinc-700 underline-offset-2 transition-colors hover:text-indigo-500 hover:underline dark:text-zinc-300 dark:hover:text-indigo-400">Términos de servicio</a>
+          y la
+          <a href="#" class="font-medium text-zinc-700 underline-offset-2 transition-colors hover:text-indigo-500 hover:underline dark:text-zinc-300 dark:hover:text-indigo-400">Política de privacidad</a>.
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // ── Tema claro/oscuro ──
+    const root = document.documentElement;
+    function applyTheme(dark) {
+      root.classList.toggle('dark', dark);
+      document.getElementById('icon-moon').classList.toggle('hidden', dark);
+      document.getElementById('icon-sun').classList.toggle('hidden', !dark);
+      document.getElementById('theme-toggle').setAttribute('aria-label', dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+    }
+    applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.getElementById('theme-toggle').addEventListener('click', () => applyTheme(!root.classList.contains('dark')));
+
+    // ── Mostrar / ocultar contraseña ──
+    const pwd = document.getElementById('password');
+    const toggle = document.getElementById('toggle-password');
+    toggle.addEventListener('click', () => {
+      const show = pwd.type === 'password';
+      pwd.type = show ? 'text' : 'password';
+      document.getElementById('eye-open').classList.toggle('hidden', show);
+      document.getElementById('eye-closed').classList.toggle('hidden', !show);
+      toggle.setAttribute('aria-pressed', String(show));
+      toggle.setAttribute('aria-label', show ? 'Ocultar contraseña' : 'Mostrar contraseña');
+    });
+
+    // ── Validación + estado de carga (mock) ──
+    const form = document.getElementById('login-form');
+    const email = document.getElementById('email');
+    const btn = document.getElementById('submit-btn');
+    const label = document.getElementById('submit-label');
+    const spinner = document.getElementById('submit-spinner');
+    const alertBox = document.getElementById('form-alert');
+    function setError(input, errorId, show) {
+      const el = document.getElementById(errorId);
+      el.classList.toggle('hidden', !show);
+      el.classList.toggle('flex', show);
+      input.classList.toggle('border-red-500/50', show);
+    }
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+      const pwdOk = pwd.value.length > 0;
+      const tenantOk = document.getElementById('tenant').value !== '';
+      setError(email, 'email-error', !emailOk);
+      setError(pwd, 'password-error', !pwdOk);
+      alertBox.classList.toggle('hidden', emailOk && pwdOk && tenantOk);
+      alertBox.classList.toggle('flex', !(emailOk && pwdOk && tenantOk));
+      if (emailOk && pwdOk && tenantOk) {
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-wait');
+        spinner.classList.remove('hidden');
+        label.textContent = 'Verificando…';
+        setTimeout(() => { // simulación de navegación (mock)
+          spinner.classList.add('hidden');
+          label.textContent = 'Sesión iniciada';
+          btn.disabled = false;
+        }, 1200);
+      }
+    });
+  </script>
+</body>
+</html>
