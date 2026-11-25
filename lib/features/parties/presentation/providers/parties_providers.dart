@@ -15,6 +15,12 @@ final getPartiesUseCaseProvider = FutureProvider<GetPartiesUseCase>((ref) async 
   return GetPartiesUseCase(repository);
 });
 
+final getPartyDetailUseCaseProvider =
+    FutureProvider<GetPartyDetailUseCase>((ref) async {
+  final repository = await ref.watch(partiesRepositoryProvider.future);
+  return GetPartyDetailUseCase(repository);
+});
+
 final createPartyUseCaseProvider =
     FutureProvider<CreatePartyUseCase>((ref) async {
   final repository = await ref.watch(partiesRepositoryProvider.future);

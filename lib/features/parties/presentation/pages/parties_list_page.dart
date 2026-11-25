@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -267,6 +268,7 @@ class _PartiesTable extends StatelessWidget {
             itemBuilder: (context, index) {
               final party = parties[index];
               return _HoverRow(
+                onTap: () => context.push('/parties/${party.id}'),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   child: Row(
@@ -343,35 +345,41 @@ class _PartiesList extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final party = parties[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              _PartyAvatar(party: party, size: 36),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      party.displayName,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${party.partyType.label} · ${party.profileDetail}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: secondary),
-                    ),
-                  ],
+        return InkWell(
+          onTap: () => context.push('/parties/${party.id}'),
+          hoverColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.white.withValues(alpha: 0.02)
+              : Colors.black.withValues(alpha: 0.02),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                _PartyAvatar(party: party, size: 36),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        party.displayName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${party.partyType.label} · ${party.profileDetail}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: secondary),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _StatusBadge(active: party.isActive),
-            ],
+                const SizedBox(width: 8),
+                _StatusBadge(active: party.isActive),
+              ],
+            ),
           ),
         );
       },
@@ -380,15 +388,16 @@ class _PartiesList extends StatelessWidget {
 }
 
 class _HoverRow extends StatelessWidget {
-  const _HoverRow({required this.child});
+  const _HoverRow({required this.child, required this.onTap});
 
   final Widget child;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       hoverColor: isDark
           ? Colors.white.withValues(alpha: 0.02)
           : Colors.black.withValues(alpha: 0.02),

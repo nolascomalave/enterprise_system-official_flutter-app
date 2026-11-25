@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:enterprise_app/features/parties/domain/entities/party.dart';
+import 'package:enterprise_app/features/parties/domain/entities/party_detail.dart';
 import 'package:enterprise_app/features/parties/domain/repositories/parties_repository.dart';
 import 'package:enterprise_app/features/parties/presentation/providers/parties_notifier.dart';
 import 'package:enterprise_app/features/parties/presentation/providers/parties_providers.dart';
@@ -15,6 +16,11 @@ class FakePartiesRepository implements PartiesRepository {
   Completer<List<Party>>? fetchCompleter;
   int fetchCalls = 0;
   int createCalls = 0;
+
+  @override
+  Future<PartyDetail> getPartyById(String partyId) {
+    throw UnimplementedError();
+  }
 
   @override
   Future<List<Party>> getParties() {

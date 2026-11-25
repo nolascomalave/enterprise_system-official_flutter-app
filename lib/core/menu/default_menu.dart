@@ -68,10 +68,19 @@ List<MenuNode> buildFallbackMenu() {
       ],
     ),
     MenuNode(
+      id: 'corporate-relationships',
+      code: 'corporate-relationships',
+      name: 'Relaciones Corporativas',
+      sortOrder: 5,
+      options: [
+        option(id: 'corporate-relationships.all', code: 'corporate-relationships.all', name: 'Holding-Filial', route: '/corporate-relationships', icon: 'hub'),
+      ],
+    ),
+    MenuNode(
       id: 'settings',
       code: 'settings',
       name: 'Configuración',
-      sortOrder: 5,
+      sortOrder: 6,
       options: [
         option(id: 'settings.catalogs', code: 'settings.catalogs', name: 'Catálogos', route: '/settings', icon: 'category'),
         option(id: 'settings.oauth', code: 'settings.oauth', name: 'Aplicaciones cliente', route: '/client-applications', icon: 'apps'),

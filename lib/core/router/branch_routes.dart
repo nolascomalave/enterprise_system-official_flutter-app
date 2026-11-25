@@ -4,6 +4,7 @@ abstract final class BranchRoutes {
   static const String parties = '/parties';
   static const String employees = '/employees';
   static const String departments = '/departments';
+  static const String corporateRelationships = '/corporate-relationships';
   static const String settings = '/settings';
 
   static const List<String> all = [
@@ -11,6 +12,7 @@ abstract final class BranchRoutes {
     parties,
     employees,
     departments,
+    corporateRelationships,
     settings,
   ];
 

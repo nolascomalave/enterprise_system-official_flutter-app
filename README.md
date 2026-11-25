@@ -113,4 +113,18 @@ flutter build web
   - Settings: sección "Aplicaciones Cliente" con lista (nombre, client_id, scopes y badge Activa/Inactiva), skeletons de carga, error con reintento y modal de creación (name + scopes separados por comas).
   - El `client_secret` se muestra **una única vez** en un recuadro ámbar con aviso y botón de copiar; al cerrar se refresca la lista.
   - Tests: notifier (carga + creación con refresh) y widget del modal (secret visible y scopes parseados).
-- Siguiente iteración: migración completa de textos a ARB (es/en) o pantallas de detalle.
+- **Detalle de Party (`/parties/:id`):**
+  - DTO `PartyDetailDto` (perfiles) + parseo tolerante de colecciones (`contacts`, `addresses`, `names`, `nationalities`, `documents`) en el repositorio → entidades `PartyDetail`, `PersonInfo`, `OrganizationInfo`, `PartyContact`, `PartyAddress`, `PartyNameEntry`, `PartyDocument`.
+  - `getPartyById` en `PartiesRepository` + `GetPartyDetailUseCase` + `PartyDetailNotifier` family.
+  - UI: header con avatar grande, tipo y badge de estado; tabs **Perfil / Contactos / Direcciones / Nombres** (badge "Principal", tags de tipo de dirección, vigencias), skeletons de carga, error con reintento y botón Editar ("Próximamente").
+  - Navegación: filas de la lista (desktop y móvil) abren el detalle con `context.push`.
+  - Tests: notifier (loading→data por ID) y widget (perfil, contactos con Principal, direcciones y nombres históricos).
+- **Relaciones Corporativas (holding-filial, `/corporate-relationships`):**
+  - DTOs `TenantRelationshipDto`, `InitiateRelationshipRequestDto`, `EmitInviteTokenResponseDto`, `ConsumeInviteTokenRequestDto`; entidades `CorporateRelationship`/`InviteToken` con estados PENDING/APPROVED/REJECTED/REVOKED/CANCELLED y rol derivado del `tenant_id` local.
+  - `RelationshipsRepositoryImpl`: listar, iniciar, emit-token, consume-token, reject, revoke y cancel (rutas asumidas del backend; documentadas en el código).
+  - `RelationshipsNotifier`: lista + acciones con refresco de estado.
+  - UI: data grid V5 con holding/filial/estado/fecha + motivos; badges por estado y acciones contextuales por rol (holding: emitir token/cancelar/revocar; filial: consumir token/rechazar).
+  - Modales: nueva relación (Holding Tenant ID), token con copiar, consumo de token y motivo para rechazar/revocar.
+  - Tests: notifier (PENDING→APPROVED al consumir) y modal de consumo (envío/errores).
+  - `graphify-out/` añadido al `.gitignore`.
+- Siguiente iteración: migración completa de textos a ARB (es/en) o edición de Party.

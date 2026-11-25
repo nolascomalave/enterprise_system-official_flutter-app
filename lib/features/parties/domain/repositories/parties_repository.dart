@@ -1,8 +1,11 @@
 import '../entities/party.dart';
+import '../entities/party_detail.dart';
 
 /// Puerto del repositorio de parties.
 abstract interface class PartiesRepository {
   Future<List<Party>> getParties();
+
+  Future<PartyDetail> getPartyById(String partyId);
 
   Future<Party> createParty(CreatePartyParams params);
 }
