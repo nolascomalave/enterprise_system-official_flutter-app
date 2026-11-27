@@ -1,23 +1,33 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../domain/entities/corporate_group.dart';
 import '../../domain/entities/department.dart';
-import '../../domain/errors/department_not_found_exception.dart';
-import 'departments_notifier.dart';
+import '../../domain/entities/department_detail.dart';
+import 'department_providers.dart';
 
 part 'department_detail_notifier.g.dart';
 
-/// Detalle de un departamento.
+/// Detalle del departamento y sus grupos corporativos reales.
 ///
-/// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-/// en memoria reutilizando la caché de [departmentsProvider].
+/// Ambos endpoints se lanzan en paralelo.
 @riverpod
 class DepartmentDetailNotifier extends _$DepartmentDetailNotifier {
   @override
-  Future<Department> build(String departmentId) async {
-    final departments = await ref.watch(departmentsProvider.future);
-    for (final department in departments) {
-      if (department.id == departmentId) return department;
-    }
-    throw DepartmentNotFoundException(departmentId);
+  Future<DepartmentDetail> build(String departmentId) async {
+    final detailUseCase = await ref.watch(
+      getDepartmentByIdUseCaseProvider.future,
+    );
+    final groupsUseCase = await ref.watch(
+      getDepartmentGroupsUseCaseProvider.future,
+    );
+
+    final results = await Future.wait<Object>([
+      detailUseCase(departmentId),
+      groupsUseCase(departmentId),
+    ]);
+    return DepartmentDetail(
+      department: results[0] as Department,
+      groups: results[1] as List<CorporateGroup>,
+    );
   }
 }

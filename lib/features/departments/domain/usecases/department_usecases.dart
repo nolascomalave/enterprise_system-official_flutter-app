@@ -11,6 +11,26 @@ class GetDepartmentsUseCase {
   Future<List<Department>> call() => _repository.getDepartments();
 }
 
+/// Caso de uso: obtener un departamento por ID.
+class GetDepartmentByIdUseCase {
+  const GetDepartmentByIdUseCase(this._repository);
+
+  final DepartmentRepository _repository;
+
+  Future<Department> call(String departmentId) =>
+      _repository.getDepartmentById(departmentId);
+}
+
+/// Caso de uso: listar los grupos corporativos de un departamento.
+class GetDepartmentGroupsUseCase {
+  const GetDepartmentGroupsUseCase(this._repository);
+
+  final DepartmentRepository _repository;
+
+  Future<List<CorporateGroup>> call(String departmentId) =>
+      _repository.getDepartmentGroups(departmentId);
+}
+
 /// Caso de uso: crear un departamento.
 class CreateDepartmentUseCase {
   const CreateDepartmentUseCase(this._repository);

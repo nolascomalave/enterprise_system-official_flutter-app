@@ -8,24 +8,21 @@ part of 'department_detail_notifier.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Detalle de un departamento.
+/// Detalle del departamento y sus grupos corporativos reales.
 ///
-/// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-/// en memoria reutilizando la caché de [departmentsProvider].
+/// Ambos endpoints se lanzan en paralelo.
 
 @ProviderFor(DepartmentDetailNotifier)
 final departmentDetailProvider = DepartmentDetailNotifierFamily._();
 
-/// Detalle de un departamento.
+/// Detalle del departamento y sus grupos corporativos reales.
 ///
-/// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-/// en memoria reutilizando la caché de [departmentsProvider].
+/// Ambos endpoints se lanzan en paralelo.
 final class DepartmentDetailNotifierProvider
-    extends $AsyncNotifierProvider<DepartmentDetailNotifier, Department> {
-  /// Detalle de un departamento.
+    extends $AsyncNotifierProvider<DepartmentDetailNotifier, DepartmentDetail> {
+  /// Detalle del departamento y sus grupos corporativos reales.
   ///
-  /// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-  /// en memoria reutilizando la caché de [departmentsProvider].
+  /// Ambos endpoints se lanzan en paralelo.
   DepartmentDetailNotifierProvider._({
     required DepartmentDetailNotifierFamily super.from,
     required String super.argument,
@@ -64,20 +61,19 @@ final class DepartmentDetailNotifierProvider
 }
 
 String _$departmentDetailNotifierHash() =>
-    r'57586f2861706cb6a7541b51a73629875ca5db16';
+    r'8afcd6ada59f64a5ff0c39a65246bd2d4446c94a';
 
-/// Detalle de un departamento.
+/// Detalle del departamento y sus grupos corporativos reales.
 ///
-/// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-/// en memoria reutilizando la caché de [departmentsProvider].
+/// Ambos endpoints se lanzan en paralelo.
 
 final class DepartmentDetailNotifierFamily extends $Family
     with
         $ClassFamilyOverride<
           DepartmentDetailNotifier,
-          AsyncValue<Department>,
-          Department,
-          FutureOr<Department>,
+          AsyncValue<DepartmentDetail>,
+          DepartmentDetail,
+          FutureOr<DepartmentDetail>,
           String
         > {
   DepartmentDetailNotifierFamily._()
@@ -89,10 +85,9 @@ final class DepartmentDetailNotifierFamily extends $Family
         isAutoDispose: true,
       );
 
-  /// Detalle de un departamento.
+  /// Detalle del departamento y sus grupos corporativos reales.
   ///
-  /// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-  /// en memoria reutilizando la caché de [departmentsProvider].
+  /// Ambos endpoints se lanzan en paralelo.
 
   DepartmentDetailNotifierProvider call(String departmentId) =>
       DepartmentDetailNotifierProvider._(argument: departmentId, from: this);
@@ -101,25 +96,26 @@ final class DepartmentDetailNotifierFamily extends $Family
   String toString() => r'departmentDetailProvider';
 }
 
-/// Detalle de un departamento.
+/// Detalle del departamento y sus grupos corporativos reales.
 ///
-/// El backend aún no expone `GET /departments/{id}`: se filtra el listado
-/// en memoria reutilizando la caché de [departmentsProvider].
+/// Ambos endpoints se lanzan en paralelo.
 
-abstract class _$DepartmentDetailNotifier extends $AsyncNotifier<Department> {
+abstract class _$DepartmentDetailNotifier
+    extends $AsyncNotifier<DepartmentDetail> {
   late final _$args = ref.$arg as String;
   String get departmentId => _$args;
 
-  FutureOr<Department> build(String departmentId);
+  FutureOr<DepartmentDetail> build(String departmentId);
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<AsyncValue<Department>, Department>;
+    final ref =
+        this.ref as $Ref<AsyncValue<DepartmentDetail>, DepartmentDetail>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<Department>, Department>,
-              AsyncValue<Department>,
+              AnyNotifier<AsyncValue<DepartmentDetail>, DepartmentDetail>,
+              AsyncValue<DepartmentDetail>,
               Object?,
               Object?
             >;

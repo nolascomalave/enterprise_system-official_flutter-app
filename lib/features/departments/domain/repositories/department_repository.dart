@@ -5,6 +5,12 @@ import '../entities/department.dart';
 abstract interface class DepartmentRepository {
   Future<List<Department>> getDepartments();
 
+  /// `GET /departments/{id}`
+  Future<Department> getDepartmentById(String departmentId);
+
+  /// `GET /departments/{id}/groups`
+  Future<List<CorporateGroup>> getDepartmentGroups(String departmentId);
+
   Future<Department> createDepartment(CreateDepartmentParams params);
 
   Future<List<CorporateGroup>> getCorporateGroups();

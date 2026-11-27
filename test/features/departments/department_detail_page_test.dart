@@ -3,7 +3,6 @@ import 'package:enterprise_app/features/departments/domain/entities/corporate_gr
 import 'package:enterprise_app/features/departments/domain/entities/department.dart';
 import 'package:enterprise_app/features/departments/domain/repositories/department_repository.dart';
 import 'package:enterprise_app/features/departments/presentation/pages/department_detail_page.dart';
-import 'package:enterprise_app/features/departments/presentation/providers/corporate_groups_notifier.dart';
 import 'package:enterprise_app/features/departments/presentation/providers/department_providers.dart';
 import 'package:enterprise_app/features/employees/domain/entities/employee.dart'
     hide Department;
@@ -37,6 +36,16 @@ class FakeDepartmentRepository implements DepartmentRepository {
       parentDepartmentId: 'd1',
     ),
   ];
+
+  @override
+  Future<Department> getDepartmentById(String departmentId) async =>
+      (await getDepartments()).firstWhere(
+        (department) => department.id == departmentId,
+      );
+
+  @override
+  Future<List<CorporateGroup>> getDepartmentGroups(String departmentId) async =>
+      const [CorporateGroup(id: 'g1', name: 'Grupo Uno')];
 
   @override
   Future<Department> createDepartment(CreateDepartmentParams params) =>
@@ -150,12 +159,6 @@ Widget buildApp() {
 void main() {
   testWidgets('renderiza general, grupos y las tres pestañas', (tester) async {
     await tester.pumpWidget(buildApp());
-    await tester.pumpAndSettle();
-
-    final container = ProviderScope.containerOf(
-      tester.element(find.byType(DepartmentDetailPage)),
-    );
-    container.read(groupAssignmentsProvider.notifier).add('g1', 'd1');
     await tester.pumpAndSettle();
 
     expect(find.text('Tecnología'), findsOneWidget);

@@ -12,7 +12,6 @@ import '../../../parties/domain/entities/party.dart';
 import '../../domain/entities/corporate_group.dart';
 import '../../domain/entities/department.dart';
 import '../../domain/errors/department_not_found_exception.dart';
-import '../providers/corporate_groups_notifier.dart';
 import '../providers/department_detail_notifier.dart';
 import '../providers/departments_notifier.dart';
 import '../widgets/department_tree_node.dart';
@@ -66,16 +65,20 @@ class DepartmentDetailPage extends ConsumerWidget {
             ],
           ),
         ),
-        data: (department) => _DepartmentDetailBody(department: department),
+        data: (detail) => _DepartmentDetailBody(
+          department: detail.department,
+          groups: detail.groups,
+        ),
       ),
     );
   }
 }
 
 class _DepartmentDetailBody extends ConsumerWidget {
-  const _DepartmentDetailBody({required this.department});
+  const _DepartmentDetailBody({required this.department, required this.groups});
 
   final Department department;
+  final List<CorporateGroup> groups;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,8 +86,6 @@ class _DepartmentDetailBody extends ConsumerWidget {
     final employeesAsync = ref.watch(employeesProvider);
     final jobs = ref.watch(jobsProvider).value ?? const [];
     final parties = ref.watch(individualPartiesProvider).value ?? const [];
-    final groupsAsync = ref.watch(corporateGroupsProvider);
-    final assignments = ref.watch(groupAssignmentsProvider);
 
     final managerName = _partyName(parties, department.managerPartyId);
 
@@ -109,9 +110,7 @@ class _DepartmentDetailBody extends ConsumerWidget {
                 _GeneralTab(
                   managerName: managerName,
                   createdAt: department.createdAt,
-                  groupsAsync: groupsAsync,
-                  assignments: assignments,
-                  departmentId: department.id,
+                  groups: groups,
                 ),
                 _SubdepartmentsTab(
                   departmentsAsync: departmentsAsync,
@@ -222,16 +221,12 @@ class _GeneralTab extends StatelessWidget {
   const _GeneralTab({
     required this.managerName,
     required this.createdAt,
-    required this.groupsAsync,
-    required this.assignments,
-    required this.departmentId,
+    required this.groups,
   });
 
   final String? managerName;
   final String? createdAt;
-  final AsyncValue<List<CorporateGroup>> groupsAsync;
-  final Map<String, Set<String>> assignments;
-  final String departmentId;
+  final List<CorporateGroup> groups;
 
   @override
   Widget build(BuildContext context) {
@@ -260,13 +255,23 @@ class _GeneralTab extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 10),
-            if (groupsAsync.isLoading)
-              const SkeletonBox(height: 28, borderRadius: 999)
+            if (groups.isEmpty)
+              Text(
+                context.l10n.noCorporateGroup,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
+                ),
+              )
             else
-              _GroupsWrap(
-                groups: groupsAsync.value ?? const [],
-                assignments: assignments,
-                departmentId: departmentId,
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final group in groups) _GroupChip(group: group),
+                ],
               ),
           ],
         ),
@@ -275,43 +280,36 @@ class _GeneralTab extends StatelessWidget {
   }
 }
 
-class _GroupsWrap extends StatelessWidget {
-  const _GroupsWrap({
-    required this.groups,
-    required this.assignments,
-    required this.departmentId,
-  });
+class _GroupChip extends StatelessWidget {
+  const _GroupChip({required this.group});
 
-  final List<CorporateGroup> groups;
-  final Map<String, Set<String>> assignments;
-  final String departmentId;
+  final CorporateGroup group;
 
   @override
   Widget build(BuildContext context) {
-    final assigned = [
-      for (final group in groups)
-        if (assignments[group.id]?.contains(departmentId) ?? false) group,
-    ];
-    final secondary = Theme.of(context).brightness == Brightness.dark
-        ? AppColors.darkTextSecondary
-        : AppColors.lightTextSecondary;
-    if (assigned.isEmpty) {
-      return Text(
-        context.l10n.noCorporateGroup,
-        style: TextStyle(fontSize: 12, color: secondary),
-      );
-    }
-    return Wrap(
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (final group in assigned)
-          Chip(
-            label: Text(group.name),
-            visualDensity: VisualDensity.compact,
-            avatar: const Icon(Icons.hub_outlined, size: 14),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.lightSurfaceMuted,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: isDark ? AppColors.darkBorder : AppColors.lightBorder,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.hub_outlined, size: 13, color: AppColors.indigo),
+          const SizedBox(width: 6),
+          Text(
+            group.name,
+            style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -161,10 +161,9 @@ flutter build web
   - UI V5: header con avatar degradado, nombre de la Party, código y badge de estado; tabs de Información laboral (cargo, departamento, fecha, manager), Historial de asignaciones (estado informativo: el backend aún no lo expone) y Contactos de la Party asociada.
   - Tests: repositorio (filtrado y no encontrado), notifier, widget del detalle con catálogos/contactos y navegación desde la lista.
 - **Detalle de Departamento (`/departments/:id`):**
-  - El backend aún no expone `GET /departments/{id}`: `DepartmentDetailNotifier` reutiliza y filtra `departmentsProvider` en memoria (pendiente crear el endpoint).
+  - `GET /departments/{id}` y `GET /departments/{id}/groups`: `DepartmentDetailNotifier` carga departamento y grupos reales en paralelo; el 404 se mapea a `DepartmentNotFoundException`.
   - Ruta anidada; el nombre en el árbol de Departamentos navega al detalle y los sub-departamentos permiten navegación recursiva.
   - UI V5: header con icono degradado, nombre, código y badge de unit_type; tabs General (manager, fecha de creación, grupos corporativos), Sub-departamentos y Empleados (con navegación a `/employees/:id`), con skeletons y empty states.
   - DTO de departamento ahora mapea `unit_type`, `parent_department_id`, `manager_party_id` y `created_at`.
-  - Tests: notifier, página (tres tabs, hijos, empleados y navegación), árbol→detalle y mapeo del DTO.
-  - Limitación: no hay endpoint para leer las asignaciones departamento→grupo; se muestran las realizadas en la sesión actual.
+  - Tests: repositorio (detalle, 404, grupos), notifier, página (tres tabs, grupos reales, hijos, empleados y navegación), árbol→detalle y mapeo del DTO.
 - Siguiente iteración: nuevas features o ajustes contra el backend real.

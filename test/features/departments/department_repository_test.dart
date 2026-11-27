@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:enterprise_app/features/departments/data/repositories/department_repository_impl.dart';
 import 'package:enterprise_app/features/departments/domain/entities/department.dart';
+import 'package:enterprise_app/features/departments/domain/errors/department_not_found_exception.dart';
 import 'package:enterprise_app/features/departments/domain/repositories/department_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -59,6 +60,76 @@ void main() {
       final tech = tree.first;
       expect(tech.children, hasLength(1));
       expect(tech.children.single.department.name, 'Frontend');
+    });
+  });
+
+  group('DepartmentRepositoryImpl.getDepartmentById', () {
+    test('llama a GET /departments/{id} y mapea el envelope', () async {
+      adapter = MockAdapter((options, body) async {
+        expect(options.method, 'GET');
+        expect(options.path, '/departments/d1');
+        return jsonResponse({
+          'data': {
+            'id': 'd1',
+            'name': 'Tecnología',
+            'code': 'TECH',
+            'unit_type': 'DIVISION',
+            'created_at': '2024-03-01T10:00:00Z',
+          },
+        });
+      });
+
+      final repository = DepartmentRepositoryImpl(buildDio());
+      final department = await repository.getDepartmentById('d1');
+
+      expect(department.id, 'd1');
+      expect(department.name, 'Tecnología');
+      expect(department.unitType, DepartmentUnitType.division);
+      expect(department.createdAt, '2024-03-01T10:00:00Z');
+      expect(adapter.lastOptions?.path, '/departments/d1');
+    });
+
+    test('mapea un 404 a DepartmentNotFoundException', () async {
+      adapter = MockAdapter((options, body) async {
+        expect(options.path, '/departments/missing');
+        return jsonResponse({'error': 'department_not_found'}, statusCode: 404);
+      });
+      final repository = DepartmentRepositoryImpl(buildDio());
+
+      expect(
+        () => repository.getDepartmentById('missing'),
+        throwsA(
+          isA<DepartmentNotFoundException>().having(
+            (error) => error.departmentId,
+            'departmentId',
+            'missing',
+          ),
+        ),
+      );
+    });
+  });
+
+  group('DepartmentRepositoryImpl.getDepartmentGroups', () {
+    test('llama a GET /departments/{id}/groups y mapea los grupos', () async {
+      adapter = MockAdapter((options, body) async {
+        expect(options.method, 'GET');
+        expect(options.path, '/departments/d1/groups');
+        return jsonResponse({
+          'data': [
+            {'id': 'g1', 'name': 'Distribución', 'description': 'Operaciones'},
+            {'id': 'g2', 'name': 'Corporativo'},
+          ],
+        });
+      });
+
+      final repository = DepartmentRepositoryImpl(buildDio());
+      final groups = await repository.getDepartmentGroups('d1');
+
+      expect(groups, hasLength(2));
+      expect(groups.first.name, 'Distribución');
+      expect(groups.first.description, 'Operaciones');
+      expect(groups.last.name, 'Corporativo');
+      expect(groups.last.description, isNull);
     });
   });
 

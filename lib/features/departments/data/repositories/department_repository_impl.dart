@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../domain/entities/corporate_group.dart';
 import '../../domain/entities/department.dart';
+import '../../domain/errors/department_not_found_exception.dart';
 import '../../domain/repositories/department_repository.dart';
 import '../dto/corporate_group_dto.dart';
 import '../dto/department_dto.dart';
@@ -28,6 +29,52 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
           .map(
             (json) =>
                 DepartmentDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
+          .toList();
+    } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<Department> getDepartmentById(String departmentId) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/departments/$departmentId',
+      );
+      final data = response.data?['data'];
+      if (data is! Map) {
+        throw const ApiException(
+          'Respuesta de detalle del departamento inválida del servidor.',
+        );
+      }
+      return DepartmentDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        throw DepartmentNotFoundException(departmentId);
+      }
+      throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<List<CorporateGroup>> getDepartmentGroups(String departmentId) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/departments/$departmentId/groups',
+      );
+      final data = response.data?['data'];
+      if (data is! List) {
+        throw const ApiException(
+          'Respuesta de grupos del departamento inválida del servidor.',
+        );
+      }
+      return data
+          .whereType<Map>()
+          .map(
+            (json) =>
+                CorporateGroupDto.fromJson(Map<String, dynamic>.from(json))
                     .toEntity(),
           )
           .toList();

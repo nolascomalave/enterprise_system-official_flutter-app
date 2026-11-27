@@ -16,6 +16,14 @@ class FakeDepartmentRepository implements DepartmentRepository {
   ];
 
   @override
+  Future<Department> getDepartmentById(String departmentId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<List<CorporateGroup>> getDepartmentGroups(String departmentId) =>
+      throw UnimplementedError();
+
+  @override
   Future<Department> createDepartment(CreateDepartmentParams params) =>
       throw UnimplementedError();
 

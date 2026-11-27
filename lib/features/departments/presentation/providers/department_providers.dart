@@ -19,6 +19,18 @@ final getDepartmentsUseCaseProvider = FutureProvider<GetDepartmentsUseCase>((
   return GetDepartmentsUseCase(repository);
 });
 
+final getDepartmentByIdUseCaseProvider =
+    FutureProvider<GetDepartmentByIdUseCase>((ref) async {
+      final repository = await ref.watch(departmentRepositoryProvider.future);
+      return GetDepartmentByIdUseCase(repository);
+    });
+
+final getDepartmentGroupsUseCaseProvider =
+    FutureProvider<GetDepartmentGroupsUseCase>((ref) async {
+      final repository = await ref.watch(departmentRepositoryProvider.future);
+      return GetDepartmentGroupsUseCase(repository);
+    });
+
 final createDepartmentUseCaseProvider = FutureProvider<CreateDepartmentUseCase>(
   (ref) async {
     final repository = await ref.watch(departmentRepositoryProvider.future);
