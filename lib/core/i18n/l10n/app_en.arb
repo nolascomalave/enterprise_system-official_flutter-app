@@ -426,5 +426,18 @@
   "departmentDetailError": "Could not load the department",
   "noSubdepartments": "No sub-departments",
   "noDepartmentEmployees": "No employees assigned",
-  "noCorporateGroup": "Not assigned to a corporate group"
+  "noCorporateGroup": "Not assigned to a corporate group",
+  "relationshipDetailTitle": "Corporate Relationship Detail",
+  "timelineStarted": "Relationship started",
+  "timelineTokenEmitted": "Token issued",
+  "timelineApproved": "Relationship approved",
+  "timelineRejected": "Relationship rejected",
+  "timelineRevoked": "Relationship revoked",
+  "timelineCancelled": "Relationship cancelled",
+  "rejectionReasonLabel": "Rejection reason",
+  "revocationReasonLabel": "Revocation reason",
+  "relationshipNotFound": "Relationship not found",
+  "relationshipDetailError": "Could not load the relationship",
+  "relationshipNoActions": "No actions available for this status and role.",
+  "cancellationReasonLabel": "Cancellation reason"
 }

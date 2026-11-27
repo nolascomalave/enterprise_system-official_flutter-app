@@ -3,13 +3,13 @@ import '../entities/corporate_relationship.dart';
 /// Puerto de relaciones corporativas (holding-filial).
 ///
 /// Rutas asumidas del backend (documentadas en la implementación):
-/// - GET  /corporate-relationships
-/// - POST /corporate-relationships/initiate
-/// - POST /corporate-relationships/{id}/emit-token
-/// - POST /corporate-relationships/consume-token
-/// - POST /corporate-relationships/{id}/reject
-/// - POST /corporate-relationships/{id}/revoke
-/// - POST /corporate-relationships/{id}/cancel
+/// - GET  /tenant-relationships
+/// - POST /tenant-relationships/initiate
+/// - POST /tenant-relationships/{id}/emit-token
+/// - POST /tenant-relationships/consume-token
+/// - POST /tenant-relationships/{id}/reject
+/// - POST /tenant-relationships/{id}/revoke
+/// - POST /tenant-relationships/{id}/cancel
 abstract interface class RelationshipsRepository {
   Future<List<CorporateRelationship>> getRelationships();
 

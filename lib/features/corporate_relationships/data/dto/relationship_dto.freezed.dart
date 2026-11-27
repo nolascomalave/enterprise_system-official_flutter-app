@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TenantRelationshipDto {
 
- String? get id; String? get status;@JsonKey(name: 'holding_id') String? get holdingId;@JsonKey(name: 'subsidiary_id') String? get subsidiaryId;@JsonKey(name: 'holding_name') String? get holdingName;@JsonKey(name: 'subsidiary_name') String? get subsidiaryName;@JsonKey(name: 'created_at') String? get createdAt;@JsonKey(name: 'updated_at') String? get updatedAt;@JsonKey(name: 'rejection_reason') String? get rejectionReason;@JsonKey(name: 'revocation_reason') String? get revocationReason;
+ String? get id; String? get status;@JsonKey(name: 'holding_id') String? get holdingId;@JsonKey(name: 'subsidiary_id') String? get subsidiaryId;@JsonKey(name: 'tenant_id_holding') String? get tenantIdHolding;@JsonKey(name: 'tenant_id_subsidiary') String? get tenantIdSubsidiary;@JsonKey(name: 'holding_tenant_id') String? get holdingTenantId;@JsonKey(name: 'subsidiary_tenant_id') String? get subsidiaryTenantId;@JsonKey(name: 'holding_name') String? get holdingName;@JsonKey(name: 'subsidiary_name') String? get subsidiaryName;@JsonKey(name: 'created_at') String? get createdAt;@JsonKey(name: 'updated_at') String? get updatedAt;@JsonKey(name: 'requested_at') String? get requestedAt;@JsonKey(name: 'approved_at') String? get approvedAt;@JsonKey(name: 'rejected_at') String? get rejectedAt;@JsonKey(name: 'canceled_at') String? get canceledAt;@JsonKey(name: 'ends_at') String? get endsAt;@JsonKey(name: 'token_emitted_at') String? get tokenEmittedAt;@JsonKey(name: 'issued_at') String? get issuedAt;@JsonKey(name: 'revoked_at') String? get revokedAt;@JsonKey(name: 'rejection_reason') String? get rejectionReason;@JsonKey(name: 'revocation_reason') String? get revocationReason;@JsonKey(name: 'cancellation_reason') String? get cancellationReason;
 /// Create a copy of TenantRelationshipDto
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $TenantRelationshipDtoCopyWith<TenantRelationshipDto> get copyWith => _$TenantRe
 @override
 bool operator ==(Object other) {
   final _this = this as TenantRelationshipDto;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantRelationshipDto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.holdingId, _this.holdingId) || other.holdingId == _this.holdingId)&&(identical(other.subsidiaryId, _this.subsidiaryId) || other.subsidiaryId == _this.subsidiaryId)&&(identical(other.holdingName, _this.holdingName) || other.holdingName == _this.holdingName)&&(identical(other.subsidiaryName, _this.subsidiaryName) || other.subsidiaryName == _this.subsidiaryName)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.rejectionReason, _this.rejectionReason) || other.rejectionReason == _this.rejectionReason)&&(identical(other.revocationReason, _this.revocationReason) || other.revocationReason == _this.revocationReason));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TenantRelationshipDto&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.holdingId, _this.holdingId) || other.holdingId == _this.holdingId)&&(identical(other.subsidiaryId, _this.subsidiaryId) || other.subsidiaryId == _this.subsidiaryId)&&(identical(other.tenantIdHolding, _this.tenantIdHolding) || other.tenantIdHolding == _this.tenantIdHolding)&&(identical(other.tenantIdSubsidiary, _this.tenantIdSubsidiary) || other.tenantIdSubsidiary == _this.tenantIdSubsidiary)&&(identical(other.holdingTenantId, _this.holdingTenantId) || other.holdingTenantId == _this.holdingTenantId)&&(identical(other.subsidiaryTenantId, _this.subsidiaryTenantId) || other.subsidiaryTenantId == _this.subsidiaryTenantId)&&(identical(other.holdingName, _this.holdingName) || other.holdingName == _this.holdingName)&&(identical(other.subsidiaryName, _this.subsidiaryName) || other.subsidiaryName == _this.subsidiaryName)&&(identical(other.createdAt, _this.createdAt) || other.createdAt == _this.createdAt)&&(identical(other.updatedAt, _this.updatedAt) || other.updatedAt == _this.updatedAt)&&(identical(other.requestedAt, _this.requestedAt) || other.requestedAt == _this.requestedAt)&&(identical(other.approvedAt, _this.approvedAt) || other.approvedAt == _this.approvedAt)&&(identical(other.rejectedAt, _this.rejectedAt) || other.rejectedAt == _this.rejectedAt)&&(identical(other.canceledAt, _this.canceledAt) || other.canceledAt == _this.canceledAt)&&(identical(other.endsAt, _this.endsAt) || other.endsAt == _this.endsAt)&&(identical(other.tokenEmittedAt, _this.tokenEmittedAt) || other.tokenEmittedAt == _this.tokenEmittedAt)&&(identical(other.issuedAt, _this.issuedAt) || other.issuedAt == _this.issuedAt)&&(identical(other.revokedAt, _this.revokedAt) || other.revokedAt == _this.revokedAt)&&(identical(other.rejectionReason, _this.rejectionReason) || other.rejectionReason == _this.rejectionReason)&&(identical(other.revocationReason, _this.revocationReason) || other.revocationReason == _this.revocationReason)&&(identical(other.cancellationReason, _this.cancellationReason) || other.cancellationReason == _this.cancellationReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as TenantRelationshipDto;
-  return Object.hash(runtimeType,_this.id,_this.status,_this.holdingId,_this.subsidiaryId,_this.holdingName,_this.subsidiaryName,_this.createdAt,_this.updatedAt,_this.rejectionReason,_this.revocationReason);
+  return Object.hashAll([runtimeType,_this.id,_this.status,_this.holdingId,_this.subsidiaryId,_this.tenantIdHolding,_this.tenantIdSubsidiary,_this.holdingTenantId,_this.subsidiaryTenantId,_this.holdingName,_this.subsidiaryName,_this.createdAt,_this.updatedAt,_this.requestedAt,_this.approvedAt,_this.rejectedAt,_this.canceledAt,_this.endsAt,_this.tokenEmittedAt,_this.issuedAt,_this.revokedAt,_this.rejectionReason,_this.revocationReason,_this.cancellationReason]);
 }
 
 @override
 String toString() {
   final _this = this as TenantRelationshipDto;
-  return 'TenantRelationshipDto(id: ${_this.id}, status: ${_this.status}, holdingId: ${_this.holdingId}, subsidiaryId: ${_this.subsidiaryId}, holdingName: ${_this.holdingName}, subsidiaryName: ${_this.subsidiaryName}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, rejectionReason: ${_this.rejectionReason}, revocationReason: ${_this.revocationReason})';
+  return 'TenantRelationshipDto(id: ${_this.id}, status: ${_this.status}, holdingId: ${_this.holdingId}, subsidiaryId: ${_this.subsidiaryId}, tenantIdHolding: ${_this.tenantIdHolding}, tenantIdSubsidiary: ${_this.tenantIdSubsidiary}, holdingTenantId: ${_this.holdingTenantId}, subsidiaryTenantId: ${_this.subsidiaryTenantId}, holdingName: ${_this.holdingName}, subsidiaryName: ${_this.subsidiaryName}, createdAt: ${_this.createdAt}, updatedAt: ${_this.updatedAt}, requestedAt: ${_this.requestedAt}, approvedAt: ${_this.approvedAt}, rejectedAt: ${_this.rejectedAt}, canceledAt: ${_this.canceledAt}, endsAt: ${_this.endsAt}, tokenEmittedAt: ${_this.tokenEmittedAt}, issuedAt: ${_this.issuedAt}, revokedAt: ${_this.revokedAt}, rejectionReason: ${_this.rejectionReason}, revocationReason: ${_this.revocationReason}, cancellationReason: ${_this.cancellationReason})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $TenantRelationshipDtoCopyWith<$Res>  {
   factory $TenantRelationshipDtoCopyWith(TenantRelationshipDto value, $Res Function(TenantRelationshipDto) _then) = _$TenantRelationshipDtoCopyWithImpl;
 @useResult
 $Res call({
- String? id, String? status,@JsonKey(name: 'holding_id') String? holdingId,@JsonKey(name: 'subsidiary_id') String? subsidiaryId,@JsonKey(name: 'holding_name') String? holdingName,@JsonKey(name: 'subsidiary_name') String? subsidiaryName,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt,@JsonKey(name: 'rejection_reason') String? rejectionReason,@JsonKey(name: 'revocation_reason') String? revocationReason
+ String? id, String? status,@JsonKey(name: 'holding_id') String? holdingId,@JsonKey(name: 'subsidiary_id') String? subsidiaryId,@JsonKey(name: 'tenant_id_holding') String? tenantIdHolding,@JsonKey(name: 'tenant_id_subsidiary') String? tenantIdSubsidiary,@JsonKey(name: 'holding_tenant_id') String? holdingTenantId,@JsonKey(name: 'subsidiary_tenant_id') String? subsidiaryTenantId,@JsonKey(name: 'holding_name') String? holdingName,@JsonKey(name: 'subsidiary_name') String? subsidiaryName,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt,@JsonKey(name: 'requested_at') String? requestedAt,@JsonKey(name: 'approved_at') String? approvedAt,@JsonKey(name: 'rejected_at') String? rejectedAt,@JsonKey(name: 'canceled_at') String? canceledAt,@JsonKey(name: 'ends_at') String? endsAt,@JsonKey(name: 'token_emitted_at') String? tokenEmittedAt,@JsonKey(name: 'issued_at') String? issuedAt,@JsonKey(name: 'revoked_at') String? revokedAt,@JsonKey(name: 'rejection_reason') String? rejectionReason,@JsonKey(name: 'revocation_reason') String? revocationReason,@JsonKey(name: 'cancellation_reason') String? cancellationReason
 });
 
 
@@ -71,18 +71,31 @@ class _$TenantRelationshipDtoCopyWithImpl<$Res>
 
 /// Create a copy of TenantRelationshipDto
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? status = freezed,Object? holdingId = freezed,Object? subsidiaryId = freezed,Object? holdingName = freezed,Object? subsidiaryName = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rejectionReason = freezed,Object? revocationReason = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = freezed,Object? status = freezed,Object? holdingId = freezed,Object? subsidiaryId = freezed,Object? tenantIdHolding = freezed,Object? tenantIdSubsidiary = freezed,Object? holdingTenantId = freezed,Object? subsidiaryTenantId = freezed,Object? holdingName = freezed,Object? subsidiaryName = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? requestedAt = freezed,Object? approvedAt = freezed,Object? rejectedAt = freezed,Object? canceledAt = freezed,Object? endsAt = freezed,Object? tokenEmittedAt = freezed,Object? issuedAt = freezed,Object? revokedAt = freezed,Object? rejectionReason = freezed,Object? revocationReason = freezed,Object? cancellationReason = freezed,}) {
   return _then(TenantRelationshipDto(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,holdingId: freezed == holdingId ? _self.holdingId : holdingId // ignore: cast_nullable_to_non_nullable
 as String?,subsidiaryId: freezed == subsidiaryId ? _self.subsidiaryId : subsidiaryId // ignore: cast_nullable_to_non_nullable
+as String?,tenantIdHolding: freezed == tenantIdHolding ? _self.tenantIdHolding : tenantIdHolding // ignore: cast_nullable_to_non_nullable
+as String?,tenantIdSubsidiary: freezed == tenantIdSubsidiary ? _self.tenantIdSubsidiary : tenantIdSubsidiary // ignore: cast_nullable_to_non_nullable
+as String?,holdingTenantId: freezed == holdingTenantId ? _self.holdingTenantId : holdingTenantId // ignore: cast_nullable_to_non_nullable
+as String?,subsidiaryTenantId: freezed == subsidiaryTenantId ? _self.subsidiaryTenantId : subsidiaryTenantId // ignore: cast_nullable_to_non_nullable
 as String?,holdingName: freezed == holdingName ? _self.holdingName : holdingName // ignore: cast_nullable_to_non_nullable
 as String?,subsidiaryName: freezed == subsidiaryName ? _self.subsidiaryName : subsidiaryName // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String?,requestedAt: freezed == requestedAt ? _self.requestedAt : requestedAt // ignore: cast_nullable_to_non_nullable
+as String?,approvedAt: freezed == approvedAt ? _self.approvedAt : approvedAt // ignore: cast_nullable_to_non_nullable
+as String?,rejectedAt: freezed == rejectedAt ? _self.rejectedAt : rejectedAt // ignore: cast_nullable_to_non_nullable
+as String?,canceledAt: freezed == canceledAt ? _self.canceledAt : canceledAt // ignore: cast_nullable_to_non_nullable
+as String?,endsAt: freezed == endsAt ? _self.endsAt : endsAt // ignore: cast_nullable_to_non_nullable
+as String?,tokenEmittedAt: freezed == tokenEmittedAt ? _self.tokenEmittedAt : tokenEmittedAt // ignore: cast_nullable_to_non_nullable
+as String?,issuedAt: freezed == issuedAt ? _self.issuedAt : issuedAt // ignore: cast_nullable_to_non_nullable
+as String?,revokedAt: freezed == revokedAt ? _self.revokedAt : revokedAt // ignore: cast_nullable_to_non_nullable
 as String?,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
 as String?,revocationReason: freezed == revocationReason ? _self.revocationReason : revocationReason // ignore: cast_nullable_to_non_nullable
+as String?,cancellationReason: freezed == cancellationReason ? _self.cancellationReason : cancellationReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }
@@ -168,10 +181,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'tenant_id_holding')  String? tenantIdHolding, @JsonKey(name: 'tenant_id_subsidiary')  String? tenantIdSubsidiary, @JsonKey(name: 'holding_tenant_id')  String? holdingTenantId, @JsonKey(name: 'subsidiary_tenant_id')  String? subsidiaryTenantId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'requested_at')  String? requestedAt, @JsonKey(name: 'approved_at')  String? approvedAt, @JsonKey(name: 'rejected_at')  String? rejectedAt, @JsonKey(name: 'canceled_at')  String? canceledAt, @JsonKey(name: 'ends_at')  String? endsAt, @JsonKey(name: 'token_emitted_at')  String? tokenEmittedAt, @JsonKey(name: 'issued_at')  String? issuedAt, @JsonKey(name: 'revoked_at')  String? revokedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason, @JsonKey(name: 'cancellation_reason')  String? cancellationReason)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TenantRelationshipDto() when $default != null:
-return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.rejectionReason,_that.revocationReason);case _:
+return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.tenantIdHolding,_that.tenantIdSubsidiary,_that.holdingTenantId,_that.subsidiaryTenantId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.requestedAt,_that.approvedAt,_that.rejectedAt,_that.canceledAt,_that.endsAt,_that.tokenEmittedAt,_that.issuedAt,_that.revokedAt,_that.rejectionReason,_that.revocationReason,_that.cancellationReason);case _:
   return orElse();
 
 }
@@ -189,10 +202,10 @@ return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.h
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'tenant_id_holding')  String? tenantIdHolding, @JsonKey(name: 'tenant_id_subsidiary')  String? tenantIdSubsidiary, @JsonKey(name: 'holding_tenant_id')  String? holdingTenantId, @JsonKey(name: 'subsidiary_tenant_id')  String? subsidiaryTenantId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'requested_at')  String? requestedAt, @JsonKey(name: 'approved_at')  String? approvedAt, @JsonKey(name: 'rejected_at')  String? rejectedAt, @JsonKey(name: 'canceled_at')  String? canceledAt, @JsonKey(name: 'ends_at')  String? endsAt, @JsonKey(name: 'token_emitted_at')  String? tokenEmittedAt, @JsonKey(name: 'issued_at')  String? issuedAt, @JsonKey(name: 'revoked_at')  String? revokedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason, @JsonKey(name: 'cancellation_reason')  String? cancellationReason)  $default,) {final _that = this;
 switch (_that) {
 case _TenantRelationshipDto():
-return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.rejectionReason,_that.revocationReason);case _:
+return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.tenantIdHolding,_that.tenantIdSubsidiary,_that.holdingTenantId,_that.subsidiaryTenantId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.requestedAt,_that.approvedAt,_that.rejectedAt,_that.canceledAt,_that.endsAt,_that.tokenEmittedAt,_that.issuedAt,_that.revokedAt,_that.rejectionReason,_that.revocationReason,_that.cancellationReason);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -209,10 +222,10 @@ return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.h
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? id,  String? status, @JsonKey(name: 'holding_id')  String? holdingId, @JsonKey(name: 'subsidiary_id')  String? subsidiaryId, @JsonKey(name: 'tenant_id_holding')  String? tenantIdHolding, @JsonKey(name: 'tenant_id_subsidiary')  String? tenantIdSubsidiary, @JsonKey(name: 'holding_tenant_id')  String? holdingTenantId, @JsonKey(name: 'subsidiary_tenant_id')  String? subsidiaryTenantId, @JsonKey(name: 'holding_name')  String? holdingName, @JsonKey(name: 'subsidiary_name')  String? subsidiaryName, @JsonKey(name: 'created_at')  String? createdAt, @JsonKey(name: 'updated_at')  String? updatedAt, @JsonKey(name: 'requested_at')  String? requestedAt, @JsonKey(name: 'approved_at')  String? approvedAt, @JsonKey(name: 'rejected_at')  String? rejectedAt, @JsonKey(name: 'canceled_at')  String? canceledAt, @JsonKey(name: 'ends_at')  String? endsAt, @JsonKey(name: 'token_emitted_at')  String? tokenEmittedAt, @JsonKey(name: 'issued_at')  String? issuedAt, @JsonKey(name: 'revoked_at')  String? revokedAt, @JsonKey(name: 'rejection_reason')  String? rejectionReason, @JsonKey(name: 'revocation_reason')  String? revocationReason, @JsonKey(name: 'cancellation_reason')  String? cancellationReason)?  $default,) {final _that = this;
 switch (_that) {
 case _TenantRelationshipDto() when $default != null:
-return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.rejectionReason,_that.revocationReason);case _:
+return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.tenantIdHolding,_that.tenantIdSubsidiary,_that.holdingTenantId,_that.subsidiaryTenantId,_that.holdingName,_that.subsidiaryName,_that.createdAt,_that.updatedAt,_that.requestedAt,_that.approvedAt,_that.rejectedAt,_that.canceledAt,_that.endsAt,_that.tokenEmittedAt,_that.issuedAt,_that.revokedAt,_that.rejectionReason,_that.revocationReason,_that.cancellationReason);case _:
   return null;
 
 }
@@ -224,19 +237,32 @@ return $default(_that.id,_that.status,_that.holdingId,_that.subsidiaryId,_that.h
 @JsonSerializable()
 
 class _TenantRelationshipDto implements TenantRelationshipDto {
-  const _TenantRelationshipDto({this.id, this.status, @JsonKey(name: 'holding_id') this.holdingId, @JsonKey(name: 'subsidiary_id') this.subsidiaryId, @JsonKey(name: 'holding_name') this.holdingName, @JsonKey(name: 'subsidiary_name') this.subsidiaryName, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt, @JsonKey(name: 'rejection_reason') this.rejectionReason, @JsonKey(name: 'revocation_reason') this.revocationReason});
+  const _TenantRelationshipDto({this.id, this.status, @JsonKey(name: 'holding_id') this.holdingId, @JsonKey(name: 'subsidiary_id') this.subsidiaryId, @JsonKey(name: 'tenant_id_holding') this.tenantIdHolding, @JsonKey(name: 'tenant_id_subsidiary') this.tenantIdSubsidiary, @JsonKey(name: 'holding_tenant_id') this.holdingTenantId, @JsonKey(name: 'subsidiary_tenant_id') this.subsidiaryTenantId, @JsonKey(name: 'holding_name') this.holdingName, @JsonKey(name: 'subsidiary_name') this.subsidiaryName, @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt, @JsonKey(name: 'requested_at') this.requestedAt, @JsonKey(name: 'approved_at') this.approvedAt, @JsonKey(name: 'rejected_at') this.rejectedAt, @JsonKey(name: 'canceled_at') this.canceledAt, @JsonKey(name: 'ends_at') this.endsAt, @JsonKey(name: 'token_emitted_at') this.tokenEmittedAt, @JsonKey(name: 'issued_at') this.issuedAt, @JsonKey(name: 'revoked_at') this.revokedAt, @JsonKey(name: 'rejection_reason') this.rejectionReason, @JsonKey(name: 'revocation_reason') this.revocationReason, @JsonKey(name: 'cancellation_reason') this.cancellationReason});
   factory _TenantRelationshipDto.fromJson(Map<String, dynamic> json) => _$TenantRelationshipDtoFromJson(json);
 
 @override final  String? id;
 @override final  String? status;
 @override@JsonKey(name: 'holding_id') final  String? holdingId;
 @override@JsonKey(name: 'subsidiary_id') final  String? subsidiaryId;
+@override@JsonKey(name: 'tenant_id_holding') final  String? tenantIdHolding;
+@override@JsonKey(name: 'tenant_id_subsidiary') final  String? tenantIdSubsidiary;
+@override@JsonKey(name: 'holding_tenant_id') final  String? holdingTenantId;
+@override@JsonKey(name: 'subsidiary_tenant_id') final  String? subsidiaryTenantId;
 @override@JsonKey(name: 'holding_name') final  String? holdingName;
 @override@JsonKey(name: 'subsidiary_name') final  String? subsidiaryName;
 @override@JsonKey(name: 'created_at') final  String? createdAt;
 @override@JsonKey(name: 'updated_at') final  String? updatedAt;
+@override@JsonKey(name: 'requested_at') final  String? requestedAt;
+@override@JsonKey(name: 'approved_at') final  String? approvedAt;
+@override@JsonKey(name: 'rejected_at') final  String? rejectedAt;
+@override@JsonKey(name: 'canceled_at') final  String? canceledAt;
+@override@JsonKey(name: 'ends_at') final  String? endsAt;
+@override@JsonKey(name: 'token_emitted_at') final  String? tokenEmittedAt;
+@override@JsonKey(name: 'issued_at') final  String? issuedAt;
+@override@JsonKey(name: 'revoked_at') final  String? revokedAt;
 @override@JsonKey(name: 'rejection_reason') final  String? rejectionReason;
 @override@JsonKey(name: 'revocation_reason') final  String? revocationReason;
+@override@JsonKey(name: 'cancellation_reason') final  String? cancellationReason;
 
 /// Create a copy of TenantRelationshipDto
 /// with the given fields replaced by the non-null parameter values.
@@ -251,18 +277,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantRelationshipDto&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.holdingId, holdingId) || other.holdingId == holdingId)&&(identical(other.subsidiaryId, subsidiaryId) || other.subsidiaryId == subsidiaryId)&&(identical(other.holdingName, holdingName) || other.holdingName == holdingName)&&(identical(other.subsidiaryName, subsidiaryName) || other.subsidiaryName == subsidiaryName)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.revocationReason, revocationReason) || other.revocationReason == revocationReason));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TenantRelationshipDto&&(identical(other.id, id) || other.id == id)&&(identical(other.status, status) || other.status == status)&&(identical(other.holdingId, holdingId) || other.holdingId == holdingId)&&(identical(other.subsidiaryId, subsidiaryId) || other.subsidiaryId == subsidiaryId)&&(identical(other.tenantIdHolding, tenantIdHolding) || other.tenantIdHolding == tenantIdHolding)&&(identical(other.tenantIdSubsidiary, tenantIdSubsidiary) || other.tenantIdSubsidiary == tenantIdSubsidiary)&&(identical(other.holdingTenantId, holdingTenantId) || other.holdingTenantId == holdingTenantId)&&(identical(other.subsidiaryTenantId, subsidiaryTenantId) || other.subsidiaryTenantId == subsidiaryTenantId)&&(identical(other.holdingName, holdingName) || other.holdingName == holdingName)&&(identical(other.subsidiaryName, subsidiaryName) || other.subsidiaryName == subsidiaryName)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt)&&(identical(other.requestedAt, requestedAt) || other.requestedAt == requestedAt)&&(identical(other.approvedAt, approvedAt) || other.approvedAt == approvedAt)&&(identical(other.rejectedAt, rejectedAt) || other.rejectedAt == rejectedAt)&&(identical(other.canceledAt, canceledAt) || other.canceledAt == canceledAt)&&(identical(other.endsAt, endsAt) || other.endsAt == endsAt)&&(identical(other.tokenEmittedAt, tokenEmittedAt) || other.tokenEmittedAt == tokenEmittedAt)&&(identical(other.issuedAt, issuedAt) || other.issuedAt == issuedAt)&&(identical(other.revokedAt, revokedAt) || other.revokedAt == revokedAt)&&(identical(other.rejectionReason, rejectionReason) || other.rejectionReason == rejectionReason)&&(identical(other.revocationReason, revocationReason) || other.revocationReason == revocationReason)&&(identical(other.cancellationReason, cancellationReason) || other.cancellationReason == cancellationReason));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,status,holdingId,subsidiaryId,holdingName,subsidiaryName,createdAt,updatedAt,rejectionReason,revocationReason);
+    return Object.hashAll([runtimeType,id,status,holdingId,subsidiaryId,tenantIdHolding,tenantIdSubsidiary,holdingTenantId,subsidiaryTenantId,holdingName,subsidiaryName,createdAt,updatedAt,requestedAt,approvedAt,rejectedAt,canceledAt,endsAt,tokenEmittedAt,issuedAt,revokedAt,rejectionReason,revocationReason,cancellationReason]);
 }
 
 @override
 String toString() {
-    return 'TenantRelationshipDto(id: $id, status: $status, holdingId: $holdingId, subsidiaryId: $subsidiaryId, holdingName: $holdingName, subsidiaryName: $subsidiaryName, createdAt: $createdAt, updatedAt: $updatedAt, rejectionReason: $rejectionReason, revocationReason: $revocationReason)';
+    return 'TenantRelationshipDto(id: $id, status: $status, holdingId: $holdingId, subsidiaryId: $subsidiaryId, tenantIdHolding: $tenantIdHolding, tenantIdSubsidiary: $tenantIdSubsidiary, holdingTenantId: $holdingTenantId, subsidiaryTenantId: $subsidiaryTenantId, holdingName: $holdingName, subsidiaryName: $subsidiaryName, createdAt: $createdAt, updatedAt: $updatedAt, requestedAt: $requestedAt, approvedAt: $approvedAt, rejectedAt: $rejectedAt, canceledAt: $canceledAt, endsAt: $endsAt, tokenEmittedAt: $tokenEmittedAt, issuedAt: $issuedAt, revokedAt: $revokedAt, rejectionReason: $rejectionReason, revocationReason: $revocationReason, cancellationReason: $cancellationReason)';
 }
 
 
@@ -273,7 +299,7 @@ abstract mixin class _$TenantRelationshipDtoCopyWith<$Res> implements $TenantRel
   factory _$TenantRelationshipDtoCopyWith(_TenantRelationshipDto value, $Res Function(_TenantRelationshipDto) _then) = __$TenantRelationshipDtoCopyWithImpl;
 @override @useResult
 $Res call({
- String? id, String? status,@JsonKey(name: 'holding_id') String? holdingId,@JsonKey(name: 'subsidiary_id') String? subsidiaryId,@JsonKey(name: 'holding_name') String? holdingName,@JsonKey(name: 'subsidiary_name') String? subsidiaryName,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt,@JsonKey(name: 'rejection_reason') String? rejectionReason,@JsonKey(name: 'revocation_reason') String? revocationReason
+ String? id, String? status,@JsonKey(name: 'holding_id') String? holdingId,@JsonKey(name: 'subsidiary_id') String? subsidiaryId,@JsonKey(name: 'tenant_id_holding') String? tenantIdHolding,@JsonKey(name: 'tenant_id_subsidiary') String? tenantIdSubsidiary,@JsonKey(name: 'holding_tenant_id') String? holdingTenantId,@JsonKey(name: 'subsidiary_tenant_id') String? subsidiaryTenantId,@JsonKey(name: 'holding_name') String? holdingName,@JsonKey(name: 'subsidiary_name') String? subsidiaryName,@JsonKey(name: 'created_at') String? createdAt,@JsonKey(name: 'updated_at') String? updatedAt,@JsonKey(name: 'requested_at') String? requestedAt,@JsonKey(name: 'approved_at') String? approvedAt,@JsonKey(name: 'rejected_at') String? rejectedAt,@JsonKey(name: 'canceled_at') String? canceledAt,@JsonKey(name: 'ends_at') String? endsAt,@JsonKey(name: 'token_emitted_at') String? tokenEmittedAt,@JsonKey(name: 'issued_at') String? issuedAt,@JsonKey(name: 'revoked_at') String? revokedAt,@JsonKey(name: 'rejection_reason') String? rejectionReason,@JsonKey(name: 'revocation_reason') String? revocationReason,@JsonKey(name: 'cancellation_reason') String? cancellationReason
 });
 
 
@@ -290,18 +316,31 @@ class __$TenantRelationshipDtoCopyWithImpl<$Res>
 
 /// Create a copy of TenantRelationshipDto
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? status = freezed,Object? holdingId = freezed,Object? subsidiaryId = freezed,Object? holdingName = freezed,Object? subsidiaryName = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? rejectionReason = freezed,Object? revocationReason = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = freezed,Object? status = freezed,Object? holdingId = freezed,Object? subsidiaryId = freezed,Object? tenantIdHolding = freezed,Object? tenantIdSubsidiary = freezed,Object? holdingTenantId = freezed,Object? subsidiaryTenantId = freezed,Object? holdingName = freezed,Object? subsidiaryName = freezed,Object? createdAt = freezed,Object? updatedAt = freezed,Object? requestedAt = freezed,Object? approvedAt = freezed,Object? rejectedAt = freezed,Object? canceledAt = freezed,Object? endsAt = freezed,Object? tokenEmittedAt = freezed,Object? issuedAt = freezed,Object? revokedAt = freezed,Object? rejectionReason = freezed,Object? revocationReason = freezed,Object? cancellationReason = freezed,}) {
   return _then(_TenantRelationshipDto(
 id: freezed == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String?,status: freezed == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as String?,holdingId: freezed == holdingId ? _self.holdingId : holdingId // ignore: cast_nullable_to_non_nullable
 as String?,subsidiaryId: freezed == subsidiaryId ? _self.subsidiaryId : subsidiaryId // ignore: cast_nullable_to_non_nullable
+as String?,tenantIdHolding: freezed == tenantIdHolding ? _self.tenantIdHolding : tenantIdHolding // ignore: cast_nullable_to_non_nullable
+as String?,tenantIdSubsidiary: freezed == tenantIdSubsidiary ? _self.tenantIdSubsidiary : tenantIdSubsidiary // ignore: cast_nullable_to_non_nullable
+as String?,holdingTenantId: freezed == holdingTenantId ? _self.holdingTenantId : holdingTenantId // ignore: cast_nullable_to_non_nullable
+as String?,subsidiaryTenantId: freezed == subsidiaryTenantId ? _self.subsidiaryTenantId : subsidiaryTenantId // ignore: cast_nullable_to_non_nullable
 as String?,holdingName: freezed == holdingName ? _self.holdingName : holdingName // ignore: cast_nullable_to_non_nullable
 as String?,subsidiaryName: freezed == subsidiaryName ? _self.subsidiaryName : subsidiaryName // ignore: cast_nullable_to_non_nullable
 as String?,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
 as String?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
+as String?,requestedAt: freezed == requestedAt ? _self.requestedAt : requestedAt // ignore: cast_nullable_to_non_nullable
+as String?,approvedAt: freezed == approvedAt ? _self.approvedAt : approvedAt // ignore: cast_nullable_to_non_nullable
+as String?,rejectedAt: freezed == rejectedAt ? _self.rejectedAt : rejectedAt // ignore: cast_nullable_to_non_nullable
+as String?,canceledAt: freezed == canceledAt ? _self.canceledAt : canceledAt // ignore: cast_nullable_to_non_nullable
+as String?,endsAt: freezed == endsAt ? _self.endsAt : endsAt // ignore: cast_nullable_to_non_nullable
+as String?,tokenEmittedAt: freezed == tokenEmittedAt ? _self.tokenEmittedAt : tokenEmittedAt // ignore: cast_nullable_to_non_nullable
+as String?,issuedAt: freezed == issuedAt ? _self.issuedAt : issuedAt // ignore: cast_nullable_to_non_nullable
+as String?,revokedAt: freezed == revokedAt ? _self.revokedAt : revokedAt // ignore: cast_nullable_to_non_nullable
 as String?,rejectionReason: freezed == rejectionReason ? _self.rejectionReason : rejectionReason // ignore: cast_nullable_to_non_nullable
 as String?,revocationReason: freezed == revocationReason ? _self.revocationReason : revocationReason // ignore: cast_nullable_to_non_nullable
+as String?,cancellationReason: freezed == cancellationReason ? _self.cancellationReason : cancellationReason // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
 }

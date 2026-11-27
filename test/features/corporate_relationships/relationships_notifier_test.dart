@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 class FakeRelationshipsRepository implements RelationshipsRepository {
   FakeRelationshipsRepository({List<CorporateRelationship>? initial})
-      : relationships = [...?initial];
+    : relationships = [...?initial];
 
   final List<CorporateRelationship> relationships;
   int fetchCalls = 0;
@@ -83,8 +83,14 @@ void main() {
     expect(relationships, hasLength(1));
     expect(relationships.single.status, RelationshipStatus.pending);
     expect(relationships.single.holdingId, 'tenant-holding');
-    expect(relationships.single.roleFor('tenant-holding'), RelationshipRole.holding);
-    expect(relationships.single.roleFor('tenant-sub'), RelationshipRole.subsidiary);
+    expect(
+      relationships.single.roleFor('tenant-holding'),
+      RelationshipRole.holding,
+    );
+    expect(
+      relationships.single.roleFor('tenant-sub'),
+      RelationshipRole.subsidiary,
+    );
     expect(repository.fetchCalls, 1);
   });
 

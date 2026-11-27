@@ -327,5 +327,18 @@
   "departmentDetailError": "No se pudo cargar el departamento",
   "noSubdepartments": "Sin sub-departamentos",
   "noDepartmentEmployees": "Sin empleados asignados",
-  "noCorporateGroup": "Sin grupo corporativo"
+  "noCorporateGroup": "Sin grupo corporativo",
+  "relationshipDetailTitle": "Detalle de Relación Corporativa",
+  "timelineStarted": "Relación iniciada",
+  "timelineTokenEmitted": "Token emitido",
+  "timelineApproved": "Relación aprobada",
+  "timelineRejected": "Relación rechazada",
+  "timelineRevoked": "Relación revocada",
+  "timelineCancelled": "Relación cancelada",
+  "rejectionReasonLabel": "Motivo de rechazo",
+  "revocationReasonLabel": "Motivo de revocación",
+  "relationshipNotFound": "Relación no encontrada",
+  "relationshipDetailError": "No se pudo cargar la relación",
+  "relationshipNoActions": "Sin acciones disponibles para este estado y rol.",
+  "cancellationReasonLabel": "Motivo de cancelación"
 }

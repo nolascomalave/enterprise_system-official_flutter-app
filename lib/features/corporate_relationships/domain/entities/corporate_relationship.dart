@@ -19,13 +19,13 @@ enum RelationshipStatus {
   }
 
   String get label => switch (this) {
-        RelationshipStatus.pending => 'Pendiente',
-        RelationshipStatus.approved => 'Aprobada',
-        RelationshipStatus.rejected => 'Rechazada',
-        RelationshipStatus.revoked => 'Revocada',
-        RelationshipStatus.cancelled => 'Cancelada',
-        RelationshipStatus.unknown => 'Desconocida',
-      };
+    RelationshipStatus.pending => 'Pendiente',
+    RelationshipStatus.approved => 'Aprobada',
+    RelationshipStatus.rejected => 'Rechazada',
+    RelationshipStatus.revoked => 'Revocada',
+    RelationshipStatus.cancelled => 'Cancelada',
+    RelationshipStatus.unknown => 'Desconocida',
+  };
 }
 
 /// Rol del tenant actual dentro de una relación.
@@ -41,8 +41,16 @@ class CorporateRelationship {
     this.holdingName,
     this.subsidiaryName,
     this.createdAt,
+    this.requestedAt,
+    this.approvedAt,
+    this.rejectedAt,
+    this.canceledAt,
+    this.endsAt,
+    this.tokenEmittedAt,
+    this.revokedAt,
     this.rejectionReason,
     this.revocationReason,
+    this.cancellationReason,
   });
 
   final String id;
@@ -54,15 +62,30 @@ class CorporateRelationship {
 
   /// ISO-8601.
   final String? createdAt;
+  final String? requestedAt;
+  final String? approvedAt;
+  final String? rejectedAt;
+  final String? canceledAt;
+  final String? endsAt;
+  final String? tokenEmittedAt;
+  final String? revokedAt;
   final String? rejectionReason;
   final String? revocationReason;
+  final String? cancellationReason;
+
+  /// Fecha de inicio de la relación (fallback a `created_at`).
+  String? get startedAt => requestedAt ?? createdAt;
 
   bool get isActiveReason =>
       (rejectionReason?.isNotEmpty ?? false) ||
-      (revocationReason?.isNotEmpty ?? false);
+      (revocationReason?.isNotEmpty ?? false) ||
+      (cancellationReason?.isNotEmpty ?? false);
 
-  String? get reason =>
-      rejectionReason?.isNotEmpty == true ? rejectionReason : revocationReason;
+  String? get reason {
+    if (rejectionReason?.isNotEmpty == true) return rejectionReason;
+    if (revocationReason?.isNotEmpty == true) return revocationReason;
+    return cancellationReason;
+  }
 
   String get dateLabel {
     final value = createdAt;

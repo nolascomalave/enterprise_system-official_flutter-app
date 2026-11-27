@@ -1033,4 +1033,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noCorporateGroup => 'Not assigned to a corporate group';
+
+  @override
+  String get relationshipDetailTitle => 'Corporate Relationship Detail';
+
+  @override
+  String get timelineStarted => 'Relationship started';
+
+  @override
+  String get timelineTokenEmitted => 'Token issued';
+
+  @override
+  String get timelineApproved => 'Relationship approved';
+
+  @override
+  String get timelineRejected => 'Relationship rejected';
+
+  @override
+  String get timelineRevoked => 'Relationship revoked';
+
+  @override
+  String get timelineCancelled => 'Relationship cancelled';
+
+  @override
+  String get rejectionReasonLabel => 'Rejection reason';
+
+  @override
+  String get revocationReasonLabel => 'Revocation reason';
+
+  @override
+  String get relationshipNotFound => 'Relationship not found';
+
+  @override
+  String get relationshipDetailError => 'Could not load the relationship';
+
+  @override
+  String get relationshipNoActions =>
+      'No actions available for this status and role.';
+
+  @override
+  String get cancellationReasonLabel => 'Cancellation reason';
 }

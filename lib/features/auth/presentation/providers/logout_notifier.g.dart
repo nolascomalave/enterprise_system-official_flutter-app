@@ -36,7 +36,7 @@ final class LogoutNotifierProvider
   LogoutNotifier create() => LogoutNotifier();
 }
 
-String _$logoutNotifierHash() => r'c5a326478f8da9e8e8abd0ca72fc317991018aba';
+String _$logoutNotifierHash() => r'3776421aa9d0d3a4bca79ad57bf140d2aa085dc8';
 
 /// Cierra la sesión y limpia los datos de usuario en memoria.
 

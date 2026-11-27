@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_exception.dart';
@@ -245,7 +246,7 @@ Color _statusColor(RelationshipStatus status) => switch (status) {
   RelationshipStatus.pending => AppColors.warning,
   RelationshipStatus.approved => AppColors.success,
   RelationshipStatus.rejected => AppColors.danger,
-  RelationshipStatus.revoked => const Color(0xFF71717A),
+  RelationshipStatus.revoked => const Color(0xFF991B1B),
   RelationshipStatus.cancelled => const Color(0xFF71717A),
   RelationshipStatus.unknown => const Color(0xFF71717A),
 };
@@ -341,47 +342,52 @@ class _RelationshipsTable extends StatelessWidget {
             itemBuilder: (context, index) {
               final relationship = relationships[index];
               final role = relationship.roleFor(tenantId);
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 4,
-                      child: _PartyLabel(
-                        label: relationship.holdingLabel,
-                        icon: Icons.apartment_rounded,
+              return InkWell(
+                key: Key('relationship_row_${relationship.id}'),
+                onTap: () =>
+                    context.go('/corporate-relationships/${relationship.id}'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 4,
+                        child: _PartyLabel(
+                          label: relationship.holdingLabel,
+                          icon: Icons.apartment_rounded,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: _PartyLabel(
-                        label: relationship.subsidiaryLabel,
-                        icon: Icons.business_outlined,
+                      Expanded(
+                        flex: 4,
+                        child: _PartyLabel(
+                          label: relationship.subsidiaryLabel,
+                          icon: Icons.business_outlined,
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: _StatusCell(relationship: relationship),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        relationship.dateLabel,
-                        style: TextStyle(fontSize: 12, color: secondary),
+                      Expanded(
+                        flex: 3,
+                        child: _StatusCell(relationship: relationship),
                       ),
-                    ),
-                    SizedBox(
-                      width: 40,
-                      child: _ActionsMenu(
-                        relationship: relationship,
-                        role: role,
-                        onAction: onAction,
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          relationship.dateLabel,
+                          style: TextStyle(fontSize: 12, color: secondary),
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(
+                        width: 40,
+                        child: _ActionsMenu(
+                          relationship: relationship,
+                          role: role,
+                          onAction: onAction,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -421,52 +427,57 @@ class _RelationshipsList extends StatelessWidget {
       itemBuilder: (context, index) {
         final relationship = relationships[index];
         final role = relationship.roleFor(tenantId);
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${relationship.holdingLabel} → ${relationship.subsidiaryLabel}',
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+        return InkWell(
+          key: Key('relationship_row_${relationship.id}'),
+          onTap: () =>
+              context.go('/corporate-relationships/${relationship.id}'),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${relationship.holdingLabel} → ${relationship.subsidiaryLabel}',
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        _StatusBadge(status: relationship.status),
-                        const SizedBox(width: 8),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          _StatusBadge(status: relationship.status),
+                          const SizedBox(width: 8),
+                          Text(
+                            relationship.dateLabel,
+                            style: TextStyle(fontSize: 11, color: secondary),
+                          ),
+                        ],
+                      ),
+                      if (relationship.reason != null) ...[
+                        const SizedBox(height: 4),
                         Text(
-                          relationship.dateLabel,
+                          relationship.reason!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontSize: 11, color: secondary),
                         ),
                       ],
-                    ),
-                    if (relationship.reason != null) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        relationship.reason!,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, color: secondary),
-                      ),
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              _ActionsMenu(
-                relationship: relationship,
-                role: role,
-                onAction: onAction,
-              ),
-            ],
+                _ActionsMenu(
+                  relationship: relationship,
+                  role: role,
+                  onAction: onAction,
+                ),
+              ],
+            ),
           ),
         );
       },

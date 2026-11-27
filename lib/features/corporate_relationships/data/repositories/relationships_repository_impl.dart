@@ -11,7 +11,7 @@ class RelationshipsRepositoryImpl implements RelationshipsRepository {
 
   final Dio _dio;
 
-  static const String _base = '/corporate-relationships';
+  static const String _base = '/tenant-relationships';
 
   @override
   Future<List<CorporateRelationship>> getRelationships() async {
@@ -20,13 +20,16 @@ class RelationshipsRepositoryImpl implements RelationshipsRepository {
       final data = response.data?['data'] ?? response.data;
       if (data is! List) {
         throw const ApiException(
-            'Respuesta de relaciones corporativas inválida del servidor.');
+          'Respuesta de relaciones corporativas inválida del servidor.',
+        );
       }
       return data
           .whereType<Map>()
-          .map((json) => TenantRelationshipDto.fromJson(
-                Map<String, dynamic>.from(json),
-              ).toEntity())
+          .map(
+            (json) =>
+                TenantRelationshipDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -58,7 +61,9 @@ class RelationshipsRepositoryImpl implements RelationshipsRepository {
           : null;
       final token = dto?.token;
       if (token == null || token.isEmpty) {
-        throw const ApiException('El servidor no devolvió el token de invitación.');
+        throw const ApiException(
+          'El servidor no devolvió el token de invitación.',
+        );
       }
       return InviteToken(token: token, expiresAt: dto?.expiresAt);
     } on DioException catch (error) {

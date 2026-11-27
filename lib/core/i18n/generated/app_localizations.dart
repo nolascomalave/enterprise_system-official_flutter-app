@@ -2065,6 +2065,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not assigned to a corporate group'**
   String get noCorporateGroup;
+
+  /// No description provided for @relationshipDetailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Corporate Relationship Detail'**
+  String get relationshipDetailTitle;
+
+  /// No description provided for @timelineStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship started'**
+  String get timelineStarted;
+
+  /// No description provided for @timelineTokenEmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Token issued'**
+  String get timelineTokenEmitted;
+
+  /// No description provided for @timelineApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship approved'**
+  String get timelineApproved;
+
+  /// No description provided for @timelineRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship rejected'**
+  String get timelineRejected;
+
+  /// No description provided for @timelineRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship revoked'**
+  String get timelineRevoked;
+
+  /// No description provided for @timelineCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship cancelled'**
+  String get timelineCancelled;
+
+  /// No description provided for @rejectionReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejection reason'**
+  String get rejectionReasonLabel;
+
+  /// No description provided for @revocationReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Revocation reason'**
+  String get revocationReasonLabel;
+
+  /// No description provided for @relationshipNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Relationship not found'**
+  String get relationshipNotFound;
+
+  /// No description provided for @relationshipDetailError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the relationship'**
+  String get relationshipDetailError;
+
+  /// No description provided for @relationshipNoActions.
+  ///
+  /// In en, this message translates to:
+  /// **'No actions available for this status and role.'**
+  String get relationshipNoActions;
+
+  /// No description provided for @cancellationReasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation reason'**
+  String get cancellationReasonLabel;
 }
 
 class _AppLocalizationsDelegate

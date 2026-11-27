@@ -1041,4 +1041,44 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noCorporateGroup => 'Sin grupo corporativo';
+
+  @override
+  String get relationshipDetailTitle => 'Detalle de Relación Corporativa';
+
+  @override
+  String get timelineStarted => 'Relación iniciada';
+
+  @override
+  String get timelineTokenEmitted => 'Token emitido';
+
+  @override
+  String get timelineApproved => 'Relación aprobada';
+
+  @override
+  String get timelineRejected => 'Relación rechazada';
+
+  @override
+  String get timelineRevoked => 'Relación revocada';
+
+  @override
+  String get timelineCancelled => 'Relación cancelada';
+
+  @override
+  String get rejectionReasonLabel => 'Motivo de rechazo';
+
+  @override
+  String get revocationReasonLabel => 'Motivo de revocación';
+
+  @override
+  String get relationshipNotFound => 'Relación no encontrada';
+
+  @override
+  String get relationshipDetailError => 'No se pudo cargar la relación';
+
+  @override
+  String get relationshipNoActions =>
+      'Sin acciones disponibles para este estado y rol.';
+
+  @override
+  String get cancellationReasonLabel => 'Motivo de cancelación';
 }

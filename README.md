@@ -166,4 +166,11 @@ flutter build web
   - UI V5: header con icono degradado, nombre, código y badge de unit_type; tabs General (manager, fecha de creación, grupos corporativos), Sub-departamentos y Empleados (con navegación a `/employees/:id`), con skeletons y empty states.
   - DTO de departamento ahora mapea `unit_type`, `parent_department_id`, `manager_party_id` y `created_at`.
   - Tests: repositorio (detalle, 404, grupos), notifier, página (tres tabs, grupos reales, hijos, empleados y navegación), árbol→detalle y mapeo del DTO.
+- **Detalle de Relación Corporativa (`/corporate-relationships/:id`):**
+  - Backend con listado y detalle enriquecidos en `/tenant-relationships`; `RelationshipDetailNotifier` resuelve la relación desde el listado cacheado.
+  - Ruta anidada; filas de la tabla/lista navegan al detalle.
+  - UI V5: split header Holding → Subsidiary con avatares y badge; timeline vertical (inicio, token emitido si existe, aprobación/rechazo/cancelación/revocación con fechas y motivos); acciones contextuales reutilizando los diálogos existentes (emitir/consumir/revocar).
+  - DTO ampliado: IDs reales (`holding_tenant_id`/`subsidiary_tenant_id`), `requested_at`, `approved_at`, `rejected_at`, `canceled_at`, `revoked_at`, `cancellation_reason`, `revocation_reason` y token emitido (`token_emitted_at`/`issued_at`).
+  - Timeline independiente para CANCELED, REJECTED y REVOKED; header de REVOKED en rojo apagado distinto de CANCELED.
+  - Tests: notifier, repositorio (mapeo de nuevos campos), timeline aprobada/rechazada/revocada/cancelada/pending.
 - Siguiente iteración: nuevas features o ajustes contra el backend real.

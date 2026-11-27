@@ -5,6 +5,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/two_factor_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/corporate_relationships/presentation/pages/corporate_relationships_page.dart';
+import '../../features/corporate_relationships/presentation/pages/relationship_detail_page.dart';
 import '../../features/departments/presentation/pages/department_detail_page.dart';
 import '../../features/departments/presentation/pages/departments_page.dart';
 import '../../features/employees/presentation/pages/employee_detail_page.dart';
@@ -123,6 +124,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: BranchRoutes.corporateRelationships,
                 name: 'corporateRelationships',
                 builder: (context, state) => const CorporateRelationshipsPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'relationshipDetail',
+                    builder: (context, state) => RelationshipDetailPage(
+                      relationshipId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

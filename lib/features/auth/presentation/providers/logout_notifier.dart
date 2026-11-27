@@ -2,6 +2,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../../core/menu/menu_notifier.dart';
 import '../../../client_apps/presentation/providers/client_apps_notifier.dart';
+import '../../../corporate_relationships/presentation/providers/relationship_detail_notifier.dart';
 import '../../../corporate_relationships/presentation/providers/relationships_notifier.dart';
 import '../../../corporate_relationships/presentation/providers/relationships_providers.dart';
 import '../../../dashboard/presentation/providers/dashboard_notifier.dart';
@@ -63,6 +64,7 @@ class LogoutNotifier extends _$LogoutNotifier {
     ref.invalidate(localCorporateGroupsProvider);
     ref.invalidate(groupAssignmentsProvider);
     ref.invalidate(relationshipsProvider);
+    ref.invalidate(relationshipDetailProvider);
     ref.invalidate(currentTenantIdProvider);
     ref.invalidate(clientAppsProvider);
     ref.invalidate(securitySettingsProvider);

@@ -61,7 +61,7 @@ final class DepartmentDetailNotifierProvider
 }
 
 String _$departmentDetailNotifierHash() =>
-    r'8afcd6ada59f64a5ff0c39a65246bd2d4446c94a';
+    r'be1661d48672c483e92221112d70f73637190966';
 
 /// Detalle del departamento y sus grupos corporativos reales.
 ///
