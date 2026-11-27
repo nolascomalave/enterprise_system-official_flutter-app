@@ -8,7 +8,9 @@ import 'department_providers.dart';
 part 'departments_notifier.g.dart';
 
 /// Árbol de departamentos derivado de la lista plana.
-final departmentTreeProvider = Provider<AsyncValue<List<DepartmentNode>>>((ref) {
+final departmentTreeProvider = Provider<AsyncValue<List<DepartmentNode>>>((
+  ref,
+) {
   return ref.watch(departmentsProvider).whenData(buildDepartmentTree);
 });
 

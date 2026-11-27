@@ -4,8 +4,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/ui/skeleton.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/party_detail.dart';
 import '../providers/party_detail_notifier.dart';
+import '../widgets/edit_party_dialog.dart';
 
 /// Detalle de una Party (perfil, contactos, direcciones y nombres).
 class PartyDetailPage extends ConsumerWidget {
@@ -21,7 +23,7 @@ class PartyDetailPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Volver',
+          tooltip: context.l10n.back,
           onPressed: () {
             if (context.canPop()) {
               context.pop();
@@ -31,13 +33,13 @@ class PartyDetailPage extends ConsumerWidget {
           },
           icon: const Icon(Icons.arrow_back_rounded, size: 20),
         ),
-        title: const Text('Detalle de Party'),
+        title: Text(context.l10n.partyDetailTitle),
         actions: [
           IconButton(
-            tooltip: 'Editar',
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Edición próximamente')),
-            ),
+            tooltip: context.l10n.editParty,
+            onPressed: detailAsync.value == null
+                ? null
+                : () => showEditPartyDialog(context, ref, detailAsync.value!),
             icon: const Icon(Icons.edit_outlined, size: 19),
           ),
         ],
@@ -49,13 +51,13 @@ class PartyDetailPage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'No se pudo cargar la party',
+                context.l10n.partyDetailError,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: () => ref.invalidate(partyDetailProvider(partyId)),
-                child: const Text('Reintentar'),
+                child: Text(context.l10n.retry),
               ),
             ],
           ),
@@ -69,11 +71,11 @@ class PartyDetailPage extends ConsumerWidget {
               TabBar(
                 isScrollable: true,
                 tabAlignment: TabAlignment.start,
-                tabs: const [
-                  Tab(text: 'Perfil'),
-                  Tab(text: 'Contactos'),
-                  Tab(text: 'Direcciones'),
-                  Tab(text: 'Nombres'),
+                tabs: [
+                  Tab(text: context.l10n.tabProfile),
+                  Tab(text: context.l10n.tabContacts),
+                  Tab(text: context.l10n.tabAddresses),
+                  Tab(text: context.l10n.tabNames),
                 ],
               ),
               Expanded(
@@ -103,10 +105,10 @@ class _DetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final statusColor =
-        detail.isActive ? AppColors.success : AppColors.danger;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final statusColor = detail.isActive ? AppColors.success : AppColors.danger;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 20, 24, 20),
@@ -155,11 +157,16 @@ class _DetailHeader extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      detail.typeLabel,
+                      detail.isOrganization
+                          ? context.l10n.partyTypeOrganization
+                          : context.l10n.partyTypeIndividual,
                       style: TextStyle(fontSize: 12.5, color: secondary),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.10),
                         borderRadius: BorderRadius.circular(999),
@@ -168,7 +175,9 @@ class _DetailHeader extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        detail.isActive ? 'Activo' : 'Inactivo',
+                        detail.isActive
+                            ? context.l10n.statusActive
+                            : context.l10n.statusInactive,
                         style: TextStyle(
                           fontSize: 10.5,
                           fontWeight: FontWeight.w600,
@@ -203,24 +212,29 @@ class _ProfileTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final rows = <(String, String)>[
       if (detail.person != null) ...[
-        if (detail.person!.firstName != null) ('Nombre', detail.person!.firstName!),
-        if (detail.person!.middleName != null) ('Segundo nombre', detail.person!.middleName!),
-        if (detail.person!.lastName != null) ('Apellido', detail.person!.lastName!),
+        if (detail.person!.firstName != null)
+          (context.l10n.firstName, detail.person!.firstName!),
+        if (detail.person!.middleName != null)
+          (context.l10n.middleName, detail.person!.middleName!),
+        if (detail.person!.lastName != null)
+          (context.l10n.lastName, detail.person!.lastName!),
         if (detail.person!.secondLastName != null)
-          ('Segundo apellido', detail.person!.secondLastName!),
+          (context.l10n.secondLastName, detail.person!.secondLastName!),
         if (detail.person!.birthDate != null)
-          ('Fecha de nacimiento', detail.person!.birthDate!),
+          (context.l10n.birthDate, detail.person!.birthDate!),
       ],
       if (detail.organization != null) ...[
         if (detail.organization!.legalName != null)
-          ('Razón social', detail.organization!.legalName!),
+          (context.l10n.legalName, detail.organization!.legalName!),
         if (detail.organization!.tradeName != null)
-          ('Nombre comercial', detail.organization!.tradeName!),
-        if (detail.organization!.taxId != null) ('Tax ID', detail.organization!.taxId!),
+          (context.l10n.tradeName, detail.organization!.tradeName!),
+        if (detail.organization!.taxId != null)
+          (context.l10n.taxId, detail.organization!.taxId!),
       ],
-      ('Tipo', detail.partyType),
-      ('Estado', detail.recordStatus),
-      if (detail.createdAt != null) ('Creado', detail.createdAt!.substring(0, 10)),
+      (context.l10n.partyType, detail.partyType),
+      (context.l10n.statusLabel, detail.recordStatus),
+      if (detail.createdAt != null)
+        (context.l10n.createdAt, detail.createdAt!.substring(0, 10)),
     ];
 
     return ListView(
@@ -238,14 +252,17 @@ class _ProfileTab extends StatelessWidget {
           const SizedBox(height: 16),
           _InfoCard(
             children: [
-              Text('Nacionalidades', style: _sectionStyle(context)),
+              Text(context.l10n.nationalities, style: _sectionStyle(context)),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   for (final nationality in detail.nationalities)
-                    Chip(label: Text(nationality), visualDensity: VisualDensity.compact),
+                    Chip(
+                      label: Text(nationality),
+                      visualDensity: VisualDensity.compact,
+                    ),
                 ],
               ),
             ],
@@ -255,7 +272,7 @@ class _ProfileTab extends StatelessWidget {
           const SizedBox(height: 16),
           _InfoCard(
             children: [
-              Text('Documentos', style: _sectionStyle(context)),
+              Text(context.l10n.documents, style: _sectionStyle(context)),
               const SizedBox(height: 10),
               for (var i = 0; i < detail.documents.length; i++) ...[
                 _InfoRow(
@@ -272,7 +289,8 @@ class _ProfileTab extends StatelessWidget {
   }
 
   TextStyle? _sectionStyle(BuildContext context) =>
-      Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600);
+      Theme.of(context).textTheme.titleSmall
+          ?.copyWith(fontWeight: FontWeight.w600);
 }
 
 class _ContactsTab extends StatelessWidget {
@@ -283,14 +301,15 @@ class _ContactsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (contacts.isEmpty) {
-      return const _EmptyTab(
+      return _EmptyTab(
         icon: Icons.alternate_email_rounded,
-        message: 'Sin contactos registrados',
+        message: context.l10n.noContacts,
       );
     }
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
@@ -307,8 +326,8 @@ class _ContactsTab extends StatelessWidget {
                 contact.isPhone
                     ? Icons.phone_outlined
                     : contact.isEmail
-                        ? Icons.mail_outline_rounded
-                        : Icons.contact_mail_outlined,
+                    ? Icons.mail_outline_rounded
+                    : Icons.contact_mail_outlined,
                 size: 18,
                 color: AppColors.indigo,
               ),
@@ -321,7 +340,10 @@ class _ContactsTab extends StatelessWidget {
                       contact.value,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -333,14 +355,17 @@ class _ContactsTab extends StatelessWidget {
               ),
               if (contact.isPrimary)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.indigo.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
                   ),
-                  child: const Text(
-                    'Principal',
-                    style: TextStyle(
+                  child: Text(
+                    context.l10n.primary,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w600,
                       color: AppColors.indigo,
@@ -363,9 +388,9 @@ class _AddressesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (addresses.isEmpty) {
-      return const _EmptyTab(
+      return _EmptyTab(
         icon: Icons.location_on_outlined,
-        message: 'Sin direcciones registradas',
+        message: context.l10n.noAddresses,
       );
     }
     return ListView.separated(
@@ -380,14 +405,21 @@ class _AddressesTab extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: AppColors.indigo),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: AppColors.indigo,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.indigo.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(6),
@@ -403,7 +435,10 @@ class _AddressesTab extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(address.text, style: const TextStyle(fontSize: 13, height: 1.4)),
+                    Text(
+                      address.text,
+                      style: const TextStyle(fontSize: 13, height: 1.4),
+                    ),
                   ],
                 ),
               ),
@@ -423,14 +458,15 @@ class _NamesTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (names.isEmpty) {
-      return const _EmptyTab(
+      return _EmptyTab(
         icon: Icons.history_rounded,
-        message: 'Sin nombres históricos',
+        message: context.l10n.noNames,
       );
     }
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 120),
@@ -438,16 +474,20 @@ class _NamesTab extends StatelessWidget {
       separatorBuilder: (context, index) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final entry = names[index];
-        final validity = [entry.validFrom, entry.validTo]
-            .whereType<String>()
-            .where((value) => value.isNotEmpty)
-            .join(' → ');
+        final validity = [
+          entry.validFrom,
+          entry.validTo,
+        ].whereType<String>().where((value) => value.isNotEmpty).join(' → ');
         return Container(
           padding: const EdgeInsets.all(14),
           decoration: _rowDecoration(context),
           child: Row(
             children: [
-              const Icon(Icons.badge_outlined, size: 18, color: AppColors.indigo),
+              const Icon(
+                Icons.badge_outlined,
+                size: 18,
+                color: AppColors.indigo,
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -455,7 +495,10 @@ class _NamesTab extends StatelessWidget {
                   children: [
                     Text(
                       entry.name,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     if (validity.isNotEmpty) ...[
                       const SizedBox(height: 2),
@@ -513,8 +556,9 @@ class _InfoRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

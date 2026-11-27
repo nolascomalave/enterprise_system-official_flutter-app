@@ -13,16 +13,16 @@ enum EmployeeStatus {
   }
 
   String get apiValue => switch (this) {
-        EmployeeStatus.active => 'ACTIVE',
-        EmployeeStatus.onLeave => 'ON_LEAVE',
-        EmployeeStatus.terminated => 'TERMINATED',
-      };
+    EmployeeStatus.active => 'ACTIVE',
+    EmployeeStatus.onLeave => 'ON_LEAVE',
+    EmployeeStatus.terminated => 'TERMINATED',
+  };
 
   String get label => switch (this) {
-        EmployeeStatus.active => 'Activo',
-        EmployeeStatus.onLeave => 'Permiso',
-        EmployeeStatus.terminated => 'Terminado',
-      };
+    EmployeeStatus.active => 'Activo',
+    EmployeeStatus.onLeave => 'Permiso',
+    EmployeeStatus.terminated => 'Terminado',
+  };
 }
 
 /// Empleado (party INDIVIDUAL convertida en empleado).

@@ -1,3 +1,5 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/features/employees/domain/entities/employee.dart';
 import 'package:enterprise_app/features/employees/domain/repositories/employees_repository.dart';
 import 'package:enterprise_app/features/employees/presentation/widgets/create_employee_form.dart';
@@ -31,6 +33,9 @@ void main() {
 
   Widget buildForm({ValueChanged<CreateEmployeeParams>? captured}) {
     return MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: Scaffold(
@@ -107,7 +112,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('15').first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('OK'));
+    await tester.tap(find.text('ACEPTAR'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('Guardar'));

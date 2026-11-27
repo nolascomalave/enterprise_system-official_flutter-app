@@ -8,6 +8,7 @@ import '../../../employees/presentation/providers/employees_providers.dart';
 import '../../../parties/domain/entities/party.dart';
 import '../../domain/entities/corporate_group.dart';
 import '../../domain/entities/department.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/repositories/department_repository.dart';
 import '../providers/corporate_groups_notifier.dart';
 import '../providers/departments_notifier.dart';
@@ -89,31 +90,31 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Label('Nombre'),
+          _Label(context.l10n.nameLabel),
           const SizedBox(height: 6),
           TextFormField(
             key: const Key('dept_name'),
             controller: _nameController,
             enabled: !_saving,
-            decoration: const InputDecoration(hintText: 'Tecnología'),
+            decoration: InputDecoration(hintText: context.l10n.deptNameHint),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'Requerido' : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Código'),
+          _Label(context.l10n.codeLabel),
           const SizedBox(height: 6),
           TextFormField(
             key: const Key('dept_code'),
             controller: _codeController,
             enabled: !_saving,
-            decoration: const InputDecoration(hintText: 'TECH'),
+            decoration: InputDecoration(hintText: context.l10n.deptCodeHint),
             validator: (value) =>
                 (value == null || value.trim().isEmpty) ? 'Requerido' : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Tipo de unidad'),
+          _Label(context.l10n.unitType),
           const SizedBox(height: 6),
           DropdownButtonFormField<DepartmentUnitType>(
             key: const Key('dept_unit_type'),
@@ -121,7 +122,10 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
             isExpanded: true,
             items: [
               for (final type in DepartmentUnitType.values)
-                DropdownMenuItem(value: type, child: Text(type.label)),
+                DropdownMenuItem(
+                  value: type,
+                  child: Text(_unitTypeLabel(context, type)),
+                ),
             ],
             onChanged: _saving
                 ? null
@@ -129,16 +133,16 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
           ),
           const SizedBox(height: 16),
 
-          _Label('Departamento padre (opcional)'),
+          _Label(context.l10n.parentDepartmentOptional),
           const SizedBox(height: 6),
           DropdownButtonFormField<String?>(
             key: const Key('dept_parent'),
             initialValue: _parentId,
             isExpanded: true,
             items: [
-              const DropdownMenuItem<String?>(
+              DropdownMenuItem<String?>(
                 value: null,
-                child: Text('— Sin padre (raíz) —'),
+                child: Text(context.l10n.noParent),
               ),
               for (final department in widget.departments)
                 DropdownMenuItem<String?>(
@@ -146,21 +150,22 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
                   child: Text(department.name),
                 ),
             ],
-            onChanged:
-                _saving ? null : (value) => setState(() => _parentId = value),
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _parentId = value),
           ),
           const SizedBox(height: 16),
 
-          _Label('Manager (opcional)'),
+          _Label(context.l10n.managerOptional),
           const SizedBox(height: 6),
           DropdownButtonFormField<String?>(
             key: const Key('dept_manager'),
             initialValue: _managerId,
             isExpanded: true,
             items: [
-              const DropdownMenuItem<String?>(
+              DropdownMenuItem<String?>(
                 value: null,
-                child: Text('— Sin manager —'),
+                child: Text(context.l10n.noManager),
               ),
               for (final manager in widget.managers)
                 DropdownMenuItem<String?>(
@@ -168,8 +173,9 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
                   child: Text(manager.label),
                 ),
             ],
-            onChanged:
-                _saving ? null : (value) => setState(() => _managerId = value),
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _managerId = value),
           ),
 
           if (_error != null) ...[
@@ -193,8 +199,10 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               _SaveButton(saving: _saving, onPressed: _submit),
@@ -205,6 +213,14 @@ class _CreateDepartmentFormState extends State<CreateDepartmentForm> {
     );
   }
 }
+
+String _unitTypeLabel(BuildContext context, DepartmentUnitType type) =>
+    switch (type) {
+      DepartmentUnitType.division => context.l10n.unitDivision,
+      DepartmentUnitType.branch => context.l10n.unitBranch,
+      DepartmentUnitType.office => context.l10n.unitOffice,
+      DepartmentUnitType.department => context.l10n.unitDepartment,
+    };
 
 class _Label extends StatelessWidget {
   const _Label(this.text);
@@ -239,7 +255,9 @@ class _SaveButton extends StatelessWidget {
         child: Ink(
           height: 42,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)]),
+            gradient: LinearGradient(
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+            ),
           ),
           child: InkWell(
             onTap: saving ? null : onPressed,
@@ -255,9 +273,9 @@ class _SaveButton extends StatelessWidget {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'Guardar',
-                        style: TextStyle(
+                    : Text(
+                        context.l10n.save,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -278,6 +296,8 @@ Future<void> showCreateDepartmentDialog(
   WidgetRef ref, {
   String? parentId,
 }) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -293,15 +313,22 @@ Future<void> showCreateDepartmentDialog(
           constraints: const BoxConstraints(maxWidth: 520),
           child: Consumer(
             builder: (context, dref, _) {
-              final departments = dref.watch(departmentsProvider).value ?? const [];
-              final employees = dref.watch(employeesProvider).value ?? const <Employee>[];
-              final parties = dref.watch(individualPartiesProvider).value ?? const <Party>[];
-              final names = {for (final Party party in parties) party.id: party.displayName};
+              final departments =
+                  dref.watch(departmentsProvider).value ?? const [];
+              final employees =
+                  dref.watch(employeesProvider).value ?? const <Employee>[];
+              final parties =
+                  dref.watch(individualPartiesProvider).value ??
+                  const <Party>[];
+              final names = {
+                for (final Party party in parties) party.id: party.displayName,
+              };
               final managers = [
                 for (final employee in employees)
                   (
                     id: employee.partyId,
-                    label: names[employee.partyId] ?? 'Party ${employee.partyId}',
+                    label:
+                        names[employee.partyId] ?? 'Party ${employee.partyId}',
                   ),
               ];
 
@@ -315,16 +342,15 @@ Future<void> showCreateDepartmentDialog(
                       children: [
                         Expanded(
                           child: Text(
-                            'Nuevo Departamento',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
+                            l10n.newDepartment,
+                            style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Cerrar',
-                          onPressed: () => Navigator.of(dialogContext).maybePop(),
+                          tooltip: l10n.close,
+                          onPressed: () =>
+                              Navigator.of(dialogContext).maybePop(),
                           icon: const Icon(Icons.close_rounded, size: 20),
                         ),
                       ],
@@ -343,14 +369,13 @@ Future<void> showCreateDepartmentDialog(
                             Navigator.of(dialogContext).pop();
                           }
                           messenger.showSnackBar(
-                            const SnackBar(
-                                content: Text('Departamento creado correctamente')),
+                            SnackBar(content: Text(l10n.departmentCreated)),
                           );
                           return null;
                         } catch (error) {
                           return error is ApiException
                               ? error.message
-                              : 'No se pudo crear el departamento.';
+                              : l10n.couldNotCreateDepartment;
                         }
                       },
                     ),
@@ -370,6 +395,8 @@ Future<void> showCreateCorporateGroupDialog(
   BuildContext context,
   WidgetRef ref,
 ) {
+  final l10n = context.l10n;
+
   final formKey = GlobalKey<FormState>();
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -389,7 +416,9 @@ Future<void> showCreateCorporateGroupDialog(
               error = null;
             });
             try {
-              await ref.read(corporateGroupsProvider.notifier).createGroup(
+              await ref
+                  .read(corporateGroupsProvider.notifier)
+                  .createGroup(
                     name: nameController.text.trim(),
                     description: descriptionController.text.trim().isEmpty
                         ? null
@@ -397,14 +426,14 @@ Future<void> showCreateCorporateGroupDialog(
                   );
               if (dialogContext.mounted) Navigator.of(dialogContext).pop();
               messenger.showSnackBar(
-                const SnackBar(content: Text('Grupo corporativo creado')),
+                SnackBar(content: Text(l10n.groupCreated)),
               );
             } catch (e) {
               setState(() {
                 saving = false;
                 error = e is ApiException
                     ? e.message
-                    : 'No se pudo crear el grupo.';
+                    : l10n.couldNotCreateGroup;
               });
             }
           }
@@ -414,7 +443,9 @@ Future<void> showCreateCorporateGroupDialog(
             backgroundColor: Theme.of(dialogContext).colorScheme.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Theme.of(dialogContext).colorScheme.outline),
+              side: BorderSide(
+                color: Theme.of(dialogContext).colorScheme.outline,
+              ),
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 460),
@@ -430,46 +461,53 @@ Future<void> showCreateCorporateGroupDialog(
                         children: [
                           Expanded(
                             child: Text(
-                              'Nuevo Grupo Corporativo',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
+                              l10n.newGroupTitle,
+                              style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(fontWeight: FontWeight.w600),
                             ),
                           ),
                           IconButton(
-                            tooltip: 'Cerrar',
-                            onPressed: () => Navigator.of(dialogContext).maybePop(),
+                            tooltip: l10n.close,
+                            onPressed: () =>
+                                Navigator.of(dialogContext).maybePop(),
                             icon: const Icon(Icons.close_rounded, size: 20),
                           ),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      const _Label('Nombre'),
+                      _Label(l10n.nameLabel),
                       const SizedBox(height: 6),
                       TextFormField(
                         key: const Key('group_name'),
                         controller: nameController,
                         enabled: !saving,
-                        decoration: const InputDecoration(hintText: 'Corporativo'),
+                        decoration: InputDecoration(
+                          hintText: l10n.groupNameHint,
+                        ),
                         validator: (value) =>
-                            (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+                            (value == null || value.trim().isEmpty)
+                            ? 'Requerido'
+                            : null,
                       ),
                       const SizedBox(height: 16),
-                      const _Label('Descripción (opcional)'),
+                      _Label(l10n.descriptionOptional),
                       const SizedBox(height: 6),
                       TextFormField(
                         key: const Key('group_description'),
                         controller: descriptionController,
                         enabled: !saving,
-                        decoration:
-                            const InputDecoration(hintText: 'Agrupación de unidades'),
+                        decoration: InputDecoration(
+                          hintText: l10n.groupDescHint,
+                        ),
                       ),
                       if (error != null) ...[
                         const SizedBox(height: 12),
                         Text(
                           error!,
-                          style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFFEF4444),
+                          ),
                         ),
                       ],
                       const SizedBox(height: 20),
@@ -477,9 +515,10 @@ Future<void> showCreateCorporateGroupDialog(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed:
-                                saving ? null : () => Navigator.of(dialogContext).maybePop(),
-                            child: const Text('Cancelar'),
+                            onPressed: saving
+                                ? null
+                                : () => Navigator.of(dialogContext).maybePop(),
+                            child: Text(l10n.cancel),
                           ),
                           const SizedBox(width: 8),
                           _SaveButton(saving: saving, onPressed: submit),
@@ -503,6 +542,8 @@ Future<void> showAssignDepartmentDialog(
   WidgetRef ref,
   CorporateGroup group,
 ) {
+  final l10n = context.l10n;
+
   String? departmentId;
 
   return showDialog<void>(
@@ -520,17 +561,22 @@ Future<void> showAssignDepartmentDialog(
             try {
               await ref
                   .read(corporateGroupsProvider.notifier)
-                  .assignDepartment(groupId: group.id, departmentId: departmentId!);
+                  .assignDepartment(
+                    groupId: group.id,
+                    departmentId: departmentId!,
+                  );
               if (dialogContext.mounted) Navigator.of(dialogContext).pop();
               messenger.showSnackBar(
-                const SnackBar(content: Text('Departamento asignado al grupo')),
+                SnackBar(content: Text(l10n.assignedToGroup)),
               );
             } catch (e) {
               setState(() => saving = false);
               messenger.showSnackBar(
                 SnackBar(
                   content: Text(
-                    e is ApiException ? e.message : 'No se pudo asignar el departamento.',
+                    e is ApiException
+                        ? e.message
+                        : l10n.couldNotAssignDepartment,
                   ),
                 ),
               );
@@ -542,7 +588,9 @@ Future<void> showAssignDepartmentDialog(
             backgroundColor: Theme.of(dialogContext).colorScheme.surface,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Theme.of(dialogContext).colorScheme.outline),
+              side: BorderSide(
+                color: Theme.of(dialogContext).colorScheme.outline,
+              ),
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 460),
@@ -553,17 +601,17 @@ Future<void> showAssignDepartmentDialog(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Asignar a "${group.name}"',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
+                      l10n.assignToGroup(group.name),
+                      style: Theme.of(context).textTheme.titleLarge
                           ?.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
                       key: const Key('assign_department'),
                       isExpanded: true,
-                      decoration: const InputDecoration(hintText: 'Selecciona un departamento'),
+                      decoration: InputDecoration(
+                        hintText: l10n.selectDepartment,
+                      ),
                       items: [
                         for (final department in departments)
                           DropdownMenuItem(
@@ -571,17 +619,19 @@ Future<void> showAssignDepartmentDialog(
                             child: Text(department.name),
                           ),
                       ],
-                      onChanged:
-                          saving ? null : (value) => setState(() => departmentId = value),
+                      onChanged: saving
+                          ? null
+                          : (value) => setState(() => departmentId = value),
                     ),
                     const SizedBox(height: 20),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
-                          onPressed:
-                              saving ? null : () => Navigator.of(dialogContext).maybePop(),
-                          child: const Text('Cancelar'),
+                          onPressed: saving
+                              ? null
+                              : () => Navigator.of(dialogContext).maybePop(),
+                          child: Text(l10n.cancel),
                         ),
                         const SizedBox(width: 8),
                         _SaveButton(saving: saving, onPressed: submit),

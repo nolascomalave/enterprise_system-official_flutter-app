@@ -4,6 +4,9 @@ import '../../domain/entities/auth_result.dart';
 
 part 'login_state.freezed.dart';
 
+/// Motivos localizables de error del flujo de login.
+enum LoginErrorKind { loginFailed, sessionExpired, verifyFailed }
+
 /// Estados del flujo de autenticación.
 @freezed
 sealed class LoginState with _$LoginState {
@@ -16,5 +19,6 @@ sealed class LoginState with _$LoginState {
   const factory LoginState.requiresTwoFactor(String tempToken) =
       LoginRequiresTwoFactor;
 
-  const factory LoginState.error(String message) = LoginError;
+  const factory LoginState.error(String message, {LoginErrorKind? kind}) =
+      LoginError;
 }

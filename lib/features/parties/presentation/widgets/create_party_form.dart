@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/party.dart';
 import '../../domain/repositories/parties_repository.dart';
 import '../providers/parties_notifier.dart';
@@ -55,18 +56,23 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
       CreatePartyParams(
         displayName: _displayName.text.trim(),
         partyType: _type,
-        firstName: _type == PartyType.individual ? _firstName.text.trim() : null,
+        firstName: _type == PartyType.individual
+            ? _firstName.text.trim()
+            : null,
         lastName: _type == PartyType.individual ? _lastName.text.trim() : null,
         secondLastName:
-            _type == PartyType.individual && _secondLastName.text.trim().isNotEmpty
-                ? _secondLastName.text.trim()
-                : null,
-        legalName: _type == PartyType.organization ? _legalName.text.trim() : null,
+            _type == PartyType.individual &&
+                _secondLastName.text.trim().isNotEmpty
+            ? _secondLastName.text.trim()
+            : null,
+        legalName: _type == PartyType.organization
+            ? _legalName.text.trim()
+            : null,
         taxId: _type == PartyType.organization ? _taxId.text.trim() : null,
         tradeName:
             _type == PartyType.organization && _tradeName.text.trim().isNotEmpty
-                ? _tradeName.text.trim()
-                : null,
+            ? _tradeName.text.trim()
+            : null,
       ),
     );
 
@@ -92,9 +98,7 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF18181B)
-                  : const Color(0xFFF4F4F5),
+              color: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: theme.colorScheme.outline),
             ),
@@ -103,7 +107,7 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
                 Expanded(
                   child: _TypeOption(
                     key: const Key('party-type-individual'),
-                    label: 'Persona',
+                    label: context.l10n.partyTypeIndividual,
                     icon: Icons.person_outline_rounded,
                     selected: _type == PartyType.individual,
                     onTap: () => setState(() => _type = PartyType.individual),
@@ -112,7 +116,7 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
                 Expanded(
                   child: _TypeOption(
                     key: const Key('party-type-organization'),
-                    label: 'Organización',
+                    label: context.l10n.partyTypeOrganization,
                     icon: Icons.business_outlined,
                     selected: _type == PartyType.organization,
                     onTap: () => setState(() => _type = PartyType.organization),
@@ -123,16 +127,17 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
           ),
           const SizedBox(height: 18),
 
-          _Label('Nombre visible'),
+          _Label(context.l10n.displayName),
           const SizedBox(height: 6),
           TextFormField(
             key: const Key('display_name'),
             controller: _displayName,
             enabled: !_saving,
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(hintText: 'Ej. Acme Corporation'),
-            validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+            decoration: InputDecoration(hintText: context.l10n.exampleOrg),
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? context.l10n.required
+                : null,
           ),
           const SizedBox(height: 16),
 
@@ -143,15 +148,18 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Label('Nombre'),
+                      _Label(context.l10n.firstName),
                       const SizedBox(height: 6),
                       TextFormField(
                         key: const Key('first_name'),
                         controller: _firstName,
                         enabled: !_saving,
-                        decoration: const InputDecoration(hintText: 'Juan'),
-                        validator: (value) => (value == null || value.trim().isEmpty)
-                            ? 'Requerido'
+                        decoration: InputDecoration(
+                          hintText: context.l10n.exampleFirstName,
+                        ),
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? context.l10n.required
                             : null,
                       ),
                     ],
@@ -162,15 +170,18 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _Label('Apellido'),
+                      _Label(context.l10n.lastName),
                       const SizedBox(height: 6),
                       TextFormField(
                         key: const Key('last_name'),
                         controller: _lastName,
                         enabled: !_saving,
-                        decoration: const InputDecoration(hintText: 'Pérez'),
-                        validator: (value) => (value == null || value.trim().isEmpty)
-                            ? 'Requerido'
+                        decoration: InputDecoration(
+                          hintText: context.l10n.exampleLastName,
+                        ),
+                        validator: (value) =>
+                            (value == null || value.trim().isEmpty)
+                            ? context.l10n.required
                             : null,
                       ),
                     ],
@@ -179,44 +190,52 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
               ],
             ),
             const SizedBox(height: 16),
-            _Label('Segundo apellido (opcional)'),
+            _Label(context.l10n.secondLastName),
             const SizedBox(height: 6),
             TextFormField(
               key: const Key('second_last_name'),
               controller: _secondLastName,
               enabled: !_saving,
-              decoration: const InputDecoration(hintText: 'García'),
+              decoration: InputDecoration(
+                hintText: context.l10n.exampleSecondLastName,
+              ),
             ),
           ] else ...[
-            _Label('Razón social'),
+            _Label(context.l10n.legalName),
             const SizedBox(height: 6),
             TextFormField(
               key: const Key('legal_name'),
               controller: _legalName,
               enabled: !_saving,
-              decoration: const InputDecoration(hintText: 'Acme Corporation S.A.'),
-              validator: (value) =>
-                  (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+              decoration: InputDecoration(
+                hintText: context.l10n.exampleLegalName,
+              ),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? context.l10n.required
+                  : null,
             ),
             const SizedBox(height: 16),
-            _Label('Tax ID'),
+            _Label(context.l10n.taxId),
             const SizedBox(height: 6),
             TextFormField(
               key: const Key('tax_id'),
               controller: _taxId,
               enabled: !_saving,
-              decoration: const InputDecoration(hintText: 'B12345678'),
-              validator: (value) =>
-                  (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+              decoration: InputDecoration(hintText: context.l10n.exampleTaxId),
+              validator: (value) => (value == null || value.trim().isEmpty)
+                  ? context.l10n.required
+                  : null,
             ),
             const SizedBox(height: 16),
-            _Label('Nombre comercial (opcional)'),
+            _Label(context.l10n.tradeName),
             const SizedBox(height: 6),
             TextFormField(
               key: const Key('trade_name'),
               controller: _tradeName,
               enabled: !_saving,
-              decoration: const InputDecoration(hintText: 'Acme'),
+              decoration: InputDecoration(
+                hintText: context.l10n.exampleTradeName,
+              ),
             ),
           ],
 
@@ -231,13 +250,19 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded,
-                      size: 16, color: Color(0xFFEF4444)),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: 16,
+                    color: Color(0xFFEF4444),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _error!,
-                      style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFFEF4444),
+                      ),
                     ),
                   ),
                 ],
@@ -250,8 +275,10 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               ClipRRect(
@@ -279,8 +306,8 @@ class _CreatePartyFormState extends State<CreatePartyForm> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text(
-                                  'Guardar',
+                              : Text(
+                                  context.l10n.save,
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -355,7 +382,9 @@ class _TypeOption extends StatelessWidget {
                 size: 15,
                 color: selected
                     ? primary
-                    : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
+                    : (isDark
+                          ? const Color(0xFFA1A1AA)
+                          : const Color(0xFF71717A)),
               ),
               const SizedBox(width: 6),
               Text(
@@ -365,7 +394,9 @@ class _TypeOption extends StatelessWidget {
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   color: selected
                       ? primary
-                      : (isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A)),
+                      : (isDark
+                            ? const Color(0xFFA1A1AA)
+                            : const Color(0xFF71717A)),
                 ),
               ),
             ],
@@ -378,6 +409,8 @@ class _TypeOption extends StatelessWidget {
 
 /// Abre el modal de creación de Party conectado a [PartiesNotifier].
 Future<void> showCreatePartyDialog(BuildContext context, WidgetRef ref) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -401,15 +434,13 @@ Future<void> showCreatePartyDialog(BuildContext context, WidgetRef ref) {
                   children: [
                     Expanded(
                       child: Text(
-                        'Nueva Party',
-                        style: Theme.of(dialogContext)
-                            .textTheme
-                            .titleLarge
+                        l10n.newParty,
+                        style: Theme.of(dialogContext).textTheme.titleLarge
                             ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Cerrar',
+                      tooltip: l10n.close,
                       onPressed: () => Navigator.of(dialogContext).maybePop(),
                       icon: const Icon(Icons.close_rounded, size: 20),
                     ),
@@ -419,18 +450,20 @@ Future<void> showCreatePartyDialog(BuildContext context, WidgetRef ref) {
                 CreatePartyForm(
                   onSubmit: (params) async {
                     try {
-                      await ref.read(partiesProvider.notifier).createParty(params);
+                      await ref
+                          .read(partiesProvider.notifier)
+                          .createParty(params);
                       if (dialogContext.mounted) {
                         Navigator.of(dialogContext).pop();
                       }
                       messenger.showSnackBar(
-                        const SnackBar(content: Text('Party creada correctamente')),
+                        SnackBar(content: Text(l10n.partyCreated)),
                       );
                       return null;
                     } catch (error) {
                       return error is ApiException
                           ? error.message
-                          : 'No se pudo crear la party. Inténtalo de nuevo.';
+                          : l10n.couldNotCreateParty;
                     }
                   },
                 ),

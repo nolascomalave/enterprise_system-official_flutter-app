@@ -51,7 +51,10 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await _dio.post<Map<String, dynamic>>(
         '/auth/2fa/verify',
-        data: VerifyTwoFactorRequestDto(tempToken: tempToken, code: code).toJson(),
+        data: VerifyTwoFactorRequestDto(
+          tempToken: tempToken,
+          code: code,
+        ).toJson(),
       );
 
       final dto = _parsePayload(response.data);
@@ -59,6 +62,17 @@ class AuthRepositoryImpl implements AuthRepository {
       return session;
     } on DioException catch (error) {
       throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<void> logout() async {
+    try {
+      await _dio.post<void>('/auth/logout');
+    } on DioException {
+      // La sesión local se invalida aunque el backend no esté disponible.
+    } finally {
+      await _storage.clear();
     }
   }
 
@@ -70,10 +84,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return AuthDto.fromJson(Map<String, dynamic>.from(data));
   }
 
-  Future<AuthResult> _resolveAuthResult(
-    AuthDto dto, {
-    String? tenantId,
-  }) async {
+  Future<AuthResult> _resolveAuthResult(AuthDto dto, {String? tenantId}) async {
     if (dto.requires2Fa) {
       final tempToken = dto.tempToken;
       if (tempToken == null || tempToken.isEmpty) {
@@ -88,15 +99,10 @@ class AuthRepositoryImpl implements AuthRepository {
     return AuthResult.success(session);
   }
 
-  Future<AuthSession> _persistSession(
-    AuthDto dto, {
-    String? tenantId,
-  }) async {
+  Future<AuthSession> _persistSession(AuthDto dto, {String? tenantId}) async {
     final token = dto.accessToken;
     if (token == null || token.isEmpty) {
-      throw const ApiException(
-        'El servidor no devolvió un token de acceso.',
-      );
+      throw const ApiException('El servidor no devolvió un token de acceso.');
     }
 
     await _storage.saveAccessToken(token);

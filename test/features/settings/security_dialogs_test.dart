@@ -1,3 +1,5 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/features/settings/domain/entities/security_settings.dart';
 import 'package:enterprise_app/features/settings/presentation/widgets/security_dialogs.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,16 +9,17 @@ import 'package:qr_flutter/qr_flutter.dart';
 void main() {
   Widget harness(WidgetBuilder dialogBuilder) {
     return MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: Scaffold(
         body: Builder(
           builder: (context) => Center(
             child: ElevatedButton(
-              onPressed: () => showDialog<void>(
-                context: context,
-                builder: dialogBuilder,
-              ),
+              onPressed: () =>
+                  showDialog<void>(context: context, builder: dialogBuilder),
               child: const Text('open'),
             ),
           ),
@@ -25,8 +28,9 @@ void main() {
     );
   }
 
-  testWidgets('el modal TOTP renderiza el QR y muestra backup codes',
-      (tester) async {
+  testWidgets('el modal TOTP renderiza el QR y muestra backup codes', (
+    tester,
+  ) async {
     const setup = TotpSetup(
       otpauthUrl: 'otpauth://totp/Enterprise:ana?secret=ABC123',
       secret: 'ABC123',
@@ -42,13 +46,17 @@ void main() {
       'HHHH-8888',
     ];
 
-    await tester.pumpWidget(harness((context) => TotpSetupDialog(
+    await tester.pumpWidget(
+      harness(
+        (context) => TotpSetupDialog(
           setup: setup,
           onVerify: (code) async {
             expect(code, '123456');
             return backupCodes;
           },
-        )));
+        ),
+      ),
+    );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
@@ -69,8 +77,9 @@ void main() {
     }
 
     // Cerrar requiere confirmación.
-    final closeButton =
-        tester.widget<FilledButton>(find.byKey(const Key('totp_close')));
+    final closeButton = tester.widget<FilledButton>(
+      find.byKey(const Key('totp_close')),
+    );
     expect(closeButton.onPressed, isNull);
 
     await tester.ensureVisible(find.byKey(const Key('backup_ack')));
@@ -86,12 +95,16 @@ void main() {
     var requested = false;
     String? submittedCode;
 
-    await tester.pumpWidget(harness((context) => OtpStepUpDialog(
+    await tester.pumpWidget(
+      harness(
+        (context) => OtpStepUpDialog(
           title: 'Desactivar 2FA',
           description: 'Introduce el código enviado a tu contacto.',
           requestOtp: () async => requested = true,
           onConfirm: (code) async => submittedCode = code,
-        )));
+        ),
+      ),
+    );
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 

@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:material_ui/material_ui.dart';
 
+import '../i18n/l10n_ext.dart';
 import '../menu/models/menu_tree.dart';
 import '../theme/app_colors.dart';
 import 'sidebar_menu_item.dart';
@@ -19,11 +20,11 @@ class MobileBottomNav extends StatelessWidget {
   final ValueChanged<int> onBranchSelected;
   final VoidCallback onMenuTap;
 
-  static const _items = [
-    (icon: Icons.space_dashboard_outlined, label: 'Inicio'),
-    (icon: Icons.groups_2_outlined, label: 'Party'),
-    (icon: Icons.badge_outlined, label: 'Equipo'),
-    (icon: Icons.business_outlined, label: 'Áreas'),
+  static const _icons = [
+    Icons.space_dashboard_outlined,
+    Icons.groups_2_outlined,
+    Icons.badge_outlined,
+    Icons.business_outlined,
   ];
 
   @override
@@ -62,10 +63,10 @@ class MobileBottomNav extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  for (var i = 0; i < _items.length; i++)
+                  for (var i = 0; i < _icons.length; i++)
                     _NavItem(
-                      icon: _items[i].icon,
-                      label: _items[i].label,
+                      icon: _icons[i],
+                      label: _navLabel(context, i),
                       active: currentIndex == i,
                       onTap: () => onBranchSelected(i),
                       isDark: isDark,
@@ -73,7 +74,7 @@ class MobileBottomNav extends StatelessWidget {
                     ),
                   _NavItem(
                     icon: Icons.menu_rounded,
-                    label: 'Menú',
+                    label: context.l10n.navMenu,
                     active: false,
                     onTap: onMenuTap,
                     isDark: isDark,
@@ -88,6 +89,13 @@ class MobileBottomNav extends StatelessWidget {
     );
   }
 }
+
+String _navLabel(BuildContext context, int index) => switch (index) {
+  0 => context.l10n.navHome,
+  1 => context.l10n.navParty,
+  2 => context.l10n.navTeam,
+  _ => context.l10n.navAreas,
+};
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
@@ -114,7 +122,10 @@ class _NavItem extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(horizontal: active ? 14 : 10, vertical: 8),
+        padding: EdgeInsets.symmetric(
+          horizontal: active ? 14 : 10,
+          vertical: 8,
+        ),
         decoration: BoxDecoration(
           color: active ? primary.withValues(alpha: 0.10) : Colors.transparent,
           borderRadius: BorderRadius.circular(999),
@@ -177,7 +188,9 @@ Future<void> showMobileMenuSheet(
                 width: 48,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF3F3F46) : const Color(0xFFD4D4D8),
+                  color: isDark
+                      ? const Color(0xFF3F3F46)
+                      : const Color(0xFFD4D4D8),
                   borderRadius: BorderRadius.circular(999),
                 ),
               ),
@@ -186,17 +199,19 @@ Future<void> showMobileMenuSheet(
                 child: Row(
                   children: [
                     Text(
-                      'Menú',
+                      context.l10n.navMenu,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.3,
-                        color: isDark ? const Color(0xFFFAFAFA) : const Color(0xFF09090B),
+                        color: isDark
+                            ? const Color(0xFFFAFAFA)
+                            : const Color(0xFF09090B),
                       ),
                     ),
                     const Spacer(),
                     IconButton(
-                      tooltip: 'Cerrar',
+                      tooltip: context.l10n.close,
                       onPressed: () => Navigator.of(context).pop(),
                       icon: const Icon(Icons.close_rounded, size: 20),
                     ),
@@ -239,10 +254,10 @@ class AskAiButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         borderRadius: BorderRadius.circular(999),
-        onTap: onTap ??
-            () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Ask AI — próximamente')),
-                ),
+        onTap:
+            onTap ??
+            () => ScaffoldMessenger.of(context)
+                .showSnackBar(SnackBar(content: Text(context.l10n.askAiSoon))),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
@@ -260,12 +275,16 @@ class AskAiButton extends StatelessWidget {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Icon(Icons.auto_awesome_rounded, size: 18, color: Colors.white),
-              SizedBox(width: 8),
+            children: [
+              const Icon(
+                Icons.auto_awesome_rounded,
+                size: 18,
+                color: Colors.white,
+              ),
+              const SizedBox(width: 8),
               Text(
-                'Ask AI',
-                style: TextStyle(
+                context.l10n.askAi,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,

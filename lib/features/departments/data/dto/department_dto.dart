@@ -43,11 +43,12 @@ abstract class CreateDepartmentRequestDto with _$CreateDepartmentRequestDto {
 
 extension DepartmentDtoMapper on DepartmentDto {
   Department toEntity() => Department(
-        id: id ?? '',
-        name: name ?? '—',
-        code: code ?? '',
-        unitType: DepartmentUnitType.fromApi(unitType),
-        parentDepartmentId: parentDepartmentId,
-        managerPartyId: managerPartyId,
-      );
+    id: id ?? '',
+    name: name ?? '—',
+    code: code ?? '',
+    unitType: DepartmentUnitType.fromApi(unitType),
+    parentDepartmentId: parentDepartmentId,
+    managerPartyId: managerPartyId,
+    createdAt: createdAt,
+  );
 }

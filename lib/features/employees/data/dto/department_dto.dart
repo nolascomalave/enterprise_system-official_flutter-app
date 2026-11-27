@@ -22,9 +22,6 @@ abstract class DepartmentDto with _$DepartmentDto {
 }
 
 extension DepartmentDtoMapper on DepartmentDto {
-  Department toEntity() => Department(
-        id: id ?? '',
-        name: name ?? '—',
-        code: code ?? '',
-      );
+  Department toEntity() =>
+      Department(id: id ?? '', name: name ?? '—', code: code ?? '');
 }

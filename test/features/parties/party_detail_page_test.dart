@@ -1,3 +1,6 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
+import 'package:enterprise_app/features/parties/domain/entities/merge_parties_result.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party_detail.dart';
 import 'package:enterprise_app/features/parties/domain/repositories/parties_repository.dart';
@@ -10,6 +13,19 @@ import 'package:material_ui/material_ui.dart';
 class FakePartiesRepository implements PartiesRepository {
   @override
   Future<PartyDetail> getPartyById(String partyId) async => detail;
+
+  @override
+  Future<void> updateParty(String partyId, UpdatePartyParams params) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<MergePartiesResult> mergeParties({
+    required String sourcePartyId,
+    required String targetPartyId,
+  }) {
+    throw UnimplementedError();
+  }
 
   @override
   Future<List<Party>> getParties() async => const [];
@@ -35,20 +51,27 @@ const detail = PartyDetail(
     PartyContact(type: 'EMAIL', value: 'ana@acme.com', isPrimary: true),
     PartyContact(type: 'PHONE', value: '+34 600 000 000'),
   ],
-  addresses: [
-    PartyAddress(type: 'LEGAL', text: 'Av. Principal 123, Madrid'),
-  ],
+  addresses: [PartyAddress(type: 'LEGAL', text: 'Av. Principal 123, Madrid')],
   names: [
-    PartyNameEntry(name: 'Acme Corp', validFrom: '2026-01-01', validTo: '2026-11-01'),
+    PartyNameEntry(
+      name: 'Acme Corp',
+      validFrom: '2026-01-01',
+      validTo: '2026-11-01',
+    ),
   ],
 );
 
 Widget buildPage() {
   return ProviderScope(
     overrides: [
-      partiesRepositoryProvider.overrideWith((ref) async => FakePartiesRepository()),
+      partiesRepositoryProvider.overrideWith(
+        (ref) async => FakePartiesRepository(),
+      ),
     ],
     child: MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: const PartyDetailPage(partyId: 'p1'),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/client_application.dart';
 import '../providers/client_apps_notifier.dart';
 
@@ -11,7 +12,7 @@ class CreateClientAppDialog extends StatefulWidget {
   const CreateClientAppDialog({super.key, required this.onCreate});
 
   final Future<ClientApplication> Function(String name, List<String> scopes)
-      onCreate;
+  onCreate;
 
   @override
   State<CreateClientAppDialog> createState() => _CreateClientAppDialogState();
@@ -39,11 +40,11 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
 
   Future<void> _submit() async {
     if (_nameController.text.trim().isEmpty) {
-      setState(() => _error = 'El nombre es obligatorio.');
+      setState(() => _error = context.l10n.nameRequired);
       return;
     }
     if (_scopes.isEmpty) {
-      setState(() => _error = 'Añade al menos un scope.');
+      setState(() => _error = context.l10n.scopesRequired);
       return;
     }
     setState(() {
@@ -66,7 +67,7 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
         _saving = false;
         _error = error is ApiException
             ? error.message
-            : 'No se pudo crear la aplicación.';
+            : context.l10n.couldNotCreateApp;
       });
     }
   }
@@ -100,12 +101,14 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
           children: [
             Expanded(
               child: Text(
-                'Crear Aplicación',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                context.l10n.createApp,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             IconButton(
-              tooltip: 'Cerrar',
+              tooltip: context.l10n.close,
               onPressed: () => Navigator.of(context).maybePop(),
               icon: const Icon(Icons.close_rounded, size: 20),
             ),
@@ -113,7 +116,7 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
         ),
         const SizedBox(height: 12),
         Text(
-          'Nombre',
+          context.l10n.appName,
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w500,
@@ -125,11 +128,11 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
           key: const Key('app_name'),
           controller: _nameController,
           enabled: !_saving,
-          decoration: const InputDecoration(hintText: 'Portal de integración'),
+          decoration: InputDecoration(hintText: context.l10n.appNameHint),
         ),
         const SizedBox(height: 16),
         Text(
-          'Scopes (separados por comas)',
+          context.l10n.scopes,
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w500,
@@ -157,8 +160,10 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-              child: const Text('Cancelar'),
+              onPressed: _saving
+                  ? null
+                  : () => Navigator.of(context).maybePop(),
+              child: Text(context.l10n.cancel),
             ),
             const SizedBox(width: 8),
             ClipRRect(
@@ -186,9 +191,9 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Crear',
-                                style: TextStyle(
+                            : Text(
+                                context.l10n.createAction,
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -214,13 +219,18 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
       children: [
         Row(
           children: [
-            const Icon(Icons.check_circle_outline_rounded,
-                color: Color(0xFF10B981), size: 22),
+            const Icon(
+              Icons.check_circle_outline_rounded,
+              color: Color(0xFF10B981),
+              size: 22,
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Aplicación creada',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                context.l10n.appCreated,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -244,13 +254,17 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.warning_amber_rounded, size: 18, color: Color(0xFF92400E)),
-                  SizedBox(width: 6),
+                  const Icon(
+                    Icons.warning_amber_rounded,
+                    size: 18,
+                    color: Color(0xFF92400E),
+                  ),
+                  const SizedBox(width: 6),
                   Text(
-                    'Solo se mostrará una vez',
-                    style: TextStyle(
+                    context.l10n.secretOnce,
+                    style: const TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF78350F),
@@ -259,9 +273,13 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
                 ],
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Copia el client secret ahora. Por seguridad, no podrás volver a verlo.',
-                style: TextStyle(fontSize: 12, height: 1.4, color: Color(0xFF78350F)),
+              Text(
+                context.l10n.secretWarning,
+                style: const TextStyle(
+                  fontSize: 12,
+                  height: 1.4,
+                  color: Color(0xFF78350F),
+                ),
               ),
               const SizedBox(height: 10),
               SelectableText(
@@ -287,11 +305,11 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
               );
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Client secret copiado')),
+                SnackBar(content: Text(context.l10n.secretCopied)),
               );
             },
             icon: const Icon(Icons.copy_rounded, size: 16),
-            label: const Text('Copiar secreto'),
+            label: Text(context.l10n.copySecret),
           ),
         ),
         const SizedBox(height: 8),
@@ -300,7 +318,7 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
           child: FilledButton(
             key: const Key('app_close'),
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cerrar'),
+            child: Text(context.l10n.close),
           ),
         ),
       ],
@@ -309,7 +327,10 @@ class _CreateClientAppDialogState extends State<CreateClientAppDialog> {
 }
 
 /// Abre el modal y refresca la lista al cerrarlo.
-Future<void> showCreateClientAppDialog(BuildContext context, WidgetRef ref) async {
+Future<void> showCreateClientAppDialog(
+  BuildContext context,
+  WidgetRef ref,
+) async {
   await showDialog<void>(
     context: context,
     builder: (dialogContext) => Consumer(

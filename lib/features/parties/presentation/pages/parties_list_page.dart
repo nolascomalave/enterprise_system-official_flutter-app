@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/party.dart';
 import '../providers/parties_notifier.dart';
 import '../widgets/create_party_form.dart';
+import '../widgets/merge_parties_dialog.dart';
 
 /// Lista de Parties — Data Grid V5 Premium.
 class PartiesListPage extends ConsumerStatefulWidget {
@@ -31,7 +33,7 @@ class _PartiesListPageState extends ConsumerState<PartiesListPage> {
     return parties.where((party) {
       return party.displayName.toLowerCase().contains(q) ||
           party.profileDetail.toLowerCase().contains(q) ||
-          party.partyType.label.toLowerCase().contains(q);
+          _partyTypeLabel(context, party.partyType).toLowerCase().contains(q);
     }).toList();
   }
 
@@ -54,6 +56,11 @@ class _PartiesListPageState extends ConsumerState<PartiesListPage> {
                   searchController: _searchController,
                   onSearch: (value) => setState(() => _query = value),
                   onCreate: () => showCreatePartyDialog(context, ref),
+                  onMerge: () => showMergePartiesDialog(
+                    context,
+                    ref,
+                    partiesAsync.value ?? const <Party>[],
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Expanded(
@@ -107,11 +114,13 @@ class _Header extends StatelessWidget {
     required this.searchController,
     required this.onSearch,
     required this.onCreate,
+    required this.onMerge,
   });
 
   final TextEditingController searchController;
   final ValueChanged<String> onSearch;
   final VoidCallback onCreate;
+  final VoidCallback onMerge;
 
   @override
   Widget build(BuildContext context) {
@@ -126,7 +135,7 @@ class _Header extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Parties',
+              context.l10n.partiesTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.6,
@@ -134,10 +143,12 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Personas y organizaciones de Acme Corporation',
+              context.l10n.partiesSubtitle,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
               ),
             ),
           ],
@@ -149,12 +160,23 @@ class _Header extends StatelessWidget {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             isDense: true,
-            hintText: 'Buscar parties…',
+            hintText: context.l10n.partiesSearch,
             hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF71717A)),
-            prefixIcon: const Icon(Icons.search_rounded, size: 17, color: Color(0xFF71717A)),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              size: 17,
+              color: Color(0xFF71717A),
+            ),
             prefixIconConstraints: const BoxConstraints(minWidth: 38),
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
+        );
+
+        final mergeButton = OutlinedButton.icon(
+          onPressed: onMerge,
+          icon: const Icon(Icons.merge_type_rounded, size: 16),
+          label: Text(context.l10n.mergeParties),
+          style: OutlinedButton.styleFrom(minimumSize: const Size(0, 42)),
         );
 
         final createButton = ClipRRect(
@@ -164,7 +186,9 @@ class _Header extends StatelessWidget {
             child: Ink(
               height: 42,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.indigo, AppColors.violet]),
+                gradient: LinearGradient(
+                  colors: [AppColors.indigo, AppColors.violet],
+                ),
               ),
               child: InkWell(
                 onTap: onCreate,
@@ -172,12 +196,16 @@ class _Header extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.add_rounded, size: 17, color: Colors.white),
-                      SizedBox(width: 6),
+                    children: [
+                      const Icon(
+                        Icons.add_rounded,
+                        size: 17,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
                       Text(
-                        'Nueva Party',
-                        style: TextStyle(
+                        context.l10n.newParty,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -199,7 +227,11 @@ class _Header extends StatelessWidget {
               const SizedBox(height: 16),
               search,
               const SizedBox(height: 12),
-              Align(alignment: Alignment.centerLeft, child: createButton),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [mergeButton, createButton],
+              ),
             ],
           );
         }
@@ -207,8 +239,10 @@ class _Header extends StatelessWidget {
         return Row(
           children: [
             Expanded(child: title),
-            SizedBox(width: 260, child: search),
+            SizedBox(width: 220, child: search),
             const SizedBox(width: 12),
+            mergeButton,
+            const SizedBox(width: 8),
             createButton,
           ],
         );
@@ -216,6 +250,11 @@ class _Header extends StatelessWidget {
     );
   }
 }
+
+String _partyTypeLabel(BuildContext context, PartyType type) =>
+    type == PartyType.organization
+    ? context.l10n.partyTypeOrganization
+    : context.l10n.partyTypeIndividual;
 
 class _PartiesTable extends StatelessWidget {
   const _PartiesTable({required this.parties});
@@ -226,21 +265,22 @@ class _PartiesTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     Widget headerCell(String label, int flex) => Expanded(
-          flex: flex,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-              color: secondary,
-            ),
-          ),
-        );
+      flex: flex,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
+          color: secondary,
+        ),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -250,10 +290,10 @@ class _PartiesTable extends StatelessWidget {
           color: secondary.withValues(alpha: 0.03),
           child: Row(
             children: [
-              headerCell('NOMBRE', 5),
-              headerCell('TIPO', 3),
-              headerCell('PERFIL', 4),
-              headerCell('ESTADO', 3),
+              headerCell(context.l10n.colName, 5),
+              headerCell(context.l10n.colType, 3),
+              headerCell(context.l10n.colProfile, 4),
+              headerCell(context.l10n.colStatus, 3),
             ],
           ),
         ),
@@ -270,7 +310,10 @@ class _PartiesTable extends StatelessWidget {
               return _HoverRow(
                 onTap: () => context.push('/parties/${party.id}'),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
                   child: Row(
                     children: [
                       Expanded(
@@ -296,7 +339,7 @@ class _PartiesTable extends StatelessWidget {
                       Expanded(
                         flex: 3,
                         child: Text(
-                          party.partyType.label,
+                          _partyTypeLabel(context, party.partyType),
                           style: TextStyle(fontSize: 12.5, color: secondary),
                         ),
                       ),
@@ -309,10 +352,7 @@ class _PartiesTable extends StatelessWidget {
                           style: TextStyle(fontSize: 12.5, color: secondary),
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: _StatusBadge(active: party.isActive),
-                      ),
+                      Expanded(flex: 3, child: _StatusBadge(party: party)),
                     ],
                   ),
                 ),
@@ -334,8 +374,9 @@ class _PartiesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return ListView.separated(
       itemCount: parties.length,
@@ -364,11 +405,14 @@ class _PartiesList extends StatelessWidget {
                         party.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${party.partyType.label} · ${party.profileDetail}',
+                        '${_partyTypeLabel(context, party.partyType)} · ${party.profileDetail}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 11, color: secondary),
@@ -377,7 +421,7 @@ class _PartiesList extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _StatusBadge(active: party.isActive),
+                _StatusBadge(party: party),
               ],
             ),
           ),
@@ -440,13 +484,22 @@ class _PartyAvatar extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.active});
+  const _StatusBadge({required this.party});
 
-  final bool active;
+  final Party party;
 
   @override
   Widget build(BuildContext context) {
-    final color = active ? AppColors.success : AppColors.danger;
+    final merged = party.isMerged;
+    final active = party.isActive;
+    final color = merged
+        ? const Color(0xFF71717A)
+        : active
+        ? AppColors.success
+        : AppColors.danger;
+    final label = merged
+        ? context.l10n.statusMerged
+        : (active ? context.l10n.statusActive : context.l10n.statusInactive);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -464,7 +517,7 @@ class _StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            active ? 'Activo' : 'Inactivo',
+            label,
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w500,
@@ -494,8 +547,8 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             (query ?? '').isEmpty
-                ? 'Aún no hay parties'
-                : 'Sin resultados para "${query!}"',
+                ? context.l10n.partiesEmpty
+                : context.l10n.noResults(query!),
             style: theme.textTheme.bodyMedium,
           ),
         ],
@@ -515,9 +568,9 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('No se pudieron cargar las parties'),
+          Text(context.l10n.partiesError),
           const SizedBox(height: 8),
-          TextButton(onPressed: onRetry, child: const Text('Reintentar')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.retry)),
         ],
       ),
     );

@@ -22,9 +22,5 @@ abstract class JobDto with _$JobDto {
 }
 
 extension JobDtoMapper on JobDto {
-  Job toEntity() => Job(
-        id: id ?? '',
-        title: title ?? '—',
-        code: code ?? '',
-      );
+  Job toEntity() => Job(id: id ?? '', title: title ?? '—', code: code ?? '');
 }

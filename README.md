@@ -127,4 +127,44 @@ flutter build web
   - Modales: nueva relación (Holding Tenant ID), token con copiar, consumo de token y motivo para rechazar/revocar.
   - Tests: notifier (PENDING→APPROVED al consumir) y modal de consumo (envío/errores).
   - `graphify-out/` añadido al `.gitignore`.
-- Siguiente iteración: migración completa de textos a ARB (es/en) o edición de Party.
+- **Golden Record — Merge de Parties (`POST /parties/merge`):**
+  - DTOs `MergePartiesRequestDto` (source/target) y `MergePartiesResponseDto` (source_id, target_id, compressed_party_ids, merged_at) + entidad `MergePartiesResult`.
+  - `mergeParties()` en el repositorio y `MergePartiesUseCase`; `MergePartiesNotifier` que invalida/refresca la lista de parties.
+  - UI: botón "Fusionar" en la lista → modal con dropdowns Target/Source (excluye fusionadas), aviso ámbar de irreversibilidad y confirmación gradiente.
+  - Feedback: badge gris **"Fusionado"** cuando `record_status == MERGED` o `canonical_party_id` presente; esas parties no se ofrecen para nuevas fusiones.
+  - Tests: notifier (merge + refresco y marcado MERGED) y widget (IDs correctos, exclusión de fusionadas).
+- **Edición de Party (`PUT /parties/{id}`):**
+  - DTO `UpdatePartyRequestDto` (`display_name`, `party_type`, perfiles anidados) + `UpdatePartyParams`; `updateParty()` en repositorio y `UpdatePartyUseCase`.
+  - `UpdatePartyNotifier` invalida `partyDetailProvider(id)` y `partiesProvider` y espera el refresco del detalle.
+  - UI: el botón "Editar" del detalle abre `EditPartyDialog` pre-poblado; `party_type` de solo lectura; campos de persona u organización; SnackBar "Party actualizada correctamente".
+  - Tests: notifier (update + refresco de detalle/lista) y widget (pre-poblado y payload de organización/persona).
+  - Nota: el permiso backend requerido es `party:write` (singular).
+- **i18n completo (es/en):**
+  - `l10n.yaml` genera `AppLocalizations` en `lib/core/i18n/generated/`; ARB en `lib/core/i18n/l10n/app_{es,en}.arb`.
+  - Todas las pantallas y modales (Parties, Employees, Departments, Corporate Relationships, Settings, Login, Dashboard, shell) usan `context.l10n`; sin textos hardcodeados en la UI.
+  - `appLocalizationsDelegates` propio con los delegates de `material_ui`/`cupertino_ui` (compatibilidad Flutter 3.50); el locale se aplica globalmente desde las preferencias del usuario.
+  - Tests: cambio de locale es→en en la lista de Parties y paridad de claves entre ambos ARB.
+- **Notificaciones en tiempo real (SSE + Outbox):**
+  - DTOs `NotificationDto`/`NotificationListEnvelopeDto`; entidades `Notification`/`NotificationPage`; `NotificationsRepositoryImpl` con `GET /notifications`, `PUT /notifications/{id}/read` y stream SSE.
+  - `NotificationsNotifier` (autoDispose): carga inicial, acumula eventos SSE, cuenta no leídas, marca leídas de forma optimista y reconecta con backoff 1s→2s→4s→8s→16s→30s. Se cancela al desmontar el shell (logout).
+  - Cliente SSE propio sobre `package:http` (streaming real en web y nativo, con `Authorization: Bearer` y cierre de conexión).
+  - UI: `AppTopBar` global con campana + badge rojo; panel `MenuAnchor` en desktop y bottom sheet en móvil; título, fecha relativa, punto azul de no leída, empty/error/skeleton y navegación por `resource_type` (`tenant_relationship` → `/corporate-relationships`).
+  - Tests: repositorio (GET paginado, PUT, SSE acumulado/deduplicado), notifier (altas, contador y lectura optimista) y widget (badge, lista y empty state).
+- **Cierre de sesión (`POST /auth/logout`):**
+  - `AuthRepository.logout()` revoca la sesión en el backend (cookie HttpOnly) y **siempre** limpia `access_token` y `tenant_id`, aunque el servidor falle.
+  - `LogoutNotifier` (keepAlive) gestiona loading/error e invalida cachés de sesión: notificaciones (SSE), preferencias, Parties y detalle, menú, dashboard, empleados, departamentos/grupos, relaciones, client apps y seguridad.
+  - UI: botón `Icons.logout_rounded` en `AppTopBar` con diálogo de confirmación V5; al confirmar navega a `/login`, el `AppShell` se desmonta y el SSE se cierra vía `ref.onDispose`.
+  - Tests: repositorio (POST + limpieza aun con fallo), notifier (loading/data + invalidación de Parties) y widget (confirmar/cancelar y navegación).
+- **Detalle de Empleado (`/employees/:id`):**
+  - Ruta anidada en la rama de Empleados; filas de la tabla y de la lista móvil navegan al detalle.
+  - `EmployeeRepository.getEmployeeById()` llama directamente a `GET /employees/{id}` y mapea el 404 a `EmployeeNotFoundException`; `GetEmployeeByIdUseCase` y `EmployeeDetailNotifier` family.
+  - UI V5: header con avatar degradado, nombre de la Party, código y badge de estado; tabs de Información laboral (cargo, departamento, fecha, manager), Historial de asignaciones (estado informativo: el backend aún no lo expone) y Contactos de la Party asociada.
+  - Tests: repositorio (filtrado y no encontrado), notifier, widget del detalle con catálogos/contactos y navegación desde la lista.
+- **Detalle de Departamento (`/departments/:id`):**
+  - El backend aún no expone `GET /departments/{id}`: `DepartmentDetailNotifier` reutiliza y filtra `departmentsProvider` en memoria (pendiente crear el endpoint).
+  - Ruta anidada; el nombre en el árbol de Departamentos navega al detalle y los sub-departamentos permiten navegación recursiva.
+  - UI V5: header con icono degradado, nombre, código y badge de unit_type; tabs General (manager, fecha de creación, grupos corporativos), Sub-departamentos y Empleados (con navegación a `/employees/:id`), con skeletons y empty states.
+  - DTO de departamento ahora mapea `unit_type`, `parent_department_id`, `manager_party_id` y `created_at`.
+  - Tests: notifier, página (tres tabs, hijos, empleados y navegación), árbol→detalle y mapeo del DTO.
+  - Limitación: no hay endpoint para leer las asignaciones departamento→grupo; se muestran las realizadas en la sesión actual.
+- Siguiente iteración: nuevas features o ajustes contra el backend real.

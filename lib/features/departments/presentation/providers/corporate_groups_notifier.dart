@@ -11,8 +11,8 @@ part 'corporate_groups_notifier.g.dart';
 /// no está disponible en el backend).
 final localCorporateGroupsProvider =
     NotifierProvider<LocalCorporateGroups, List<CorporateGroup>>(
-  LocalCorporateGroups.new,
-);
+      LocalCorporateGroups.new,
+    );
 
 class LocalCorporateGroups extends Notifier<List<CorporateGroup>> {
   @override
@@ -24,8 +24,8 @@ class LocalCorporateGroups extends Notifier<List<CorporateGroup>> {
 /// Asignaciones departamento → grupo realizadas en esta sesión.
 final groupAssignmentsProvider =
     NotifierProvider<GroupAssignments, Map<String, Set<String>>>(
-  GroupAssignments.new,
-);
+      GroupAssignments.new,
+    );
 
 class GroupAssignments extends Notifier<Map<String, Set<String>>> {
   @override
@@ -78,7 +78,9 @@ class CorporateGroupsNotifier extends _$CorporateGroupsNotifier {
     required String groupId,
     required String departmentId,
   }) async {
-    final useCase = await ref.read(assignDepartmentToGroupUseCaseProvider.future);
+    final useCase = await ref.read(
+      assignDepartmentToGroupUseCaseProvider.future,
+    );
     await useCase(departmentId: departmentId, corporateGroupId: groupId);
     ref.read(groupAssignmentsProvider.notifier).add(groupId, departmentId);
   }

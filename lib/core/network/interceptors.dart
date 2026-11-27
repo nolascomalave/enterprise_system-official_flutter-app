@@ -50,15 +50,17 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
     final path = err.requestOptions.path;
     final alreadyRetried = err.requestOptions.extra[_retriedFlag] == true;
 
-    final isRefreshOrLogin = path.contains('/auth/refresh') || path.contains('/auth/login');
+    final isRefreshOrLogin =
+        path.contains('/auth/refresh') || path.contains('/auth/login');
     if (statusCode != 401 || alreadyRetried || isRefreshOrLogin) {
       handler.next(err);
       return;
     }
 
     try {
-      final refreshResponse =
-          await _refreshClient.post<Map<String, dynamic>>('/auth/refresh');
+      final refreshResponse = await _refreshClient.post<Map<String, dynamic>>(
+        '/auth/refresh',
+      );
       final data = refreshResponse.data?['data'];
       final newToken = data is Map ? data['access_token'] as String? : null;
 
@@ -87,8 +89,6 @@ class TokenRefreshInterceptor extends QueuedInterceptor {
 class ApiErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    handler.reject(
-      err.copyWith(error: ApiException.fromDio(err)),
-    );
+    handler.reject(err.copyWith(error: ApiException.fromDio(err)));
   }
 }

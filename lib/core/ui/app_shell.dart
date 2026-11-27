@@ -2,15 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../i18n/l10n_ext.dart';
+
 import '../menu/default_menu.dart';
 import '../menu/menu_notifier.dart';
 import '../router/branch_routes.dart';
 import '../../features/preferences/presentation/providers/preferences_notifier.dart';
 import 'app_sidebar.dart';
-import 'mobile_nav.dart';
+import 'app_top_bar.dart';
+import 'layout.dart';
 
-/// Breakpoint de layout: ≥768px → sidebar; menor → bottom nav.
-bool isDesktopLayout(double width) => width > 768;
+export 'layout.dart';
+import 'mobile_nav.dart';
 
 /// Shell principal: Sidebar en desktop, Bottom Nav + Bottom Sheet en móvil.
 class AppShell extends ConsumerStatefulWidget {
@@ -43,7 +46,7 @@ class _AppShellState extends ConsumerState<AppShell> {
     final index = BranchRoutes.indexForRoute(route);
     if (index == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sección "$route" próximamente')),
+        SnackBar(content: Text(context.l10n.sectionComingSoon(route))),
       );
       return;
     }
@@ -73,13 +76,24 @@ class _AppShellState extends ConsumerState<AppShell> {
               onRetry: () => ref.invalidate(menuProvider),
             ),
             Expanded(
-              child: Stack(
+              child: Column(
                 children: [
-                  Positioned.fill(child: widget.navigationShell),
-                  Positioned(
-                    right: 24,
-                    bottom: 24,
-                    child: AskAiButton(),
+                  const AppTopBar(),
+                  Expanded(
+                    child: MediaQuery.removePadding(
+                      context: context,
+                      removeTop: true,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(child: widget.navigationShell),
+                          Positioned(
+                            right: 24,
+                            bottom: 24,
+                            child: AskAiButton(),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -90,28 +104,35 @@ class _AppShellState extends ConsumerState<AppShell> {
     }
 
     return Scaffold(
-      body: Stack(
+      body: Column(
         children: [
-          Positioned.fill(child: widget.navigationShell),
-          Positioned(
-            left: 24,
-            right: 24,
-            bottom: 24,
-            child: MobileBottomNav(
-              currentIndex: widget.navigationShell.currentIndex,
-              onBranchSelected: _goToBranch,
-              onMenuTap: () => showMobileMenuSheet(
-                context,
-                menu: menu,
-                currentPath: currentPath,
-                onOptionSelected: _onOptionSelected,
+          const AppTopBar(),
+          Expanded(
+            child: MediaQuery.removePadding(
+              context: context,
+              removeTop: true,
+              child: Stack(
+                children: [
+                  Positioned.fill(child: widget.navigationShell),
+                  Positioned(
+                    left: 24,
+                    right: 24,
+                    bottom: 24,
+                    child: MobileBottomNav(
+                      currentIndex: widget.navigationShell.currentIndex,
+                      onBranchSelected: _goToBranch,
+                      onMenuTap: () => showMobileMenuSheet(
+                        context,
+                        menu: menu,
+                        currentPath: currentPath,
+                        onOptionSelected: _onOptionSelected,
+                      ),
+                    ),
+                  ),
+                  Positioned(right: 20, bottom: 100, child: AskAiButton()),
+                ],
               ),
             ),
-          ),
-          Positioned(
-            right: 20,
-            bottom: 100,
-            child: AskAiButton(),
           ),
         ],
       ),

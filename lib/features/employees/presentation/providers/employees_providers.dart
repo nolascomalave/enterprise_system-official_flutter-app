@@ -8,26 +8,37 @@ import '../../domain/entities/employee.dart';
 import '../../domain/repositories/employees_repository.dart';
 import '../../domain/usecases/employee_usecases.dart';
 
-final employeesRepositoryProvider =
-    FutureProvider<EmployeesRepository>((ref) async {
+final employeesRepositoryProvider = FutureProvider<EmployeesRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return EmployeeRepositoryImpl(dio);
 });
 
-final orgStructureRepositoryProvider =
-    FutureProvider<OrgStructureRepository>((ref) async {
+final orgStructureRepositoryProvider = FutureProvider<OrgStructureRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return OrgStructureRepositoryImpl(dio);
 });
 
-final getEmployeesUseCaseProvider =
-    FutureProvider<GetEmployeesUseCase>((ref) async {
+final getEmployeesUseCaseProvider = FutureProvider<GetEmployeesUseCase>((
+  ref,
+) async {
   final repository = await ref.watch(employeesRepositoryProvider.future);
   return GetEmployeesUseCase(repository);
 });
 
-final createEmployeeUseCaseProvider =
-    FutureProvider<CreateEmployeeUseCase>((ref) async {
+final getEmployeeByIdUseCaseProvider = FutureProvider<GetEmployeeByIdUseCase>((
+  ref,
+) async {
+  final repository = await ref.watch(employeesRepositoryProvider.future);
+  return GetEmployeeByIdUseCase(repository);
+});
+
+final createEmployeeUseCaseProvider = FutureProvider<CreateEmployeeUseCase>((
+  ref,
+) async {
   final repository = await ref.watch(employeesRepositoryProvider.future);
   return CreateEmployeeUseCase(repository);
 });

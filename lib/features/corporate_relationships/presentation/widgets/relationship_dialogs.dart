@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/corporate_relationship.dart';
 import '../providers/relationships_notifier.dart';
 
@@ -30,7 +31,7 @@ class _NewRelationshipDialogState extends State<NewRelationshipDialog> {
   Future<void> _submit() async {
     final id = _controller.text.trim();
     if (id.isEmpty) {
-      setState(() => _error = 'Introduce el Holding Tenant ID.');
+      setState(() => _error = context.l10n.holdingIdRequired);
       return;
     }
     setState(() {
@@ -53,13 +54,13 @@ class _NewRelationshipDialogState extends State<NewRelationshipDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return _DialogShell(
-      title: 'Nueva Relación',
+      title: context.l10n.newRelationship,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Introduce el identificador del tenant holding para iniciar la relación.',
+            context.l10n.newRelationshipHint,
             style: TextStyle(
               fontSize: 12.5,
               height: 1.5,
@@ -71,24 +72,31 @@ class _NewRelationshipDialogState extends State<NewRelationshipDialog> {
             key: const Key('holding_tenant_id'),
             controller: _controller,
             enabled: !_saving,
-            decoration: const InputDecoration(hintText: 'UUID del holding'),
+            decoration: InputDecoration(
+              hintText: context.l10n.holdingTenantIdHint,
+            ),
             onSubmitted: (_) => _submit(),
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(_error!, style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444))),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+            ),
           ],
           const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               _GradientButton(
-                label: 'Iniciar',
+                label: context.l10n.initiateAction,
                 loading: _saving,
                 onPressed: _submit,
               ),
@@ -109,14 +117,14 @@ class EmitTokenDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _DialogShell(
-      title: 'Token de invitación',
+      title: context.l10n.tokenTitle,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Comparte este token con la filial para que consuma la relación. Puede caducar.',
-            style: TextStyle(fontSize: 12.5, height: 1.5),
+          Text(
+            context.l10n.tokenWarning,
+            style: const TextStyle(fontSize: 12.5, height: 1.5),
           ),
           const SizedBox(height: 14),
           Container(
@@ -140,7 +148,7 @@ class EmitTokenDialog extends StatelessWidget {
           if (token.expiresAt != null) ...[
             const SizedBox(height: 8),
             Text(
-              'Caduca: ${token.expiresAt}',
+              context.l10n.expiresAt(token.expiresAt!),
               style: const TextStyle(fontSize: 11, color: Color(0xFF71717A)),
             ),
           ],
@@ -152,12 +160,12 @@ class EmitTokenDialog extends StatelessWidget {
                 await Clipboard.setData(ClipboardData(text: token.token));
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Token copiado')),
+                    SnackBar(content: Text(context.l10n.tokenCopied)),
                   );
                 }
               },
               icon: const Icon(Icons.copy_rounded, size: 16),
-              label: const Text('Copiar token'),
+              label: Text(context.l10n.copyToken),
             ),
           ),
           const SizedBox(height: 8),
@@ -165,7 +173,7 @@ class EmitTokenDialog extends StatelessWidget {
             alignment: Alignment.centerRight,
             child: FilledButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar'),
+              child: Text(context.l10n.close),
             ),
           ),
         ],
@@ -199,7 +207,7 @@ class _ConsumeTokenDialogState extends State<ConsumeTokenDialog> {
   Future<void> _submit() async {
     final token = _controller.text.trim();
     if (token.isEmpty) {
-      setState(() => _error = 'Introduce el token.');
+      setState(() => _error = context.l10n.tokenRequired);
       return;
     }
     setState(() {
@@ -221,38 +229,43 @@ class _ConsumeTokenDialogState extends State<ConsumeTokenDialog> {
   @override
   Widget build(BuildContext context) {
     return _DialogShell(
-      title: 'Consumir token',
+      title: context.l10n.consumeToken,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Introduce el token de invitación recibido del holding.',
-            style: TextStyle(fontSize: 12.5, height: 1.5),
+          Text(
+            context.l10n.consumeTokenHint,
+            style: const TextStyle(fontSize: 12.5, height: 1.5),
           ),
           const SizedBox(height: 14),
           TextField(
             key: const Key('consume_token'),
             controller: _controller,
             enabled: !_saving,
-            decoration: const InputDecoration(hintText: 'Token de invitación'),
+            decoration: InputDecoration(hintText: context.l10n.tokenFieldHint),
             onSubmitted: (_) => _submit(),
           ),
           if (_error != null) ...[
             const SizedBox(height: 8),
-            Text(_error!, style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444))),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+            ),
           ],
           const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               _GradientButton(
-                label: 'Consumir',
+                label: context.l10n.consumeAction,
                 loading: _saving,
                 onPressed: _submit,
               ),
@@ -280,7 +293,8 @@ class RelationshipReasonDialog extends StatefulWidget {
   final Future<String?> Function(String? reason) onSubmit;
 
   @override
-  State<RelationshipReasonDialog> createState() => _RelationshipReasonDialogState();
+  State<RelationshipReasonDialog> createState() =>
+      _RelationshipReasonDialogState();
 }
 
 class _RelationshipReasonDialogState extends State<RelationshipReasonDialog> {
@@ -321,27 +335,35 @@ class _RelationshipReasonDialogState extends State<RelationshipReasonDialog> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (widget.withReason) ...[
-            const Text(
-              'Motivo (opcional)',
-              style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500),
+            Text(
+              context.l10n.reasonOptional,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 6),
             TextField(
               controller: _controller,
               enabled: !_saving,
-              decoration: const InputDecoration(hintText: 'Describe el motivo'),
+              decoration: InputDecoration(hintText: context.l10n.reasonHint),
             ),
             const SizedBox(height: 8),
           ],
           if (_error != null)
-            Text(_error!, style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444))),
+            Text(
+              _error!,
+              style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+            ),
           const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               _GradientButton(
@@ -360,6 +382,8 @@ class _RelationshipReasonDialogState extends State<RelationshipReasonDialog> {
 // ── Helpers conectados a Riverpod ──────────────────────────────────────────
 
 Future<void> showNewRelationshipDialog(BuildContext context, WidgetRef ref) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -371,13 +395,13 @@ Future<void> showNewRelationshipDialog(BuildContext context, WidgetRef ref) {
                 .read(relationshipsProvider.notifier)
                 .initiate(holdingTenantId: holdingId);
             messenger.showSnackBar(
-              const SnackBar(content: Text('Relación iniciada')),
+              SnackBar(content: Text(l10n.relationshipStarted)),
             );
             return null;
           } catch (error) {
             return error is ApiException
                 ? error.message
-                : 'No se pudo iniciar la relación.';
+                : l10n.couldNotIssueToken;
           }
         },
       );
@@ -393,6 +417,8 @@ Future<void> showEmitTokenDialog(BuildContext context, InviteToken token) {
 }
 
 Future<void> showConsumeTokenDialog(BuildContext context, WidgetRef ref) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -402,13 +428,13 @@ Future<void> showConsumeTokenDialog(BuildContext context, WidgetRef ref) {
           try {
             await ref.read(relationshipsProvider.notifier).consumeToken(token);
             messenger.showSnackBar(
-              const SnackBar(content: Text('Relación aprobada')),
+              SnackBar(content: Text(l10n.relationshipApproved)),
             );
             return null;
           } catch (error) {
             return error is ApiException
                 ? error.message
-                : 'No se pudo consumir el token.';
+                : l10n.couldNotConsumeToken;
           }
         },
       );
@@ -421,11 +447,13 @@ Future<void> showRejectRelationshipDialog(
   WidgetRef ref,
   String relationshipId,
 ) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => RelationshipReasonDialog(
-      title: 'Rechazar relación',
-      actionLabel: 'Rechazar',
+      title: l10n.rejectTitle,
+      actionLabel: l10n.rejectAction,
       onSubmit: (reason) async {
         try {
           await ref
@@ -433,7 +461,7 @@ Future<void> showRejectRelationshipDialog(
               .reject(relationshipId, reason: reason);
           return null;
         } catch (error) {
-          return error is ApiException ? error.message : 'No se pudo rechazar.';
+          return error is ApiException ? error.message : l10n.couldNotReject;
         }
       },
     ),
@@ -445,11 +473,13 @@ Future<void> showRevokeRelationshipDialog(
   WidgetRef ref,
   String relationshipId,
 ) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => RelationshipReasonDialog(
-      title: 'Revocar relación',
-      actionLabel: 'Revocar',
+      title: l10n.revokeTitle,
+      actionLabel: l10n.revokeAction,
       onSubmit: (reason) async {
         try {
           await ref
@@ -457,7 +487,7 @@ Future<void> showRevokeRelationshipDialog(
               .revoke(relationshipId, reason: reason);
           return null;
         } catch (error) {
-          return error is ApiException ? error.message : 'No se pudo revocar.';
+          return error is ApiException ? error.message : l10n.couldNotRevoke;
         }
       },
     ),
@@ -469,18 +499,20 @@ Future<void> showCancelRelationshipDialog(
   WidgetRef ref,
   String relationshipId,
 ) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => RelationshipReasonDialog(
-      title: 'Cancelar relación',
-      actionLabel: 'Cancelar',
+      title: l10n.cancelTitle,
+      actionLabel: l10n.cancel,
       withReason: false,
       onSubmit: (_) async {
         try {
           await ref.read(relationshipsProvider.notifier).cancel(relationshipId);
           return null;
         } catch (error) {
-          return error is ApiException ? error.message : 'No se pudo cancelar.';
+          return error is ApiException ? error.message : l10n.couldNotCancel;
         }
       },
     ),
@@ -513,7 +545,9 @@ class _DialogShell extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 12),
               child,
@@ -545,7 +579,9 @@ class _GradientButton extends StatelessWidget {
         child: Ink(
           height: 42,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)]),
+            gradient: LinearGradient(
+              colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+            ),
           ),
           child: InkWell(
             onTap: loading ? null : onPressed,
@@ -556,7 +592,10 @@ class _GradientButton extends StatelessWidget {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
                       )
                     : Text(
                         label,

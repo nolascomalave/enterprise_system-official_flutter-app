@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../domain/entities/employee.dart';
+import '../../domain/errors/employee_not_found_exception.dart';
 import '../../domain/repositories/employees_repository.dart';
 import '../dto/department_dto.dart';
 import '../dto/employee_dto.dart';
@@ -19,14 +20,40 @@ class EmployeeRepositoryImpl implements EmployeesRepository {
       final response = await _dio.get<Map<String, dynamic>>('/employees');
       final data = response.data?['data'];
       if (data is! List) {
-        throw const ApiException('Respuesta de empleados inválida del servidor.');
+        throw const ApiException(
+          'Respuesta de empleados inválida del servidor.',
+        );
       }
       return data
           .whereType<Map>()
-          .map((json) =>
-              EmployeeDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                EmployeeDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<Employee> getEmployeeById(String employeeId) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/employees/$employeeId',
+      );
+      final data = response.data?['data'];
+      if (data is! Map) {
+        throw const ApiException(
+          'Respuesta de detalle del empleado inválida del servidor.',
+        );
+      }
+      return EmployeeDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) {
+        throw EmployeeNotFoundException(employeeId);
+      }
       throw _toApiException(error);
     }
   }
@@ -50,7 +77,9 @@ class EmployeeRepositoryImpl implements EmployeesRepository {
       );
       final data = response.data?['data'];
       if (data is! Map) {
-        throw const ApiException('Respuesta de creación inválida del servidor.');
+        throw const ApiException(
+          'Respuesta de creación inválida del servidor.',
+        );
       }
       return EmployeeDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
     } on DioException catch (error) {
@@ -81,7 +110,10 @@ class OrgStructureRepositoryImpl implements OrgStructureRepository {
       }
       return data
           .whereType<Map>()
-          .map((json) => JobDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                JobDto.fromJson(Map<String, dynamic>.from(json)).toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -95,12 +127,16 @@ class OrgStructureRepositoryImpl implements OrgStructureRepository {
       final data = response.data?['data'];
       if (data is! List) {
         throw const ApiException(
-            'Respuesta de departamentos inválida del servidor.');
+          'Respuesta de departamentos inválida del servidor.',
+        );
       }
       return data
           .whereType<Map>()
-          .map((json) =>
-              DepartmentDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                DepartmentDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);

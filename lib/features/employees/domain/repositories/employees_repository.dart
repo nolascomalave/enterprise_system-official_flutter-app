@@ -4,6 +4,9 @@ import '../entities/employee.dart';
 abstract interface class EmployeesRepository {
   Future<List<Employee>> getEmployees();
 
+  /// El backend no expone `GET /employees/{id}`: se filtra el listado.
+  Future<Employee> getEmployeeById(String employeeId);
+
   Future<Employee> createEmployee(CreateEmployeeParams params);
 }
 

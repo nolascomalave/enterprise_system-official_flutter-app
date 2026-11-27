@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/core/ui/skeleton.dart';
 import 'package:enterprise_app/features/dashboard/domain/entities/dashboard_summary.dart';
 import 'package:enterprise_app/features/dashboard/domain/repositories/dashboard_repository.dart';
@@ -50,6 +52,9 @@ Widget buildPage(FakeDashboardRepository repository) {
       dashboardRepositoryProvider.overrideWith((ref) async => repository),
     ],
     child: MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: const Scaffold(body: DashboardPage()),
@@ -58,8 +63,9 @@ Widget buildPage(FakeDashboardRepository repository) {
 }
 
 void main() {
-  testWidgets('muestra skeletons al cargar y luego las 3 tarjetas KPI',
-      (tester) async {
+  testWidgets('muestra skeletons al cargar y luego las 3 tarjetas KPI', (
+    tester,
+  ) async {
     final repository = FakeDashboardRepository(
       completer: Completer<DashboardSummary>(),
     );
@@ -97,7 +103,10 @@ void main() {
     await tester.pumpWidget(buildPage(repository));
     await tester.pumpAndSettle();
 
-    expect(find.text('No se pudo cargar el resumen del dashboard'), findsOneWidget);
+    expect(
+      find.text('No se pudo cargar el resumen del dashboard'),
+      findsOneWidget,
+    );
     expect(find.text('Reintentar'), findsOneWidget);
   });
 }

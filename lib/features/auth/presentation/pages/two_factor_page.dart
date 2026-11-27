@@ -5,8 +5,10 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/i18n/generated/app_localizations.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../providers/login_notifier.dart';
+import '../state/login_error_l10n.dart';
 import '../state/login_state.dart';
 import '../widgets/auth_shell.dart';
 
@@ -29,9 +31,9 @@ class _TwoFactorPageState extends ConsumerState<TwoFactorPage> {
 
   void _verify() {
     FocusScope.of(context).unfocus();
-    ref.read(loginProvider.notifier).verifyTwoFactor(
-          code: _codeController.text.trim(),
-        );
+    ref
+        .read(loginProvider.notifier)
+        .verifyTwoFactor(code: _codeController.text.trim());
   }
 
   void _backToLogin() {
@@ -45,7 +47,9 @@ class _TwoFactorPageState extends ConsumerState<TwoFactorPage> {
     final theme = Theme.of(context);
     final state = ref.watch(loginProvider);
     final isLoading = state is LoginLoading;
-    final errorMessage = state is LoginError ? state.message : null;
+    final errorMessage = state is LoginError
+        ? state.localizedMessage(context)
+        : null;
     final hasTempToken = state is LoginRequiresTwoFactor || isLoading;
 
     ref.listen<LoginState>(loginProvider, (previous, next) {
@@ -72,12 +76,18 @@ class _TwoFactorPageState extends ConsumerState<TwoFactorPage> {
                     colors: [AppColors.indigo, AppColors.purple],
                   ),
                 ),
-                child: const Icon(Icons.shield_outlined, color: Colors.white, size: 18),
+                child: const Icon(
+                  Icons.shield_outlined,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
                 'Enterprise App',
-                style: theme.textTheme.titleMedium?.copyWith(letterSpacing: -0.4),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  letterSpacing: -0.4,
+                ),
               ),
             ],
           ),
@@ -97,11 +107,15 @@ class _TwoFactorPageState extends ConsumerState<TwoFactorPage> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 16, color: AppColors.warning),
+                  const Icon(
+                    Icons.info_outline_rounded,
+                    size: 16,
+                    color: AppColors.warning,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'La verificación expiró. Vuelve a iniciar sesión.',
+                      context.l10n.sessionExpired,
                       style: theme.textTheme.bodySmall,
                     ),
                   ),

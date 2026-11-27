@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../i18n/l10n_ext.dart';
+
 /// Página temporal para ramas aún no implementadas.
 class SectionPlaceholderPage extends StatelessWidget {
   const SectionPlaceholderPage({
@@ -24,7 +26,7 @@ class SectionPlaceholderPage extends StatelessWidget {
             Text(title, style: theme.textTheme.headlineSmall),
             const SizedBox(height: 6),
             Text(
-              'Sección en construcción',
+              context.l10n.underConstruction,
               style: theme.textTheme.bodyMedium,
             ),
           ],

@@ -27,7 +27,8 @@ class ApiException implements Exception {
 
     final fallback = switch (exception.type) {
       DioExceptionType.connectionTimeout => 'Tiempo de conexión agotado.',
-      DioExceptionType.receiveTimeout => 'La respuesta del servidor tardó demasiado.',
+      DioExceptionType.receiveTimeout =>
+        'La respuesta del servidor tardó demasiado.',
       DioExceptionType.sendTimeout => 'No se pudo enviar la solicitud.',
       DioExceptionType.connectionError => 'No hay conexión con el servidor.',
       DioExceptionType.cancel => 'Solicitud cancelada.',

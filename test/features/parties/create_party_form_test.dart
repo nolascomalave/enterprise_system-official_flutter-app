@@ -1,3 +1,5 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/features/parties/domain/entities/party.dart';
 import 'package:enterprise_app/features/parties/domain/repositories/parties_repository.dart';
 import 'package:enterprise_app/features/parties/presentation/widgets/create_party_form.dart';
@@ -7,6 +9,9 @@ import 'package:material_ui/material_ui.dart';
 void main() {
   Widget buildForm({ValueChanged<CreatePartyParams>? captured}) {
     return MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: Scaffold(
@@ -32,8 +37,9 @@ void main() {
     expect(find.byKey(const Key('tax_id')), findsNothing);
   });
 
-  testWidgets('cambia a campos de organización al seleccionar ORGANIZATION',
-      (tester) async {
+  testWidgets('cambia a campos de organización al seleccionar ORGANIZATION', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildForm());
 
     await tester.tap(find.byKey(const Key('party-type-organization')));
@@ -51,8 +57,9 @@ void main() {
     expect(find.byKey(const Key('legal_name')), findsNothing);
   });
 
-  testWidgets('envía los datos correctos según el tipo seleccionado',
-      (tester) async {
+  testWidgets('envía los datos correctos según el tipo seleccionado', (
+    tester,
+  ) async {
     CreatePartyParams? captured;
     await tester.pumpWidget(buildForm(captured: (params) => captured = params));
 
@@ -60,7 +67,10 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byKey(const Key('display_name')), 'Globex');
-    await tester.enterText(find.byKey(const Key('legal_name')), 'Globex Industries S.A.');
+    await tester.enterText(
+      find.byKey(const Key('legal_name')),
+      'Globex Industries S.A.',
+    );
     await tester.enterText(find.byKey(const Key('tax_id')), 'G87654321');
 
     await tester.tap(find.text('Guardar'));

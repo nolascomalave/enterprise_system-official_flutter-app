@@ -44,7 +44,7 @@ final class LoginNotifierProvider
   }
 }
 
-String _$loginNotifierHash() => r'fe1a7975fcee3b2aaaf9bb854bdec0ae2c08ca7e';
+String _$loginNotifierHash() => r'54e0b11fbac3366f3c8e277c2d91547ae95ab492';
 
 /// Orquesta el flujo de login (credenciales → posible 2FA → sesión).
 

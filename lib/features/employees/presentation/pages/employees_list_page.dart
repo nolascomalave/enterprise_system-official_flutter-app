@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/employee.dart';
 import '../providers/employees_notifier.dart';
 import '../providers/employees_providers.dart';
@@ -32,7 +34,9 @@ class _EmployeesListPageState extends ConsumerState<EmployeesListPage> {
     final jobs = ref.watch(jobsProvider).value ?? const [];
     final departments = ref.watch(departmentOptionsProvider).value ?? const [];
 
-    final partyNames = {for (final party in parties) party.id: party.displayName};
+    final partyNames = {
+      for (final party in parties) party.id: party.displayName,
+    };
     final jobTitles = {for (final job in jobs) job.id: job.title};
     final departmentNames = {
       for (final department in departments) department.id: department.name,
@@ -78,10 +82,15 @@ class _EmployeesListPageState extends ConsumerState<EmployeesListPage> {
                               final department =
                                   departmentNames[employee.departmentId] ?? '';
                               return name.toLowerCase().contains(q) ||
-                                  employee.employeeCode.toLowerCase().contains(q) ||
+                                  employee.employeeCode.toLowerCase().contains(
+                                    q,
+                                  ) ||
                                   job.toLowerCase().contains(q) ||
                                   department.toLowerCase().contains(q) ||
-                                  employee.status.label.toLowerCase().contains(q);
+                                  _employeeStatusLabel(
+                                    context,
+                                    employee.status,
+                                  ).toLowerCase().contains(q);
                             }).toList();
 
                       return Container(
@@ -150,7 +159,7 @@ class _Header extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Empleados',
+              context.l10n.employeesTitle,
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.6,
@@ -158,10 +167,12 @@ class _Header extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              'Equipo de Acme Corporation',
+              context.l10n.employeesSubtitle,
               style: TextStyle(
                 fontSize: 13,
-                color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+                color: isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.lightTextSecondary,
               ),
             ),
           ],
@@ -173,9 +184,13 @@ class _Header extends StatelessWidget {
           style: const TextStyle(fontSize: 13),
           decoration: InputDecoration(
             isDense: true,
-            hintText: 'Buscar empleados…',
+            hintText: context.l10n.employeesSearch,
             hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF71717A)),
-            prefixIcon: const Icon(Icons.search_rounded, size: 17, color: Color(0xFF71717A)),
+            prefixIcon: const Icon(
+              Icons.search_rounded,
+              size: 17,
+              color: Color(0xFF71717A),
+            ),
             prefixIconConstraints: const BoxConstraints(minWidth: 38),
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
           ),
@@ -188,7 +203,9 @@ class _Header extends StatelessWidget {
             child: Ink(
               height: 42,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.indigo, AppColors.violet]),
+                gradient: LinearGradient(
+                  colors: [AppColors.indigo, AppColors.violet],
+                ),
               ),
               child: InkWell(
                 onTap: onCreate,
@@ -196,12 +213,16 @@ class _Header extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.add_rounded, size: 17, color: Colors.white),
-                      SizedBox(width: 6),
+                    children: [
+                      const Icon(
+                        Icons.add_rounded,
+                        size: 17,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
                       Text(
-                        'Nuevo Empleado',
-                        style: TextStyle(
+                        context.l10n.newEmployee,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -258,21 +279,22 @@ class _EmployeesTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     Widget headerCell(String label, int flex) => Expanded(
-          flex: flex,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-              color: secondary,
-            ),
-          ),
-        );
+      flex: flex,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
+          color: secondary,
+        ),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -282,11 +304,11 @@ class _EmployeesTable extends StatelessWidget {
           color: secondary.withValues(alpha: 0.03),
           child: Row(
             children: [
-              headerCell('EMPLEADO', 5),
-              headerCell('CÓDIGO', 3),
-              headerCell('CARGO', 4),
-              headerCell('DEPARTAMENTO', 4),
-              headerCell('ESTADO', 3),
+              headerCell(context.l10n.colEmployee, 5),
+              headerCell(context.l10n.colCode, 3),
+              headerCell(context.l10n.colJob, 4),
+              headerCell(context.l10n.colDepartment, 4),
+              headerCell(context.l10n.colStatus, 3),
             ],
           ),
         ),
@@ -300,61 +322,69 @@ class _EmployeesTable extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               final employee = employees[index];
-              final name = partyNames[employee.partyId] ?? 'Party ${employee.partyId}';
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        children: [
-                          _EmployeeAvatar(name: name),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              name,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500,
+              final name =
+                  partyNames[employee.partyId] ?? 'Party ${employee.partyId}';
+              return InkWell(
+                key: Key('employee_row_${employee.id}'),
+                onTap: () => context.go('/employees/${employee.id}'),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          children: [
+                            _EmployeeAvatar(name: name),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        employee.employeeCode,
-                        style: TextStyle(fontSize: 12.5, color: secondary),
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                          employee.employeeCode,
+                          style: TextStyle(fontSize: 12.5, color: secondary),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        jobTitles[employee.jobId] ?? '—',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.5, color: secondary),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          jobTitles[employee.jobId] ?? '—',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12.5, color: secondary),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        departmentNames[employee.departmentId] ?? '—',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 12.5, color: secondary),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          departmentNames[employee.departmentId] ?? '—',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12.5, color: secondary),
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 3,
-                      child: _EmployeeStatusBadge(status: employee.status),
-                    ),
-                  ],
+                      Expanded(
+                        flex: 3,
+                        child: _EmployeeStatusBadge(status: employee.status),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -382,8 +412,9 @@ class _EmployeesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return ListView.separated(
       itemCount: employees.length,
@@ -393,36 +424,44 @@ class _EmployeesList extends StatelessWidget {
       ),
       itemBuilder: (context, index) {
         final employee = employees[index];
-        final name = partyNames[employee.partyId] ?? 'Party ${employee.partyId}';
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              _EmployeeAvatar(name: name, size: 36),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '${employee.employeeCode} · ${jobTitles[employee.jobId] ?? '—'} · ${departmentNames[employee.departmentId] ?? '—'}',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontSize: 11, color: secondary),
-                    ),
-                  ],
+        final name =
+            partyNames[employee.partyId] ?? 'Party ${employee.partyId}';
+        return InkWell(
+          key: Key('employee_row_${employee.id}'),
+          onTap: () => context.go('/employees/${employee.id}'),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                _EmployeeAvatar(name: name, size: 36),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${employee.employeeCode} · ${jobTitles[employee.jobId] ?? '—'} · ${departmentNames[employee.departmentId] ?? '—'}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 11, color: secondary),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _EmployeeStatusBadge(status: employee.status),
-            ],
+                const SizedBox(width: 8),
+                _EmployeeStatusBadge(status: employee.status),
+              ],
+            ),
           ),
         );
       },
@@ -437,13 +476,19 @@ class _EmployeeAvatar extends StatelessWidget {
   final double size;
 
   String get _initials {
-    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return '?';
     if (parts.length == 1) {
       final single = parts.first;
-      return (single.length >= 2 ? single.substring(0, 2) : single).toUpperCase();
+      return (single.length >= 2 ? single.substring(0, 2) : single)
+          .toUpperCase();
     }
-    return '${parts.first.substring(0, 1)}${parts[1].substring(0, 1)}'.toUpperCase();
+    return '${parts.first.substring(0, 1)}${parts[1].substring(0, 1)}'
+        .toUpperCase();
   }
 
   @override
@@ -454,7 +499,9 @@ class _EmployeeAvatar extends StatelessWidget {
       alignment: Alignment.center,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF9333EA)]),
+        gradient: LinearGradient(
+          colors: [Color(0xFF6366F1), Color(0xFF9333EA)],
+        ),
       ),
       child: Text(
         _initials,
@@ -468,16 +515,23 @@ class _EmployeeAvatar extends StatelessWidget {
   }
 }
 
+String _employeeStatusLabel(BuildContext context, EmployeeStatus status) =>
+    switch (status) {
+      EmployeeStatus.active => context.l10n.statusActive,
+      EmployeeStatus.onLeave => context.l10n.statusOnLeave,
+      EmployeeStatus.terminated => context.l10n.statusTerminated,
+    };
+
 class _EmployeeStatusBadge extends StatelessWidget {
   const _EmployeeStatusBadge({required this.status});
 
   final EmployeeStatus status;
 
   Color get _color => switch (status) {
-        EmployeeStatus.active => AppColors.success,
-        EmployeeStatus.onLeave => AppColors.warning,
-        EmployeeStatus.terminated => AppColors.danger,
-      };
+    EmployeeStatus.active => AppColors.success,
+    EmployeeStatus.onLeave => AppColors.warning,
+    EmployeeStatus.terminated => AppColors.danger,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +552,7 @@ class _EmployeeStatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            status.label,
+            _employeeStatusLabel(context, status),
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w500,
@@ -528,14 +582,16 @@ class _EmptyState extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             (query ?? '').isEmpty
-                ? 'Aún no hay empleados'
-                : 'Sin resultados para "${query!}"',
+                ? context.l10n.employeesEmpty
+                : context.l10n.noResults(query!),
             style: theme.textTheme.bodyMedium,
           ),
           if ((query ?? '').isEmpty) ...[
             const SizedBox(height: 4),
-            Text('Crea el primero con "Nuevo Empleado"',
-                style: theme.textTheme.bodySmall),
+            Text(
+              context.l10n.employeesEmptyHint,
+              style: theme.textTheme.bodySmall,
+            ),
           ],
         ],
       ),
@@ -554,9 +610,9 @@ class _ErrorState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text('No se pudieron cargar los empleados'),
+          Text(context.l10n.employeesError),
           const SizedBox(height: 8),
-          TextButton(onPressed: onRetry, child: const Text('Reintentar')),
+          TextButton(onPressed: onRetry, child: Text(context.l10n.retry)),
         ],
       ),
     );

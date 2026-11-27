@@ -16,8 +16,9 @@ const String apiBaseUrl = String.fromEnvironment(
 );
 
 /// Cliente HTTP configurado (interceptores + cookies persistentes).
-final secureStorageProvider =
-    Provider<SecureStorageService>((ref) => SecureStorageService());
+final secureStorageProvider = Provider<SecureStorageService>(
+  (ref) => SecureStorageService(),
+);
 
 /// `FutureProvider` porque el cookie jar persistente necesita el directorio
 /// de la app (operación asíncrona). En web se usa un jar en memoria.
@@ -45,9 +46,7 @@ final dioProvider = FutureProvider<Dio>((ref) async {
     refreshClient.interceptors.add(CookieManager(cookieJar));
   }
 
-  dio.interceptors.add(
-    TokenRefreshInterceptor(refreshClient, storage),
-  );
+  dio.interceptors.add(TokenRefreshInterceptor(refreshClient, storage));
   dio.interceptors.add(ApiErrorInterceptor());
 
   return dio;

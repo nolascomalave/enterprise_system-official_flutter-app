@@ -1,3 +1,5 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/features/departments/domain/entities/department.dart';
 import 'package:enterprise_app/features/departments/presentation/widgets/department_tree_node.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -37,6 +39,9 @@ void main() {
 
   Widget buildWidget({ValueChanged<Department>? onCreateChild}) {
     return MaterialApp(
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
       theme: ThemeData.dark(useMaterial3: true)
           .copyWith(splashFactory: InkRipple.splashFactory),
       home: Scaffold(
@@ -52,8 +57,9 @@ void main() {
     );
   }
 
-  testWidgets('ExpansionTile renderiza correctamente los hijos anidados',
-      (tester) async {
+  testWidgets('ExpansionTile renderiza correctamente los hijos anidados', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildWidget());
 
     // Nivel 1 (colapsado): los hijos aún no se construyen.
@@ -76,8 +82,9 @@ void main() {
     expect(find.text('Oficina'), findsOneWidget);
   });
 
-  testWidgets('el botón + crea un sub-departamento del nodo correcto',
-      (tester) async {
+  testWidgets('el botón + crea un sub-departamento del nodo correcto', (
+    tester,
+  ) async {
     Department? parent;
     await tester.pumpWidget(
       buildWidget(onCreateChild: (department) => parent = department),

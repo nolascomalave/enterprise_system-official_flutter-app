@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/ui/skeleton.dart';
@@ -82,7 +83,7 @@ class SettingsPage extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Configuración',
+                  context.l10n.settingsTitle,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.6,
@@ -90,7 +91,7 @@ class SettingsPage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Seguridad y acceso de tu cuenta',
+                  context.l10n.settingsSubtitle,
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark
@@ -114,8 +115,9 @@ class SettingsPage extends ConsumerWidget {
                       _disable(context, ref);
                     }
                   },
-                  onSelectMethod: (method) =>
-                      ref.read(securitySettingsProvider.notifier).selectMethod(method),
+                  onSelectMethod: (method) => ref
+                      .read(securitySettingsProvider.notifier)
+                      .selectMethod(method),
                   onConfigure: () => _configure(context, ref, settings.method),
                 ),
                 const SizedBox(height: 16),
@@ -128,6 +130,21 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 }
+
+String _themeLabel(BuildContext context, ThemePreference value) =>
+    switch (value) {
+      ThemePreference.light => context.l10n.themeLight,
+      ThemePreference.dark => context.l10n.themeDark,
+      ThemePreference.system => context.l10n.themeSystem,
+    };
+
+String _methodLabel(BuildContext context, MfaMethod value) => switch (value) {
+  MfaMethod.totp => 'TOTP',
+  MfaMethod.emailOtp => 'EMAIL_OTP',
+};
+
+String _appStatusLabel(BuildContext context, ClientApplication app) =>
+    app.isActive ? context.l10n.appActive : context.l10n.appInactive;
 
 class _AppearanceCard extends StatelessWidget {
   const _AppearanceCard({
@@ -144,8 +161,9 @@ class _AppearanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -171,7 +189,11 @@ class _AppearanceCard extends StatelessWidget {
                       colors: [AppColors.indigo, AppColors.violet],
                     ),
                   ),
-                  child: const Icon(Icons.palette_outlined, size: 20, color: Colors.white),
+                  child: const Icon(
+                    Icons.palette_outlined,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -179,7 +201,7 @@ class _AppearanceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Apariencia',
+                        context.l10n.appearance,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
@@ -187,7 +209,7 @@ class _AppearanceCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Tema e idioma se guardan en tu cuenta.',
+                        context.l10n.appearanceDesc,
                         style: TextStyle(fontSize: 12, color: secondary),
                       ),
                     ],
@@ -208,7 +230,7 @@ class _AppearanceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tema',
+                      context.l10n.theme,
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
@@ -220,11 +242,15 @@ class _AppearanceCard extends StatelessWidget {
                       key: const Key('pref_theme'),
                       segments: [
                         for (final value in ThemePreference.values)
-                          ButtonSegment(value: value, label: Text(value.label)),
+                          ButtonSegment(
+                            value: value,
+                            label: Text(_themeLabel(context, value)),
+                          ),
                       ],
                       selected: {preferences.theme},
                       showSelectedIcon: false,
-                      onSelectionChanged: (selection) => onThemeChanged(selection.first),
+                      onSelectionChanged: (selection) =>
+                          onThemeChanged(selection.first),
                     ),
                   ],
                 ),
@@ -232,7 +258,7 @@ class _AppearanceCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Idioma',
+                      context.l10n.language,
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w500,
@@ -251,9 +277,15 @@ class _AppearanceCard extends StatelessWidget {
                         child: DropdownButton<String>(
                           key: const Key('pref_locale'),
                           value: preferences.localeCode,
-                          items: const [
-                            DropdownMenuItem(value: 'es', child: Text('Español')),
-                            DropdownMenuItem(value: 'en', child: Text('Inglés')),
+                          items: [
+                            DropdownMenuItem(
+                              value: 'es',
+                              child: Text(context.l10n.languageSpanish),
+                            ),
+                            DropdownMenuItem(
+                              value: 'en',
+                              child: Text(context.l10n.languageEnglish),
+                            ),
                           ],
                           onChanged: (value) {
                             if (value != null) onLocaleChanged(value);
@@ -279,8 +311,9 @@ class _ClientAppsCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final appsAsync = ref.watch(clientAppsProvider);
 
     return Container(
@@ -307,7 +340,11 @@ class _ClientAppsCard extends ConsumerWidget {
                       colors: [AppColors.indigo, AppColors.violet],
                     ),
                   ),
-                  child: const Icon(Icons.apps_rounded, size: 20, color: Colors.white),
+                  child: const Icon(
+                    Icons.apps_rounded,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -315,7 +352,7 @@ class _ClientAppsCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Aplicaciones Cliente',
+                        context.l10n.clientApps,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
@@ -323,7 +360,7 @@ class _ClientAppsCard extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Integraciones OAuth2 (M2M) de tu tenant.',
+                        context.l10n.clientAppsDesc,
                         style: TextStyle(fontSize: 12, color: secondary),
                       ),
                     ],
@@ -347,12 +384,16 @@ class _ClientAppsCard extends ConsumerWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 14),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(Icons.add_rounded, size: 16, color: Colors.white),
-                              SizedBox(width: 6),
+                            children: [
+                              const Icon(
+                                Icons.add_rounded,
+                                size: 16,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 6),
                               Text(
-                                'Crear Aplicación',
-                                style: TextStyle(
+                                context.l10n.createApp,
+                                style: const TextStyle(
                                   fontSize: 12.5,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.white,
@@ -383,20 +424,20 @@ class _ClientAppsCard extends ConsumerWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      'No se pudieron cargar las aplicaciones',
+                      context.l10n.appsError,
                       style: TextStyle(fontSize: 13, color: secondary),
                     ),
                   ),
                   TextButton(
                     onPressed: () => ref.invalidate(clientAppsProvider),
-                    child: const Text('Reintentar'),
+                    child: Text(context.l10n.retry),
                   ),
                 ],
               ),
               data: (apps) {
                 if (apps.isEmpty) {
                   return Text(
-                    'Aún no hay aplicaciones cliente. Crea la primera para integrar un servicio.',
+                    context.l10n.appsEmpty,
                     style: TextStyle(fontSize: 13, color: secondary),
                   );
                 }
@@ -426,8 +467,9 @@ class _ClientAppRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     final color = app.isActive ? AppColors.success : AppColors.danger;
 
     return Container(
@@ -447,7 +489,11 @@ class _ClientAppRow extends StatelessWidget {
               color: AppColors.indigo.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(9),
             ),
-            child: const Icon(Icons.key_outlined, size: 17, color: AppColors.indigo),
+            child: const Icon(
+              Icons.key_outlined,
+              size: 17,
+              color: AppColors.indigo,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -458,7 +504,10 @@ class _ClientAppRow extends StatelessWidget {
                   app.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -488,7 +537,7 @@ class _ClientAppRow extends StatelessWidget {
               border: Border.all(color: color.withValues(alpha: 0.2)),
             ),
             child: Text(
-              app.statusLabel,
+              _appStatusLabel(context, app),
               style: TextStyle(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w600,
@@ -519,8 +568,9 @@ class _SecurityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Container(
       decoration: BoxDecoration(
@@ -546,7 +596,11 @@ class _SecurityCard extends StatelessWidget {
                       colors: [AppColors.indigo, AppColors.violet],
                     ),
                   ),
-                  child: const Icon(Icons.shield_outlined, size: 20, color: Colors.white),
+                  child: const Icon(
+                    Icons.shield_outlined,
+                    size: 20,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -554,7 +608,7 @@ class _SecurityCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Autenticación de Dos Factores (2FA)',
+                        context.l10n.securityTitle,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
@@ -562,7 +616,7 @@ class _SecurityCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Añade un segundo factor para proteger tu cuenta.',
+                        context.l10n.securitySubtitle,
                         style: TextStyle(fontSize: 12, color: secondary),
                       ),
                     ],
@@ -623,9 +677,9 @@ class _EnabledBody extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 6),
-              const Text(
-                'Activo',
-                style: TextStyle(
+              Text(
+                context.l10n.activeBadge,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: AppColors.success,
@@ -637,14 +691,20 @@ class _EnabledBody extends StatelessWidget {
         const SizedBox(width: 10),
         Flexible(
           child: Text(
-            'Método: ${method.label}',
-            style: TextStyle(fontSize: 13, color: theme.textTheme.bodySmall?.color),
+            '${context.l10n.method}: ${_methodLabel(context, method)}',
+            style: TextStyle(
+              fontSize: 13,
+              color: theme.textTheme.bodySmall?.color,
+            ),
           ),
         ),
         const Spacer(),
         Text(
-          'Desactiva con el switch',
-          style: TextStyle(fontSize: 11, color: theme.textTheme.bodySmall?.color),
+          context.l10n.disableHint,
+          style: TextStyle(
+            fontSize: 11,
+            color: theme.textTheme.bodySmall?.color,
+          ),
         ),
       ],
     );
@@ -669,7 +729,7 @@ class _DisabledBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Método',
+          context.l10n.method,
           style: TextStyle(
             fontSize: 12.5,
             fontWeight: FontWeight.w500,
@@ -698,7 +758,8 @@ class _DisabledBody extends StatelessWidget {
               ],
               selected: {method},
               showSelectedIcon: false,
-              onSelectionChanged: (selection) => onSelectMethod(selection.first),
+              onSelectionChanged: (selection) =>
+                  onSelectMethod(selection.first),
             ),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
@@ -719,8 +780,8 @@ class _DisabledBody extends StatelessWidget {
                       child: Center(
                         child: Text(
                           method == MfaMethod.totp
-                              ? 'Configurar TOTP'
-                              : 'Configurar EMAIL_OTP',
+                              ? context.l10n.configureTotp
+                              : context.l10n.configureEmailOtp,
                           style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -737,8 +798,11 @@ class _DisabledBody extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'El estado de 2FA se conserva durante la sesión (el backend no expone un GET de preferencias).',
-          style: TextStyle(fontSize: 11, color: theme.textTheme.bodySmall?.color),
+          context.l10n.prefsNote,
+          style: TextStyle(
+            fontSize: 11,
+            color: theme.textTheme.bodySmall?.color,
+          ),
         ),
       ],
     );

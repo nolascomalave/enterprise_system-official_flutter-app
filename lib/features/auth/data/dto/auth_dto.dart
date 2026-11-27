@@ -14,5 +14,6 @@ abstract class AuthDto with _$AuthDto {
     @JsonKey(name: 'token_type') String? tokenType,
   }) = _AuthDto;
 
-  factory AuthDto.fromJson(Map<String, dynamic> json) => _$AuthDtoFromJson(json);
+  factory AuthDto.fromJson(Map<String, dynamic> json) =>
+      _$AuthDtoFromJson(json);
 }

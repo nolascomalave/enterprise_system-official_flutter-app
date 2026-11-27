@@ -17,4 +17,10 @@ abstract interface class AuthRepository {
     required String tempToken,
     required String code,
   });
+
+  /// Revoca la sesión en el backend y limpia el almacenamiento local.
+  ///
+  /// El cierre local es autoritativo: si el servidor no responde, el token
+  /// y el tenant se eliminan igualmente.
+  Future<void> logout();
 }

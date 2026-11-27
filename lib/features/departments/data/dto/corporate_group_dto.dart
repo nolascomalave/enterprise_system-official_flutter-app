@@ -42,14 +42,12 @@ abstract class AssignDepartmentToGroupRequestDto
     @JsonKey(name: 'corporate_group_id') required String corporateGroupId,
   }) = _AssignDepartmentToGroupRequestDto;
 
-  factory AssignDepartmentToGroupRequestDto.fromJson(Map<String, dynamic> json) =>
-      _$AssignDepartmentToGroupRequestDtoFromJson(json);
+  factory AssignDepartmentToGroupRequestDto.fromJson(
+    Map<String, dynamic> json,
+  ) => _$AssignDepartmentToGroupRequestDtoFromJson(json);
 }
 
 extension CorporateGroupDtoMapper on CorporateGroupDto {
-  CorporateGroup toEntity() => CorporateGroup(
-        id: id ?? '',
-        name: name ?? '—',
-        description: description,
-      );
+  CorporateGroup toEntity() =>
+      CorporateGroup(id: id ?? '', name: name ?? '—', description: description);
 }

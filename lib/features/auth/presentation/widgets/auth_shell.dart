@@ -1,5 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../core/i18n/l10n_ext.dart';
+
 import '../../../../core/theme/app_colors.dart';
 
 /// Layout compartido de autenticación — V5 Premium.
@@ -55,7 +57,11 @@ class _BrandPanel extends StatelessWidget {
               gradient: RadialGradient(
                 center: Alignment.topLeft,
                 radius: 1.4,
-                colors: [Color(0x331E1B4B), AppColors.darkBackground, AppColors.darkBackground],
+                colors: [
+                  Color(0x331E1B4B),
+                  AppColors.darkBackground,
+                  AppColors.darkBackground,
+                ],
                 stops: [0.0, 0.65, 1.0],
               ),
             ),
@@ -79,7 +85,11 @@ class _BrandPanel extends StatelessWidget {
                           colors: [AppColors.indigo, AppColors.purple],
                         ),
                       ),
-                      child: const Icon(Icons.apartment_rounded, color: Colors.white, size: 18),
+                      child: const Icon(
+                        Icons.apartment_rounded,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                     const SizedBox(width: 10),
                     Text(
@@ -95,7 +105,7 @@ class _BrandPanel extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  'Diseñado para operar al nivel de tu ambición.',
+                  context.l10n.authTagline,
                   style: TextStyle(
                     fontSize: 34,
                     height: 1.18,
@@ -106,7 +116,7 @@ class _BrandPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'Profundidad de datos empresarial con una experiencia que se siente inevitable.',
+                  context.l10n.authTaglineBody,
                   style: TextStyle(
                     fontSize: 14,
                     height: 1.6,
@@ -115,13 +125,19 @@ class _BrandPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 Row(
-                  children: const [
+                  children: [
                     Expanded(
-                      child: _GlassStat(label: 'Parties', value: '1.248'),
+                      child: _GlassStat(
+                        label: context.l10n.statParties,
+                        value: '1.248',
+                      ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: _GlassStat(label: 'Uptime', value: '99,99%'),
+                      child: _GlassStat(
+                        label: context.l10n.uptime,
+                        value: '99,99%',
+                      ),
                     ),
                   ],
                 ),
@@ -259,7 +275,11 @@ class AuthErrorText extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.error_outline_rounded, size: 16, color: AppColors.danger),
+          const Icon(
+            Icons.error_outline_rounded,
+            size: 16,
+            color: AppColors.danger,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(

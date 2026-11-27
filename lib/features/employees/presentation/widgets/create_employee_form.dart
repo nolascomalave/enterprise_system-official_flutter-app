@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/network/api_exception.dart';
 import '../../../parties/domain/entities/party.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/employee.dart';
 import '../../domain/repositories/employees_repository.dart';
 import '../providers/employees_notifier.dart';
@@ -17,6 +18,13 @@ String formatIsoDate(DateTime date) {
 }
 
 /// Formulario de alta de empleado (modal V5).
+String _employeeStatusLabel(BuildContext context, EmployeeStatus status) =>
+    switch (status) {
+      EmployeeStatus.active => context.l10n.statusActive,
+      EmployeeStatus.onLeave => context.l10n.statusOnLeave,
+      EmployeeStatus.terminated => context.l10n.statusTerminated,
+    };
+
 class CreateEmployeeForm extends StatefulWidget {
   const CreateEmployeeForm({
     super.key,
@@ -102,65 +110,79 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Label('Party (persona)'),
+          _Label(context.l10n.partyPersonLabel),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             key: const Key('employee_party'),
             isExpanded: true,
-            decoration: const InputDecoration(hintText: 'Selecciona una persona'),
+            decoration: InputDecoration(hintText: context.l10n.selectPerson),
             items: [
               for (final party in widget.parties)
-                DropdownMenuItem(value: party.id, child: Text(party.displayName)),
+                DropdownMenuItem(
+                  value: party.id,
+                  child: Text(party.displayName),
+                ),
             ],
-            onChanged: _saving ? null : (value) => setState(() => _partyId = value),
-            validator: (value) => value == null ? 'Requerido' : null,
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _partyId = value),
+            validator: (value) => value == null ? context.l10n.required : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Código de empleado'),
+          _Label(context.l10n.employeeCode),
           const SizedBox(height: 6),
           TextFormField(
             key: const Key('employee_code'),
             controller: _codeController,
             enabled: !_saving,
             decoration: const InputDecoration(hintText: 'EMP-0001'),
-            validator: (value) =>
-                (value == null || value.trim().isEmpty) ? 'Requerido' : null,
+            validator: (value) => (value == null || value.trim().isEmpty)
+                ? context.l10n.required
+                : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Puesto'),
+          _Label(context.l10n.jobTitle),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             key: const Key('employee_job'),
             isExpanded: true,
-            decoration: const InputDecoration(hintText: 'Selecciona un puesto'),
+            decoration: InputDecoration(hintText: context.l10n.selectJob),
             items: [
               for (final job in widget.jobs)
                 DropdownMenuItem(value: job.id, child: Text(job.title)),
             ],
-            onChanged: _saving ? null : (value) => setState(() => _jobId = value),
-            validator: (value) => value == null ? 'Requerido' : null,
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _jobId = value),
+            validator: (value) => value == null ? context.l10n.required : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Departamento'),
+          _Label(context.l10n.departmentLabel),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             key: const Key('employee_department'),
             isExpanded: true,
-            decoration: const InputDecoration(hintText: 'Selecciona un departamento'),
+            decoration: InputDecoration(
+              hintText: context.l10n.selectDepartment,
+            ),
             items: [
               for (final department in widget.departments)
-                DropdownMenuItem(value: department.id, child: Text(department.name)),
+                DropdownMenuItem(
+                  value: department.id,
+                  child: Text(department.name),
+                ),
             ],
-            onChanged:
-                _saving ? null : (value) => setState(() => _departmentId = value),
-            validator: (value) => value == null ? 'Requerido' : null,
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _departmentId = value),
+            validator: (value) => value == null ? context.l10n.required : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Fecha de contratación'),
+          _Label(context.l10n.hireDate),
           const SizedBox(height: 6),
           TextFormField(
             key: const Key('hire_date'),
@@ -173,11 +195,11 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
               suffixIcon: Icon(Icons.calendar_today_outlined, size: 18),
             ),
             validator: (value) =>
-                (value == null || value.isEmpty) ? 'Requerido' : null,
+                (value == null || value.isEmpty) ? context.l10n.required : null,
           ),
           const SizedBox(height: 16),
 
-          _Label('Estado'),
+          _Label(context.l10n.statusLabel),
           const SizedBox(height: 6),
           DropdownButtonFormField<EmployeeStatus>(
             key: const Key('employee_status'),
@@ -185,10 +207,14 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
             isExpanded: true,
             items: [
               for (final status in EmployeeStatus.values)
-                DropdownMenuItem(value: status, child: Text(status.label)),
+                DropdownMenuItem(
+                  value: status,
+                  child: Text(_employeeStatusLabel(context, status)),
+                ),
             ],
-            onChanged:
-                _saving ? null : (value) => setState(() => _status = value ?? _status),
+            onChanged: _saving
+                ? null
+                : (value) => setState(() => _status = value ?? _status),
           ),
 
           if (_error != null) ...[
@@ -202,13 +228,19 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.error_outline_rounded,
-                      size: 16, color: Color(0xFFEF4444)),
+                  const Icon(
+                    Icons.error_outline_rounded,
+                    size: 16,
+                    color: Color(0xFFEF4444),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _error!,
-                      style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFFEF4444),
+                      ),
                     ),
                   ),
                 ],
@@ -221,8 +253,10 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: _saving ? null : () => Navigator.of(context).maybePop(),
-                child: const Text('Cancelar'),
+                onPressed: _saving
+                    ? null
+                    : () => Navigator.of(context).maybePop(),
+                child: Text(context.l10n.cancel),
               ),
               const SizedBox(width: 8),
               ClipRRect(
@@ -250,8 +284,8 @@ class _CreateEmployeeFormState extends State<CreateEmployeeForm> {
                                     color: Colors.white,
                                   ),
                                 )
-                              : const Text(
-                                  'Guardar',
+                              : Text(
+                                  context.l10n.save,
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
@@ -292,6 +326,8 @@ class _Label extends StatelessWidget {
 
 /// Abre el modal de alta de empleado (carga parties/jobs/departments).
 Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
+  final l10n = context.l10n;
+
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -311,10 +347,12 @@ Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
               final jobsAsync = dref.watch(jobsProvider);
               final departmentsAsync = dref.watch(departmentOptionsProvider);
 
-              final isLoading = partiesAsync.isLoading ||
+              final isLoading =
+                  partiesAsync.isLoading ||
                   jobsAsync.isLoading ||
                   departmentsAsync.isLoading;
-              final hasError = partiesAsync.hasError ||
+              final hasError =
+                  partiesAsync.hasError ||
                   jobsAsync.hasError ||
                   departmentsAsync.hasError;
 
@@ -336,7 +374,7 @@ Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text('No se pudieron cargar los catálogos'),
+                      Text(l10n.catalogsError),
                       const SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
@@ -344,7 +382,7 @@ Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
                           dref.invalidate(jobsProvider);
                           dref.invalidate(departmentOptionsProvider);
                         },
-                        child: const Text('Reintentar'),
+                        child: Text(l10n.retry),
                       ),
                     ],
                   ),
@@ -356,18 +394,20 @@ Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
                   departments: departmentsAsync.value ?? const [],
                   onSubmit: (params) async {
                     try {
-                      await dref.read(employeesProvider.notifier).createEmployee(params);
+                      await dref
+                          .read(employeesProvider.notifier)
+                          .createEmployee(params);
                       if (dialogContext.mounted) {
                         Navigator.of(dialogContext).pop();
                       }
                       messenger.showSnackBar(
-                        const SnackBar(content: Text('Empleado creado correctamente')),
+                        SnackBar(content: Text(l10n.employeeCreated)),
                       );
                       return null;
                     } catch (error) {
                       return error is ApiException
                           ? error.message
-                          : 'No se pudo crear el empleado. Inténtalo de nuevo.';
+                          : l10n.couldNotCreateEmployee;
                     }
                   },
                 );
@@ -383,16 +423,15 @@ Future<void> showCreateEmployeeDialog(BuildContext context, WidgetRef ref) {
                       children: [
                         Expanded(
                           child: Text(
-                            'Nuevo Empleado',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge
+                            l10n.newEmployee,
+                            style: Theme.of(context).textTheme.titleLarge
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                         ),
                         IconButton(
-                          tooltip: 'Cerrar',
-                          onPressed: () => Navigator.of(dialogContext).maybePop(),
+                          tooltip: l10n.close,
+                          onPressed: () =>
+                              Navigator.of(dialogContext).maybePop(),
                           icon: const Icon(Icons.close_rounded, size: 20),
                         ),
                       ],

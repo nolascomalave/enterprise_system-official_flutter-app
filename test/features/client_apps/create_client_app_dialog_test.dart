@@ -1,14 +1,21 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/features/client_apps/domain/entities/client_application.dart';
 import 'package:enterprise_app/features/client_apps/presentation/widgets/create_client_app_dialog.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
 void main() {
-  testWidgets('muestra el client_secret una única vez al crear', (tester) async {
+  testWidgets('muestra el client_secret una única vez al crear', (
+    tester,
+  ) async {
     List<String>? sentScopes;
 
     await tester.pumpWidget(
       MaterialApp(
+        locale: const Locale('es'),
+        localizationsDelegates: appLocalizationsDelegates,
+        supportedLocales: appSupportedLocales,
         theme: ThemeData.dark(useMaterial3: true)
             .copyWith(splashFactory: InkRipple.splashFactory),
         home: Scaffold(

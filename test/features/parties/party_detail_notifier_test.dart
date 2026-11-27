@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:enterprise_app/features/parties/domain/entities/merge_parties_result.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party_detail.dart';
 import 'package:enterprise_app/features/parties/domain/repositories/parties_repository.dart';
@@ -18,6 +19,19 @@ class FakePartiesRepository implements PartiesRepository {
   Future<PartyDetail> getPartyById(String partyId) {
     requestedId = partyId;
     return (completer ?? Completer<PartyDetail>()).future;
+  }
+
+  @override
+  Future<void> updateParty(String partyId, UpdatePartyParams params) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<MergePartiesResult> mergeParties({
+    required String sourcePartyId,
+    required String targetPartyId,
+  }) {
+    throw UnimplementedError();
   }
 
   @override
@@ -41,9 +55,7 @@ const detail = PartyDetail(
   contacts: [
     PartyContact(type: 'EMAIL', value: 'ana@acme.com', isPrimary: true),
   ],
-  addresses: [
-    PartyAddress(type: 'LEGAL', text: 'Av. Principal 123, Madrid'),
-  ],
+  addresses: [PartyAddress(type: 'LEGAL', text: 'Av. Principal 123, Madrid')],
   names: [
     PartyNameEntry(name: 'Acme Corp', validFrom: '2026-01-01', validTo: null),
   ],
@@ -77,6 +89,9 @@ void main() {
     expect(loaded.contacts.single.isPrimary, isTrue);
     expect(loaded.addresses.single.type, 'LEGAL');
     expect(loaded.names.single.name, 'Acme Corp');
-    expect(container.read(partyDetailProvider('p1')), isA<AsyncData<PartyDetail>>());
+    expect(
+      container.read(partyDetailProvider('p1')),
+      isA<AsyncData<PartyDetail>>(),
+    );
   });
 }

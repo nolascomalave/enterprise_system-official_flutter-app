@@ -8,7 +8,8 @@ enum PartyType {
 
   String get apiValue => name.toUpperCase();
 
-  String get label => this == PartyType.organization ? 'Organización' : 'Persona';
+  String get label =>
+      this == PartyType.organization ? 'Organización' : 'Persona';
 }
 
 /// Entidad de dominio Party.
@@ -23,6 +24,7 @@ class Party {
     this.legalName,
     this.taxId,
     this.createdAt,
+    this.canonicalPartyId,
   });
 
   final String id;
@@ -34,15 +36,23 @@ class Party {
   final String? legalName;
   final String? taxId;
   final String? createdAt;
+  final String? canonicalPartyId;
 
   bool get isActive => recordStatus.toUpperCase() == 'ACTIVE';
+
+  bool get isMerged =>
+      recordStatus.toUpperCase() == 'MERGED' ||
+      (canonicalPartyId != null && canonicalPartyId!.isNotEmpty);
 
   /// Detalle breve según el tipo de party.
   String get profileDetail {
     if (partyType == PartyType.organization) {
       return taxId?.isNotEmpty == true ? taxId! : (legalName ?? '—');
     }
-    final name = [firstName, lastName].whereType<String>().where((v) => v.isNotEmpty).join(' ');
+    final name = [
+      firstName,
+      lastName,
+    ].whereType<String>().where((v) => v.isNotEmpty).join(' ');
     return name.isEmpty ? '—' : name;
   }
 
@@ -56,8 +66,10 @@ class Party {
     if (parts.isEmpty) return '?';
     if (parts.length == 1) {
       final single = parts.first;
-      return (single.length >= 2 ? single.substring(0, 2) : single).toUpperCase();
+      return (single.length >= 2 ? single.substring(0, 2) : single)
+          .toUpperCase();
     }
-    return '${parts.first.substring(0, 1)}${parts[1].substring(0, 1)}'.toUpperCase();
+    return '${parts.first.substring(0, 1)}${parts[1].substring(0, 1)}'
+        .toUpperCase();
   }
 }

@@ -1,14 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/department.dart';
 
 /// Colores V5 por tipo de unidad.
 Color unitTypeColor(DepartmentUnitType type) => switch (type) {
-      DepartmentUnitType.division => const Color(0xFF6366F1),
-      DepartmentUnitType.branch => const Color(0xFFF59E0B),
-      DepartmentUnitType.office => const Color(0xFF10B981),
-      DepartmentUnitType.department => const Color(0xFF0EA5E9),
-    };
+  DepartmentUnitType.division => const Color(0xFF6366F1),
+  DepartmentUnitType.branch => const Color(0xFFF59E0B),
+  DepartmentUnitType.office => const Color(0xFF10B981),
+  DepartmentUnitType.department => const Color(0xFF0EA5E9),
+};
 
 class UnitTypeBadge extends StatelessWidget {
   const UnitTypeBadge({super.key, required this.type});
@@ -26,7 +27,12 @@ class UnitTypeBadge extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Text(
-        type.label,
+        switch (type) {
+          DepartmentUnitType.division => context.l10n.unitDivision,
+          DepartmentUnitType.branch => context.l10n.unitBranch,
+          DepartmentUnitType.office => context.l10n.unitOffice,
+          DepartmentUnitType.department => context.l10n.unitDepartment,
+        },
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
@@ -43,11 +49,13 @@ class DepartmentTreeNode extends StatelessWidget {
     super.key,
     required this.node,
     required this.onCreateChild,
+    this.onOpen,
     this.level = 0,
   });
 
   final DepartmentNode node;
   final ValueChanged<Department> onCreateChild;
+  final ValueChanged<Department>? onOpen;
   final int level;
 
   @override
@@ -62,11 +70,21 @@ class DepartmentTreeNode extends StatelessWidget {
     final title = Row(
       children: [
         Flexible(
-          child: Text(
-            department.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500),
+          child: InkWell(
+            onTap: onOpen == null ? null : () => onOpen!(department),
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                department.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 8),
@@ -74,7 +92,7 @@ class DepartmentTreeNode extends StatelessWidget {
         const SizedBox(width: 4),
         IconButton(
           key: ValueKey('add-child-${department.id}'),
-          tooltip: 'Nuevo sub-departamento',
+          tooltip: context.l10n.newSubDepartment,
           onPressed: () => onCreateChild(department),
           icon: const Icon(Icons.add_rounded, size: 16),
           visualDensity: VisualDensity.compact,
@@ -132,6 +150,7 @@ class DepartmentTreeNode extends StatelessWidget {
             DepartmentTreeNode(
               node: child,
               onCreateChild: onCreateChild,
+              onOpen: onOpen,
               level: level + 1,
             ),
         ],

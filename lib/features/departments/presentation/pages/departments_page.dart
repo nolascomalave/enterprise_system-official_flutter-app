@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/corporate_group.dart';
 import '../../domain/entities/department.dart';
 import '../providers/corporate_groups_notifier.dart';
@@ -28,7 +30,9 @@ class _DepartmentsPageState extends ConsumerState<DepartmentsPage> {
     final isDark = theme.brightness == Brightness.dark;
 
     final actionButton = _GradientAction(
-      label: _tab == DepartmentsTab.hierarchy ? 'Nuevo Departamento' : 'Nuevo Grupo',
+      label: _tab == DepartmentsTab.hierarchy
+          ? context.l10n.newDepartment
+          : context.l10n.newGroup,
       icon: Icons.add_rounded,
       onTap: () {
         if (_tab == DepartmentsTab.hierarchy) {
@@ -56,7 +60,7 @@ class _DepartmentsPageState extends ConsumerState<DepartmentsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Departamentos',
+                            context.l10n.departmentsTitle,
                             style: theme.textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.w600,
                               letterSpacing: -0.6,
@@ -64,7 +68,7 @@ class _DepartmentsPageState extends ConsumerState<DepartmentsPage> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Estructura organizativa de Acme Corporation',
+                            context.l10n.departmentsSubtitle,
                             style: TextStyle(
                               fontSize: 13,
                               color: isDark
@@ -81,16 +85,16 @@ class _DepartmentsPageState extends ConsumerState<DepartmentsPage> {
                 ),
                 const SizedBox(height: 16),
                 SegmentedButton<DepartmentsTab>(
-                  segments: const [
+                  segments: [
                     ButtonSegment(
                       value: DepartmentsTab.hierarchy,
-                      label: Text('Jerarquía'),
-                      icon: Icon(Icons.account_tree_outlined, size: 16),
+                      label: Text(context.l10n.hierarchy),
+                      icon: const Icon(Icons.account_tree_outlined, size: 16),
                     ),
                     ButtonSegment(
                       value: DepartmentsTab.groups,
-                      label: Text('Grupos corporativos'),
-                      icon: Icon(Icons.hub_outlined, size: 16),
+                      label: Text(context.l10n.corporateGroups),
+                      icon: const Icon(Icons.hub_outlined, size: 16),
                     ),
                   ],
                   selected: {_tab},
@@ -133,7 +137,9 @@ class _GradientAction extends StatelessWidget {
         child: Ink(
           height: 42,
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [AppColors.indigo, AppColors.violet]),
+            gradient: LinearGradient(
+              colors: [AppColors.indigo, AppColors.violet],
+            ),
           ),
           child: InkWell(
             onTap: onTap,
@@ -182,11 +188,11 @@ class _HierarchyView extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('No se pudieron cargar los departamentos'),
+            Text(context.l10n.departmentsError),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => ref.invalidate(departmentsProvider),
-              child: const Text('Reintentar'),
+              child: Text(context.l10n.retry),
             ),
           ],
         ),
@@ -197,10 +203,15 @@ class _HierarchyView extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Aún no hay departamentos', style: theme.textTheme.bodyMedium),
+                Text(
+                  context.l10n.departmentsEmpty,
+                  style: theme.textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 4),
-                Text('Crea el primero con "Nuevo Departamento"',
-                    style: theme.textTheme.bodySmall),
+                Text(
+                  context.l10n.createFirstDepartment,
+                  style: theme.textTheme.bodySmall,
+                ),
               ],
             ),
           );
@@ -222,6 +233,8 @@ class _HierarchyView extends ConsumerWidget {
                     ref,
                     parentId: department.id,
                   ),
+                  onOpen: (department) =>
+                      context.go('/departments/${department.id}'),
                 ),
             ],
           ),
@@ -251,11 +264,11 @@ class _CorporateGroupsView extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('No se pudieron cargar los grupos corporativos'),
+            Text(context.l10n.groupsError),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => ref.invalidate(corporateGroupsProvider),
-              child: const Text('Reintentar'),
+              child: Text(context.l10n.retry),
             ),
           ],
         ),
@@ -266,10 +279,15 @@ class _CorporateGroupsView extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Aún no hay grupos corporativos',
-                    style: theme.textTheme.bodyMedium),
+                Text(
+                  context.l10n.groupsEmpty,
+                  style: theme.textTheme.bodyMedium,
+                ),
                 const SizedBox(height: 4),
-                Text('Crea el primero con "Nuevo Grupo"', style: theme.textTheme.bodySmall),
+                Text(
+                  context.l10n.createFirstGroup,
+                  style: theme.textTheme.bodySmall,
+                ),
               ],
             ),
           );
@@ -277,7 +295,8 @@ class _CorporateGroupsView extends ConsumerWidget {
         return ListView.separated(
           itemCount: groups.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
-          itemBuilder: (context, index) => _CorporateGroupCard(group: groups[index]),
+          itemBuilder: (context, index) =>
+              _CorporateGroupCard(group: groups[index]),
         );
       },
     );
@@ -320,14 +339,21 @@ class _CorporateGroupCard extends ConsumerWidget {
             color: AppColors.indigo.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(9),
           ),
-          child: const Icon(Icons.hub_outlined, size: 17, color: AppColors.indigo),
+          child: const Icon(
+            Icons.hub_outlined,
+            size: 17,
+            color: AppColors.indigo,
+          ),
         ),
         title: Row(
           children: [
             Expanded(
               child: Text(
                 group.name,
-                style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
             Container(
@@ -337,7 +363,7 @@ class _CorporateGroupCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Text(
-                '${assignedIds.length} dpto${assignedIds.length == 1 ? '' : 's'}',
+                context.l10n.departmentsCount(assignedIds.length),
                 style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -361,7 +387,7 @@ class _CorporateGroupCard extends ConsumerWidget {
               children: [
                 if (assignedDepartments.isEmpty)
                   Text(
-                    'Sin departamentos asignados en esta sesión',
+                    context.l10n.noAssignments,
                     style: theme.textTheme.bodySmall,
                   )
                 else
@@ -371,12 +397,16 @@ class _CorporateGroupCard extends ConsumerWidget {
                     children: [
                       for (final Department department in assignedDepartments)
                         Container(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 5,
+                          ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest,
                             borderRadius: BorderRadius.circular(999),
-                            border: Border.all(color: theme.colorScheme.outline),
+                            border: Border.all(
+                              color: theme.colorScheme.outline,
+                            ),
                           ),
                           child: Text(
                             department.name,
@@ -392,7 +422,7 @@ class _CorporateGroupCard extends ConsumerWidget {
                     onPressed: () =>
                         showAssignDepartmentDialog(context, ref, group),
                     icon: const Icon(Icons.add_link_rounded, size: 16),
-                    label: const Text('Asignar departamento'),
+                    label: Text(context.l10n.assignDepartment),
                   ),
                 ),
               ],

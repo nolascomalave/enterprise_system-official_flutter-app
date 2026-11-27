@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 
+import '../i18n/l10n_ext.dart';
 import '../menu/models/menu_tree.dart';
 import 'sidebar_menu_item.dart';
 
@@ -93,12 +94,14 @@ class _AppSidebarState extends State<AppSidebar> {
             children: [
               _Header(collapsed: widget.collapsed, isDark: isDark),
               if (!widget.collapsed) _buildSearch(isDark, borderColor),
-              if (widget.loading)
-                const LinearProgressIndicator(minHeight: 2),
+              if (widget.loading) const LinearProgressIndicator(minHeight: 2),
               if (widget.hasError && !widget.collapsed) _buildError(isDark),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 8,
+                  ),
                   children: [
                     for (final node in _filteredMenu)
                       Padding(
@@ -120,7 +123,10 @@ class _AppSidebarState extends State<AppSidebar> {
         Positioned(
           right: -12,
           top: 32,
-          child: _CollapseButton(collapsed: widget.collapsed, onTap: widget.onToggle),
+          child: _CollapseButton(
+            collapsed: widget.collapsed,
+            onTap: widget.onToggle,
+          ),
         ),
       ],
     );
@@ -138,11 +144,18 @@ class _AppSidebarState extends State<AppSidebar> {
         ),
         decoration: InputDecoration(
           isDense: true,
-          hintText: 'Buscar…',
+          hintText: context.l10n.searchMenu,
           hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF71717A)),
-          prefixIcon: const Icon(Icons.search_rounded, size: 17, color: Color(0xFF71717A)),
+          prefixIcon: const Icon(
+            Icons.search_rounded,
+            size: 17,
+            color: Color(0xFF71717A),
+          ),
           prefixIconConstraints: const BoxConstraints(minWidth: 36),
-          contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 8,
+          ),
           fillColor: isDark ? const Color(0xFF18181B) : const Color(0xFFF4F4F5),
           filled: true,
           border: OutlineInputBorder(
@@ -155,7 +168,9 @@ class _AppSidebarState extends State<AppSidebar> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(9),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
         ),
       ),
@@ -167,19 +182,25 @@ class _AppSidebarState extends State<AppSidebar> {
       padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
       child: Row(
         children: [
-          const Icon(Icons.wifi_off_rounded, size: 14, color: Color(0xFFF59E0B)),
+          const Icon(
+            Icons.wifi_off_rounded,
+            size: 14,
+            color: Color(0xFFF59E0B),
+          ),
           const SizedBox(width: 6),
           Expanded(
             child: Text(
-              'Menú offline',
+              context.l10n.menuOffline,
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
+                color: isDark
+                    ? const Color(0xFFA1A1AA)
+                    : const Color(0xFF71717A),
               ),
             ),
           ),
           IconButton(
-            tooltip: 'Reintentar',
+            tooltip: context.l10n.retry,
             onPressed: widget.onRetry,
             icon: const Icon(Icons.refresh_rounded, size: 15),
             visualDensity: VisualDensity.compact,
@@ -222,7 +243,11 @@ class _Header extends StatelessWidget {
                 ),
               ],
             ),
-            child: const Icon(Icons.apartment_rounded, color: Colors.white, size: 17),
+            child: const Icon(
+              Icons.apartment_rounded,
+              color: Colors.white,
+              size: 17,
+            ),
           ),
           if (!collapsed) ...[
             const SizedBox(width: 10),
@@ -232,7 +257,9 @@ class _Header extends StatelessWidget {
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
-                color: isDark ? const Color(0xFFFAFAFA) : const Color(0xFF09090B),
+                color: isDark
+                    ? const Color(0xFFFAFAFA)
+                    : const Color(0xFF09090B),
               ),
             ),
           ],
@@ -258,8 +285,9 @@ class _Footer extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisAlignment:
-            collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+        mainAxisAlignment: collapsed
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
         children: [
           Container(
             width: 32,
@@ -299,7 +327,9 @@ class _Footer extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.5,
                       fontWeight: FontWeight.w600,
-                      color: isDark ? const Color(0xFFFAFAFA) : const Color(0xFF09090B),
+                      color: isDark
+                          ? const Color(0xFFFAFAFA)
+                          : const Color(0xFF09090B),
                     ),
                   ),
                   const Text(
@@ -328,7 +358,7 @@ class _CollapseButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Tooltip(
-      message: collapsed ? 'Expandir menú' : 'Colapsar menú',
+      message: collapsed ? context.l10n.expandMenu : context.l10n.collapseMenu,
       child: Material(
         color: isDark ? const Color(0xFF18181B) : Colors.white,
         shape: CircleBorder(
@@ -341,7 +371,9 @@ class _CollapseButton extends StatelessWidget {
             width: 24,
             height: 24,
             child: Icon(
-              collapsed ? Icons.chevron_right_rounded : Icons.chevron_left_rounded,
+              collapsed
+                  ? Icons.chevron_right_rounded
+                  : Icons.chevron_left_rounded,
               size: 16,
               color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B),
             ),

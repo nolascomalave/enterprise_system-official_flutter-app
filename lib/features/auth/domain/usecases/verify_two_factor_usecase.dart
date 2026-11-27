@@ -7,10 +7,7 @@ class VerifyTwoFactorUseCase {
 
   final AuthRepository _repository;
 
-  Future<AuthSession> call({
-    required String tempToken,
-    required String code,
-  }) {
+  Future<AuthSession> call({required String tempToken, required String code}) {
     return _repository.verifyTwoFactor(tempToken: tempToken, code: code);
   }
 }

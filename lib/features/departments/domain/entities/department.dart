@@ -17,11 +17,11 @@ enum DepartmentUnitType {
   String get apiValue => name.toUpperCase();
 
   String get label => switch (this) {
-        DepartmentUnitType.division => 'División',
-        DepartmentUnitType.branch => 'Sucursal',
-        DepartmentUnitType.office => 'Oficina',
-        DepartmentUnitType.department => 'Departamento',
-      };
+    DepartmentUnitType.division => 'División',
+    DepartmentUnitType.branch => 'Sucursal',
+    DepartmentUnitType.office => 'Oficina',
+    DepartmentUnitType.department => 'Departamento',
+  };
 }
 
 /// Departamento (plano, tal como llega del backend).
@@ -33,6 +33,7 @@ class Department {
     this.unitType = DepartmentUnitType.department,
     this.parentDepartmentId,
     this.managerPartyId,
+    this.createdAt,
   });
 
   final String id;
@@ -41,6 +42,7 @@ class Department {
   final DepartmentUnitType unitType;
   final String? parentDepartmentId;
   final String? managerPartyId;
+  final String? createdAt;
 }
 
 /// Nodo del árbol en memoria.
@@ -60,8 +62,9 @@ List<DepartmentNode> buildDepartmentTree(List<Department> departments) {
   final ids = departments.map((d) => d.id).toSet();
 
   for (final department in departments) {
-    final parent =
-        ids.contains(department.parentDepartmentId) ? department.parentDepartmentId : null;
+    final parent = ids.contains(department.parentDepartmentId)
+        ? department.parentDepartmentId
+        : null;
     byParent.putIfAbsent(parent, () => []).add(department);
   }
 
@@ -70,10 +73,7 @@ List<DepartmentNode> buildDepartmentTree(List<Department> departments) {
     final sorted = [...children]..sort((a, b) => a.name.compareTo(b.name));
     return [
       for (final department in sorted)
-        DepartmentNode(
-          department: department,
-          children: build(department.id),
-        ),
+        DepartmentNode(department: department, children: build(department.id)),
     ];
   }
 

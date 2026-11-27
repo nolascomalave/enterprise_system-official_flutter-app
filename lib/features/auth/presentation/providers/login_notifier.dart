@@ -31,14 +31,16 @@ class LoginNotifier extends _$LoginNotifier {
 
       state = switch (result) {
         AuthSuccess(:final session) => LoginState.success(session),
-        AuthRequiresTwoFactor(:final tempToken) =>
-          LoginState.requiresTwoFactor(tempToken),
+        AuthRequiresTwoFactor(:final tempToken) => LoginState.requiresTwoFactor(
+          tempToken,
+        ),
       };
     } on ApiException catch (error) {
       state = LoginState.error(error.message);
     } catch (_) {
       state = const LoginState.error(
         'No se pudo iniciar sesión. Inténtalo de nuevo.',
+        kind: LoginErrorKind.loginFailed,
       );
     }
   }
@@ -53,6 +55,7 @@ class LoginNotifier extends _$LoginNotifier {
     if (tempToken == null || tempToken.isEmpty) {
       state = const LoginState.error(
         'La verificación expiró. Vuelve a iniciar sesión.',
+        kind: LoginErrorKind.sessionExpired,
       );
       return;
     }
@@ -68,6 +71,7 @@ class LoginNotifier extends _$LoginNotifier {
     } catch (_) {
       state = const LoginState.error(
         'No se pudo verificar el código. Inténtalo de nuevo.',
+        kind: LoginErrorKind.verifyFailed,
       );
     }
   }

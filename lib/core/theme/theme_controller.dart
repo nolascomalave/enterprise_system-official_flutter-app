@@ -2,8 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Controla el modo de tema de la app (claro / oscuro / sistema).
-final themeModeProvider =
-    NotifierProvider<ThemeModeController, ThemeMode>(ThemeModeController.new);
+final themeModeProvider = NotifierProvider<ThemeModeController, ThemeMode>(
+  ThemeModeController.new,
+);
 
 class ThemeModeController extends Notifier<ThemeMode> {
   @override

@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/ui/skeleton.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/dashboard_summary.dart';
 import '../providers/dashboard_notifier.dart';
 
@@ -72,7 +73,7 @@ class _DashboardHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Buenos días, Ana',
+                context.l10n.greeting,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.headlineSmall?.copyWith(
@@ -82,7 +83,7 @@ class _DashboardHeader extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Resumen general de Acme Corporation',
+                context.l10n.dashboardSubtitle,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -135,23 +136,23 @@ class _KpiGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final kpis = [
       _KpiData(
-        label: 'Total Parties',
+        label: context.l10n.totalParties,
         value: summary.totalParties,
-        caption: 'en la organización',
+        caption: context.l10n.orgCaption,
         icon: Icons.groups_2_outlined,
         gradient: const [AppColors.indigo, AppColors.purple],
       ),
       _KpiData(
-        label: 'Empleados',
+        label: context.l10n.employeesKpi,
         value: summary.totalEmployees,
-        caption: 'activos',
+        caption: context.l10n.activeCaption,
         icon: Icons.badge_outlined,
         gradient: const [Color(0xFF10B981), Color(0xFF14B8A6)],
       ),
       _KpiData(
-        label: 'Departamentos',
+        label: context.l10n.departmentsKpi,
         value: summary.totalDepartments,
-        caption: 'unidades organizativas',
+        caption: context.l10n.unitsCaption,
         icon: Icons.business_outlined,
         gradient: const [Color(0xFFF59E0B), Color(0xFFF97316)],
       ),
@@ -198,6 +199,11 @@ class _KpiData {
   final List<Color> gradient;
 }
 
+String _recentTypeLabel(BuildContext context, RecentPartyType type) =>
+    type == RecentPartyType.organization
+    ? context.l10n.partyTypeOrganization
+    : context.l10n.partyTypeIndividual;
+
 class _KpiCard extends StatelessWidget {
   const _KpiCard({required this.data});
 
@@ -207,8 +213,9 @@ class _KpiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Container(
       padding: const EdgeInsets.all(22),
@@ -288,7 +295,7 @@ class _RecentPartiesCard extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 14),
             child: Text(
-              'Últimos registros',
+              context.l10n.recentRecords,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.3,
@@ -301,7 +308,7 @@ class _RecentPartiesCard extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: Center(
                 child: Text(
-                  'Sin registros recientes',
+                  context.l10n.noRecent,
                   style: TextStyle(
                     fontSize: 13,
                     color: isDark
@@ -335,21 +342,22 @@ class _RecentPartiesTable extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     Widget header(String label, int flex) => Expanded(
-          flex: flex,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-              color: secondary,
-            ),
-          ),
-        );
+      flex: flex,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
+          color: secondary,
+        ),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -359,10 +367,10 @@ class _RecentPartiesTable extends StatelessWidget {
           color: secondary.withValues(alpha: 0.03),
           child: Row(
             children: [
-              header('REGISTRO', 5),
-              header('TIPO', 3),
-              header('ESTADO', 3),
-              header('FECHA', 3),
+              header(context.l10n.colRecord, 5),
+              header(context.l10n.colType, 3),
+              header(context.l10n.colStatus, 3),
+              header(context.l10n.colDate, 3),
             ],
           ),
         ),
@@ -394,7 +402,7 @@ class _RecentPartiesTable extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: Text(
-                    parties[i].type.label,
+                    _recentTypeLabel(context, parties[i].type),
                     style: TextStyle(fontSize: 12.5, color: secondary),
                   ),
                 ),
@@ -432,8 +440,9 @@ class _RecentPartiesList extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return Column(
       children: [
@@ -459,7 +468,7 @@ class _RecentPartiesList extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${parties[i].type.label} · ${parties[i].dateLabel}',
+                        '${_recentTypeLabel(context, parties[i].type)} · ${parties[i].dateLabel}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 11, color: secondary),
@@ -536,7 +545,7 @@ class _StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            active ? 'Activo' : 'Inactivo',
+            active ? context.l10n.statusActive : context.l10n.statusInactive,
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w500,
@@ -557,33 +566,33 @@ class _DashboardSkeleton extends StatelessWidget {
     final theme = Theme.of(context);
 
     Widget cardChild() => Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Row(
-                children: [
-                  SkeletonBox(width: 90, height: 12),
-                  Spacer(),
-                  SkeletonBox(width: 36, height: 36, borderRadius: 10),
-                ],
-              ),
-              SizedBox(height: 14),
-              SkeletonBox(width: 120, height: 30, borderRadius: 8),
-              SizedBox(height: 12),
-              SkeletonBox(width: 80, height: 10),
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Row(
+            children: [
+              SkeletonBox(width: 90, height: 12),
+              Spacer(),
+              SkeletonBox(width: 36, height: 36, borderRadius: 10),
             ],
           ),
-        );
+          SizedBox(height: 14),
+          SkeletonBox(width: 120, height: 30, borderRadius: 8),
+          SizedBox(height: 12),
+          SkeletonBox(width: 80, height: 10),
+        ],
+      ),
+    );
 
     Widget card() => Container(
-          decoration: BoxDecoration(
-            color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: theme.colorScheme.outline),
-          ),
-          child: cardChild(),
-        );
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.outline),
+      ),
+      child: cardChild(),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -675,9 +684,12 @@ class _ErrorState extends StatelessWidget {
             color: theme.textTheme.bodySmall?.color,
           ),
           const SizedBox(height: 10),
-          const Text('No se pudo cargar el resumen del dashboard'),
+          Text(context.l10n.dashboardError),
           const SizedBox(height: 10),
-          FilledButton.tonal(onPressed: onRetry, child: const Text('Reintentar')),
+          FilledButton.tonal(
+            onPressed: onRetry,
+            child: Text(context.l10n.retry),
+          ),
         ],
       ),
     );

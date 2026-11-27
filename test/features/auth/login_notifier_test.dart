@@ -10,6 +10,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakeAuthRepository implements AuthRepository {
+  @override
+  Future<void> logout() async {}
+
   final Completer<AuthResult> loginCompleter = Completer<AuthResult>();
   final Completer<AuthSession> verifyCompleter = Completer<AuthSession>();
 

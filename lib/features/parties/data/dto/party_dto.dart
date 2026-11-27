@@ -81,7 +81,8 @@ abstract class CreatePersonProfileDto with _$CreatePersonProfileDto {
 
 /// Body de `POST /parties` — perfil de organización.
 @freezed
-abstract class CreateOrganizationProfileDto with _$CreateOrganizationProfileDto {
+abstract class CreateOrganizationProfileDto
+    with _$CreateOrganizationProfileDto {
   const factory CreateOrganizationProfileDto({
     @JsonKey(name: 'legal_name', includeIfNull: false) String? legalName,
     @JsonKey(name: 'trade_name', includeIfNull: false) String? tradeName,
@@ -120,6 +121,7 @@ extension PartyDtoMapper on PartyDto {
       legalName: organizationProfile?.legalName,
       taxId: organizationProfile?.taxId,
       createdAt: createdAt,
+      canonicalPartyId: canonicalPartyId,
     );
   }
 }

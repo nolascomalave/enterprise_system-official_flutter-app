@@ -187,4 +187,36 @@ void main() {
       expect(sent['code'], '123456');
     });
   });
+
+  group('AuthRepositoryImpl.logout', () {
+    test('llama POST /auth/logout y limpia token y tenant', () async {
+      storage.token = 'token-123';
+      storage.tenantId = 'tenant-1';
+      adapter = MockAdapter((options, body) async {
+        expect(options.method, 'POST');
+        expect(options.path, '/auth/logout');
+        return ResponseBody.fromString('', 204);
+      });
+      repository = AuthRepositoryImpl(buildDio(), storage);
+
+      await repository.logout();
+
+      expect(storage.token, isNull);
+      expect(storage.tenantId, isNull);
+    });
+
+    test('limpia el storage aunque el backend falle', () async {
+      storage.token = 'token-123';
+      storage.tenantId = 'tenant-1';
+      adapter = MockAdapter((options, body) async {
+        return jsonResponse({'error': 'boom'}, statusCode: 500);
+      });
+      repository = AuthRepositoryImpl(buildDio(), storage);
+
+      await repository.logout();
+
+      expect(storage.token, isNull);
+      expect(storage.tenantId, isNull);
+    });
+  });
 }

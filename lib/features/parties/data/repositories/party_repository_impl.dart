@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../domain/entities/merge_parties_result.dart';
 import '../../domain/entities/party.dart';
 import '../../domain/entities/party_detail.dart';
 import '../../domain/repositories/parties_repository.dart';
+import '../dto/merge_parties_dto.dart';
 import '../dto/party_detail_dto.dart';
 import '../dto/party_dto.dart';
+import '../dto/update_party_dto.dart';
 
 /// Implementación contra la API Go.
 ///
@@ -27,7 +30,10 @@ class PartyRepositoryImpl implements PartiesRepository {
       }
       return data
           .whereType<Map>()
-          .map((json) => PartyDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                PartyDto.fromJson(Map<String, dynamic>.from(json)).toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -37,8 +43,9 @@ class PartyRepositoryImpl implements PartiesRepository {
   @override
   Future<PartyDetail> getPartyById(String partyId) async {
     try {
-      final response =
-          await _dio.get<Map<String, dynamic>>('/parties/$partyId');
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/parties/$partyId',
+      );
       final data = response.data?['data'] ?? response.data;
       if (data is! Map) {
         throw const ApiException('Respuesta de detalle inválida del servidor.');
@@ -77,9 +84,69 @@ class PartyRepositoryImpl implements PartiesRepository {
       );
       final data = response.data?['data'];
       if (data is! Map) {
-        throw const ApiException('Respuesta de creación inválida del servidor.');
+        throw const ApiException(
+          'Respuesta de creación inválida del servidor.',
+        );
       }
       return PartyDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
+    } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<void> updateParty(String partyId, UpdatePartyParams params) async {
+    final request = UpdatePartyRequestDto(
+      displayName: params.displayName,
+      partyType: params.partyType.apiValue,
+      personProfile: params.partyType == PartyType.individual
+          ? CreatePersonProfileDto(
+              firstName: params.firstName,
+              middleName: params.middleName,
+              lastName: params.lastName,
+              secondLastName: params.secondLastName,
+              birthDate: params.birthDate,
+            )
+          : null,
+      organizationProfile: params.partyType == PartyType.organization
+          ? CreateOrganizationProfileDto(
+              legalName: params.legalName,
+              tradeName: params.tradeName,
+              taxId: params.taxId,
+            )
+          : null,
+    );
+
+    try {
+      await _dio.put<void>('/parties/$partyId', data: request.toJson());
+    } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  @override
+  Future<MergePartiesResult> mergeParties({
+    required String sourcePartyId,
+    required String targetPartyId,
+  }) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(
+        '/parties/merge',
+        data: MergePartiesRequestDto(
+          sourcePartyId: sourcePartyId,
+          targetPartyId: targetPartyId,
+        ).toJson(),
+      );
+      final data = response.data?['data'];
+      if (data is Map) {
+        return MergePartiesResponseDto.fromJson(Map<String, dynamic>.from(data))
+            .toEntity();
+      }
+      // 204 o respuesta sin body: devolvemos lo enviado.
+      return MergePartiesResult(
+        sourceId: sourcePartyId,
+        targetId: targetPartyId,
+      );
     } on DioException catch (error) {
       throw _toApiException(error);
     }
@@ -131,14 +198,23 @@ class PartyRepositoryImpl implements PartiesRepository {
           entries.add(PartyContact(type: fallbackType, value: item));
         } else if (item is Map) {
           final map = Map<String, dynamic>.from(item);
-          final value = _firstString(map, ['value', 'email', 'phone', 'number', 'contact']);
+          final value = _firstString(map, [
+            'value',
+            'email',
+            'phone',
+            'number',
+            'contact',
+          ]);
           if (value == null) continue;
           entries.add(
             PartyContact(
-              type: _firstString(
-                    map,
-                    ['contact_type', 'type', 'kind', 'method'],
-                  ) ??
+              type:
+                  _firstString(map, [
+                    'contact_type',
+                    'type',
+                    'kind',
+                    'method',
+                  ]) ??
                   fallbackType,
               value: value,
               isPrimary: _firstBool(map, ['is_primary', 'primary']),
@@ -148,7 +224,10 @@ class PartyRepositoryImpl implements PartiesRepository {
       }
     }
 
-    addAll(_pick(json, ['contacts', 'party_contacts', 'contact_methods']), 'Contacto');
+    addAll(
+      _pick(json, ['contacts', 'party_contacts', 'contact_methods']),
+      'Contacto',
+    );
     addAll(_pick(json, ['emails', 'email_addresses']), 'EMAIL');
     addAll(_pick(json, ['phones', 'phone_numbers']), 'PHONE');
     return entries;
@@ -159,9 +238,11 @@ class PartyRepositoryImpl implements PartiesRepository {
     for (final item in _asList(_pick(json, ['addresses', 'party_addresses']))) {
       if (item is! Map) continue;
       final map = Map<String, dynamic>.from(item);
-      final type = _firstString(map, ['address_type', 'type', 'kind']) ?? 'ADDRESS';
+      final type =
+          _firstString(map, ['address_type', 'type', 'kind']) ?? 'ADDRESS';
       final formatted = _firstString(map, ['formatted', 'full_address']);
-      final text = formatted ??
+      final text =
+          formatted ??
           [
             _firstString(map, ['line1', 'street', 'address']),
             _firstString(map, ['line2']),
@@ -178,10 +259,17 @@ class PartyRepositoryImpl implements PartiesRepository {
 
   List<PartyNameEntry> _parseNames(Map<String, dynamic> json) {
     final entries = <PartyNameEntry>[];
-    for (final item in _asList(_pick(json, ['names', 'party_names', 'name_history']))) {
+    for (final item in _asList(
+      _pick(json, ['names', 'party_names', 'name_history']),
+    )) {
       if (item is! Map) continue;
       final map = Map<String, dynamic>.from(item);
-      final name = _firstString(map, ['name', 'display_name', 'full_name', 'value']);
+      final name = _firstString(map, [
+        'name',
+        'display_name',
+        'full_name',
+        'value',
+      ]);
       if (name == null) continue;
       entries.add(
         PartyNameEntry(
@@ -196,12 +284,20 @@ class PartyRepositoryImpl implements PartiesRepository {
 
   List<String> _parseNationalities(Map<String, dynamic> json) {
     final values = <String>[];
-    for (final item in _asList(_pick(json, ['nationalities', 'party_nationalities']))) {
+    for (final item in _asList(
+      _pick(json, ['nationalities', 'party_nationalities']),
+    )) {
       if (item is String && item.isNotEmpty) {
         values.add(item);
       } else if (item is Map) {
         final map = Map<String, dynamic>.from(item);
-        final label = _firstString(map, ['name', 'country', 'nationality', 'code', 'country_code']);
+        final label = _firstString(map, [
+          'name',
+          'country',
+          'nationality',
+          'code',
+          'country_code',
+        ]);
         if (label != null) values.add(label);
       }
     }
@@ -213,14 +309,19 @@ class PartyRepositoryImpl implements PartiesRepository {
     for (final item in _asList(_pick(json, ['documents', 'party_documents']))) {
       if (item is! Map) continue;
       final map = Map<String, dynamic>.from(item);
-      final value = _firstString(
-        map,
-        ['document_number', 'number', 'value', 'identifier', 'document_id'],
-      );
+      final value = _firstString(map, [
+        'document_number',
+        'number',
+        'value',
+        'identifier',
+        'document_id',
+      ]);
       if (value == null) continue;
       entries.add(
         PartyDocument(
-          type: _firstString(map, ['document_type', 'type', 'kind']) ?? 'DOCUMENTO',
+          type:
+              _firstString(map, ['document_type', 'type', 'kind']) ??
+              'DOCUMENTO',
           value: value,
         ),
       );

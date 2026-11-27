@@ -129,14 +129,14 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( AuthSession session)?  success,TResult Function( String tempToken)?  requiresTwoFactor,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( AuthSession session)?  success,TResult Function( String tempToken)?  requiresTwoFactor,TResult Function( String message,  LoginErrorKind? kind)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case LoginInitial() when initial != null:
 return initial();case LoginLoading() when loading != null:
 return loading();case LoginSuccess() when success != null:
 return success(_that.session);case LoginRequiresTwoFactor() when requiresTwoFactor != null:
 return requiresTwoFactor(_that.tempToken);case LoginError() when error != null:
-return error(_that.message);case _:
+return error(_that.message,_that.kind);case _:
   return orElse();
 
 }
@@ -154,14 +154,14 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( AuthSession session)  success,required TResult Function( String tempToken)  requiresTwoFactor,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( AuthSession session)  success,required TResult Function( String tempToken)  requiresTwoFactor,required TResult Function( String message,  LoginErrorKind? kind)  error,}) {final _that = this;
 switch (_that) {
 case LoginInitial():
 return initial();case LoginLoading():
 return loading();case LoginSuccess():
 return success(_that.session);case LoginRequiresTwoFactor():
 return requiresTwoFactor(_that.tempToken);case LoginError():
-return error(_that.message);}
+return error(_that.message,_that.kind);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -175,14 +175,14 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( AuthSession session)?  success,TResult? Function( String tempToken)?  requiresTwoFactor,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( AuthSession session)?  success,TResult? Function( String tempToken)?  requiresTwoFactor,TResult? Function( String message,  LoginErrorKind? kind)?  error,}) {final _that = this;
 switch (_that) {
 case LoginInitial() when initial != null:
 return initial();case LoginLoading() when loading != null:
 return loading();case LoginSuccess() when success != null:
 return success(_that.session);case LoginRequiresTwoFactor() when requiresTwoFactor != null:
 return requiresTwoFactor(_that.tempToken);case LoginError() when error != null:
-return error(_that.message);case _:
+return error(_that.message,_that.kind);case _:
   return null;
 
 }
@@ -394,10 +394,11 @@ as String,
 
 
 class LoginError implements LoginState {
-  const LoginError(this.message);
+  const LoginError(this.message, {this.kind});
   
 
  final  String message;
+ final  LoginErrorKind? kind;
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
@@ -409,18 +410,18 @@ $LoginErrorCopyWith<LoginError> get copyWith => _$LoginErrorCopyWithImpl<LoginEr
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginError&&(identical(other.message, message) || other.message == message));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginError&&(identical(other.message, message) || other.message == message)&&(identical(other.kind, kind) || other.kind == kind));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,message);
+    return Object.hash(runtimeType,message,kind);
 }
 
 @override
 String toString() {
-    return 'LoginState.error(message: $message)';
+    return 'LoginState.error(message: $message, kind: $kind)';
 }
 
 
@@ -431,7 +432,7 @@ abstract mixin class $LoginErrorCopyWith<$Res> implements $LoginStateCopyWith<$R
   factory $LoginErrorCopyWith(LoginError value, $Res Function(LoginError) _then) = _$LoginErrorCopyWithImpl;
 @useResult
 $Res call({
- String message
+ String message, LoginErrorKind? kind
 });
 
 
@@ -448,10 +449,11 @@ class _$LoginErrorCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? message = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? message = null,Object? kind = freezed,}) {
   return _then(LoginError(
 null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
-as String,
+as String,kind: freezed == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as LoginErrorKind?,
   ));
 }
 

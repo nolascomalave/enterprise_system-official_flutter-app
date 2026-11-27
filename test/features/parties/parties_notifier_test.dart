@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:enterprise_app/features/parties/domain/entities/merge_parties_result.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party.dart';
 import 'package:enterprise_app/features/parties/domain/entities/party_detail.dart';
 import 'package:enterprise_app/features/parties/domain/repositories/parties_repository.dart';
@@ -9,8 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class FakePartiesRepository implements PartiesRepository {
-  FakePartiesRepository({List<Party>? initial})
-      : parties = [...?initial];
+  FakePartiesRepository({List<Party>? initial}) : parties = [...?initial];
 
   final List<Party> parties;
   Completer<List<Party>>? fetchCompleter;
@@ -19,6 +19,19 @@ class FakePartiesRepository implements PartiesRepository {
 
   @override
   Future<PartyDetail> getPartyById(String partyId) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateParty(String partyId, UpdatePartyParams params) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<MergePartiesResult> mergeParties({
+    required String sourcePartyId,
+    required String targetPartyId,
+  }) {
     throw UnimplementedError();
   }
 

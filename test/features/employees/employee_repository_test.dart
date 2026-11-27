@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:enterprise_app/features/employees/data/repositories/employee_repository_impl.dart';
 import 'package:enterprise_app/features/employees/domain/entities/employee.dart';
+import 'package:enterprise_app/features/employees/domain/errors/employee_not_found_exception.dart';
 import 'package:enterprise_app/features/employees/domain/repositories/employees_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -9,8 +10,9 @@ import '../../helpers/mock_dio.dart';
 void main() {
   late MockAdapter adapter;
 
-  Dio buildDio() => Dio(BaseOptions(baseUrl: 'http://test.local/api/v1'))
-    ..httpClientAdapter = adapter;
+  Dio buildDio() =>
+      Dio(BaseOptions(baseUrl: 'http://test.local/api/v1'))
+        ..httpClientAdapter = adapter;
 
   group('EmployeeRepositoryImpl.getEmployees', () {
     test('parsea el envelope y mapea estados', () async {
@@ -50,46 +52,95 @@ void main() {
     });
   });
 
-  group('EmployeeRepositoryImpl.createEmployee', () {
-    test('envía el payload snake_case requerido y devuelve el empleado',
-        () async {
+  group('EmployeeRepositoryImpl.getEmployeeById', () {
+    test('llama a GET /employees/{id} y mapea el envelope', () async {
       adapter = MockAdapter((options, body) async {
-        expect(options.path, '/employees');
+        expect(options.method, 'GET');
+        expect(options.path, '/employees/p2');
         return jsonResponse({
           'data': {
-            'party_id': 'p1',
-            'employee_code': 'EMP-0100',
-            'job_id': 'j1',
-            'department_id': 'd1',
-            'hire_date': '2026-11-19',
-            'status': 'ACTIVE',
+            'party_id': 'p2',
+            'employee_code': 'EMP-0002',
+            'job_id': 'j2',
+            'department_id': 'd2',
+            'hire_date': '2025-06-01',
+            'status': 'ON_LEAVE',
           },
-        }, statusCode: 201);
+        });
       });
 
       final repository = EmployeeRepositoryImpl(buildDio());
-      final employee = await repository.createEmployee(
-        const CreateEmployeeParams(
-          partyId: 'p1',
-          employeeCode: 'EMP-0100',
-          hireDate: '2026-11-19',
-          jobId: 'j1',
-          departmentId: 'd1',
+      final employee = await repository.getEmployeeById('p2');
+
+      expect(employee.partyId, 'p2');
+      expect(employee.employeeCode, 'EMP-0002');
+      expect(employee.status, EmployeeStatus.onLeave);
+      // No debe consultar el listado.
+      expect(adapter.lastOptions?.path, '/employees/p2');
+    });
+
+    test('mapea un 404 a EmployeeNotFoundException', () async {
+      adapter = MockAdapter(
+        (options, body) async =>
+            jsonResponse({'error': 'employee_not_found'}, statusCode: 404),
+      );
+      final repository = EmployeeRepositoryImpl(buildDio());
+
+      expect(
+        () => repository.getEmployeeById('missing'),
+        throwsA(
+          isA<EmployeeNotFoundException>().having(
+            (error) => error.employeeId,
+            'employeeId',
+            'missing',
+          ),
         ),
       );
-
-      expect(employee.employeeCode, 'EMP-0100');
-      expect(employee.status, EmployeeStatus.active);
-
-      final sent = adapter.lastBody!;
-      expect(sent, contains('"party_id":"p1"'));
-      expect(sent, contains('"employee_code":"EMP-0100"'));
-      expect(sent, contains('"hire_date":"2026-11-19"'));
-      expect(sent, contains('"job_id":"j1"'));
-      expect(sent, contains('"department_id":"d1"'));
-      expect(sent, contains('"status":"ACTIVE"'));
-      expect(sent, isNot(contains('"manager_party_id"')));
     });
+  });
+
+  group('EmployeeRepositoryImpl.createEmployee', () {
+    test(
+      'envía el payload snake_case requerido y devuelve el empleado',
+      () async {
+        adapter = MockAdapter((options, body) async {
+          expect(options.path, '/employees');
+          return jsonResponse({
+            'data': {
+              'party_id': 'p1',
+              'employee_code': 'EMP-0100',
+              'job_id': 'j1',
+              'department_id': 'd1',
+              'hire_date': '2026-11-19',
+              'status': 'ACTIVE',
+            },
+          }, statusCode: 201);
+        });
+
+        final repository = EmployeeRepositoryImpl(buildDio());
+        final employee = await repository.createEmployee(
+          const CreateEmployeeParams(
+            partyId: 'p1',
+            employeeCode: 'EMP-0100',
+            hireDate: '2026-11-19',
+            jobId: 'j1',
+            departmentId: 'd1',
+          ),
+        );
+
+        expect(employee.employeeCode, 'EMP-0100');
+        expect(employee.status, EmployeeStatus.active);
+
+        final sent = adapter.lastBody!;
+        expect(sent, contains('"party_id":"p1"'));
+        expect(sent, contains('"employee_code":"EMP-0100"'));
+        expect(sent, contains('"hire_date":"2026-11-19"'));
+        expect(sent, contains('"job_id":"j1"'));
+        expect(sent, contains('"department_id":"d1"'));
+        expect(sent, contains('"status":"ACTIVE"'));
+        expect(sent, isNot(contains('"manager_party_id"')));
+      },
+    );
   });
 
   group('OrgStructureRepositoryImpl', () {

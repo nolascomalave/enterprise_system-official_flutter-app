@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../../core/network/api_exception.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/ui/skeleton.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/corporate_relationship.dart';
 import '../providers/relationships_notifier.dart';
 import '../providers/relationships_providers.dart';
@@ -18,8 +19,9 @@ class CorporateRelationshipsPage extends ConsumerWidget {
     CorporateRelationship relationship,
   ) async {
     try {
-      final token =
-          await ref.read(relationshipsProvider.notifier).emitToken(relationship.id);
+      final token = await ref
+          .read(relationshipsProvider.notifier)
+          .emitToken(relationship.id);
       if (!context.mounted) return;
       await showEmitTokenDialog(context, token);
     } catch (error) {
@@ -27,7 +29,9 @@ class CorporateRelationshipsPage extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            error is ApiException ? error.message : 'No se pudo emitir el token.',
+            error is ApiException
+                ? error.message
+                : context.l10n.couldNotIssueToken,
           ),
         ),
       );
@@ -70,7 +74,9 @@ class CorporateRelationshipsPage extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _Header(onCreate: () => showNewRelationshipDialog(context, ref)),
+                _Header(
+                  onCreate: () => showNewRelationshipDialog(context, ref),
+                ),
                 const SizedBox(height: 20),
                 Expanded(
                   child: relationAsync.when(
@@ -79,11 +85,12 @@ class CorporateRelationshipsPage extends ConsumerWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('No se pudieron cargar las relaciones'),
+                          Text(context.l10n.relationshipsError),
                           const SizedBox(height: 8),
                           TextButton(
-                            onPressed: () => ref.invalidate(relationshipsProvider),
-                            child: const Text('Reintentar'),
+                            onPressed: () =>
+                                ref.invalidate(relationshipsProvider),
+                            child: Text(context.l10n.retry),
                           ),
                         ],
                       ),
@@ -109,23 +116,25 @@ class CorporateRelationshipsPage extends ConsumerWidget {
                                     return _RelationshipsTable(
                                       relationships: relationships,
                                       tenantId: tenantId,
-                                      onAction: (relationship, action) => _onAction(
-                                        context,
-                                        ref,
-                                        relationship,
-                                        action,
-                                      ),
+                                      onAction: (relationship, action) =>
+                                          _onAction(
+                                            context,
+                                            ref,
+                                            relationship,
+                                            action,
+                                          ),
                                     );
                                   }
                                   return _RelationshipsList(
                                     relationships: relationships,
                                     tenantId: tenantId,
-                                    onAction: (relationship, action) => _onAction(
-                                      context,
-                                      ref,
-                                      relationship,
-                                      action,
-                                    ),
+                                    onAction: (relationship, action) =>
+                                        _onAction(
+                                          context,
+                                          ref,
+                                          relationship,
+                                          action,
+                                        ),
                                   );
                                 },
                               ),
@@ -158,7 +167,7 @@ class _Header extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Relaciones Corporativas',
+                context.l10n.relationshipsTitle,
                 style: theme.textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.6,
@@ -166,7 +175,7 @@ class _Header extends StatelessWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                'Estructura holding-filial de tus tenants',
+                context.l10n.relationshipsSubtitle,
                 style: TextStyle(
                   fontSize: 13,
                   color: isDark
@@ -185,7 +194,9 @@ class _Header extends StatelessWidget {
             child: Ink(
               height: 42,
               decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [AppColors.indigo, AppColors.violet]),
+                gradient: LinearGradient(
+                  colors: [AppColors.indigo, AppColors.violet],
+                ),
               ),
               child: InkWell(
                 onTap: onCreate,
@@ -193,12 +204,16 @@ class _Header extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.add_rounded, size: 17, color: Colors.white),
-                      SizedBox(width: 6),
+                    children: [
+                      const Icon(
+                        Icons.add_rounded,
+                        size: 17,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 6),
                       Text(
-                        'Nueva Relación',
-                        style: TextStyle(
+                        context.l10n.newRelationship,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           color: Colors.white,
@@ -216,31 +231,52 @@ class _Header extends StatelessWidget {
   }
 }
 
-Color _statusColor(RelationshipStatus status) => switch (status) {
-      RelationshipStatus.pending => AppColors.warning,
-      RelationshipStatus.approved => AppColors.success,
-      RelationshipStatus.rejected => AppColors.danger,
-      RelationshipStatus.revoked => const Color(0xFF71717A),
-      RelationshipStatus.cancelled => const Color(0xFF71717A),
-      RelationshipStatus.unknown => const Color(0xFF71717A),
+String _statusLabel(BuildContext context, RelationshipStatus status) =>
+    switch (status) {
+      RelationshipStatus.pending => context.l10n.statusPending,
+      RelationshipStatus.approved => context.l10n.statusApproved,
+      RelationshipStatus.rejected => context.l10n.statusRejected,
+      RelationshipStatus.revoked => context.l10n.statusRevoked,
+      RelationshipStatus.cancelled => context.l10n.statusCancelled,
+      RelationshipStatus.unknown => context.l10n.statusUnknown,
     };
 
+Color _statusColor(RelationshipStatus status) => switch (status) {
+  RelationshipStatus.pending => AppColors.warning,
+  RelationshipStatus.approved => AppColors.success,
+  RelationshipStatus.rejected => AppColors.danger,
+  RelationshipStatus.revoked => const Color(0xFF71717A),
+  RelationshipStatus.cancelled => const Color(0xFF71717A),
+  RelationshipStatus.unknown => const Color(0xFF71717A),
+};
+
 List<PopupMenuEntry<String>> _actionEntries(
+  BuildContext context,
   CorporateRelationship relationship,
   RelationshipRole role,
 ) {
   final entries = <PopupMenuEntry<String>>[];
   if (relationship.status == RelationshipStatus.pending) {
     if (role == RelationshipRole.holding) {
-      entries.add(const PopupMenuItem(value: 'emit', child: Text('Emitir token')));
-      entries.add(const PopupMenuItem(value: 'cancel', child: Text('Cancelar')));
+      entries.add(
+        PopupMenuItem(value: 'emit', child: Text(context.l10n.emitToken)),
+      );
+      entries.add(
+        PopupMenuItem(value: 'cancel', child: Text(context.l10n.cancelAction)),
+      );
     } else if (role == RelationshipRole.subsidiary) {
-      entries.add(const PopupMenuItem(value: 'consume', child: Text('Consumir token')));
-      entries.add(const PopupMenuItem(value: 'reject', child: Text('Rechazar')));
+      entries.add(
+        PopupMenuItem(value: 'consume', child: Text(context.l10n.consumeToken)),
+      );
+      entries.add(
+        PopupMenuItem(value: 'reject', child: Text(context.l10n.rejectAction)),
+      );
     }
   } else if (relationship.status == RelationshipStatus.approved &&
       role == RelationshipRole.holding) {
-    entries.add(const PopupMenuItem(value: 'revoke', child: Text('Revocar')));
+    entries.add(
+      PopupMenuItem(value: 'revoke', child: Text(context.l10n.revokeAction)),
+    );
   }
   return entries;
 }
@@ -254,27 +290,29 @@ class _RelationshipsTable extends StatelessWidget {
 
   final List<CorporateRelationship> relationships;
   final String? tenantId;
-  final void Function(CorporateRelationship relationship, String action) onAction;
+  final void Function(CorporateRelationship relationship, String action)
+  onAction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     Widget header(String label, int flex) => Expanded(
-          flex: flex,
-          child: Text(
-            label,
-            style: TextStyle(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.2,
-              color: secondary,
-            ),
-          ),
-        );
+      flex: flex,
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 1.2,
+          color: secondary,
+        ),
+      ),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -284,10 +322,10 @@ class _RelationshipsTable extends StatelessWidget {
           color: secondary.withValues(alpha: 0.03),
           child: Row(
             children: [
-              header('HOLDING', 4),
-              header('FILIAL', 4),
-              header('ESTADO', 3),
-              header('FECHA', 3),
+              header(context.l10n.colHolding, 4),
+              header(context.l10n.colSubsidiary, 4),
+              header(context.l10n.colStatus, 3),
+              header(context.l10n.colDate, 3),
               const SizedBox(width: 40),
             ],
           ),
@@ -304,7 +342,10 @@ class _RelationshipsTable extends StatelessWidget {
               final relationship = relationships[index];
               final role = relationship.roleFor(tenantId);
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -360,14 +401,16 @@ class _RelationshipsList extends StatelessWidget {
 
   final List<CorporateRelationship> relationships;
   final String? tenantId;
-  final void Function(CorporateRelationship relationship, String action) onAction;
+  final void Function(CorporateRelationship relationship, String action)
+  onAction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return ListView.separated(
       itemCount: relationships.length,
@@ -390,7 +433,10 @@ class _RelationshipsList extends StatelessWidget {
                       '${relationship.holdingLabel} → ${relationship.subsidiaryLabel}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -461,8 +507,9 @@ class _StatusCell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final secondary =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondary = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -506,7 +553,7 @@ class _StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 5),
           Text(
-            status.label,
+            _statusLabel(context, status),
             style: TextStyle(
               fontSize: 10.5,
               fontWeight: FontWeight.w500,
@@ -528,11 +575,12 @@ class _ActionsMenu extends StatelessWidget {
 
   final CorporateRelationship relationship;
   final RelationshipRole role;
-  final void Function(CorporateRelationship relationship, String action) onAction;
+  final void Function(CorporateRelationship relationship, String action)
+  onAction;
 
   @override
   Widget build(BuildContext context) {
-    final entries = _actionEntries(relationship, role);
+    final entries = _actionEntries(context, relationship, role);
     if (entries.isEmpty) {
       return Text(
         '—',
@@ -543,7 +591,7 @@ class _ActionsMenu extends StatelessWidget {
       );
     }
     return PopupMenuButton<String>(
-      tooltip: 'Acciones',
+      tooltip: context.l10n.actions,
       onSelected: (action) => onAction(relationship, action),
       itemBuilder: (context) => entries,
       icon: const Icon(Icons.more_vert_rounded, size: 18),
@@ -563,11 +611,21 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.hub_outlined, size: 36, color: theme.textTheme.bodySmall?.color),
+          Icon(
+            Icons.hub_outlined,
+            size: 36,
+            color: theme.textTheme.bodySmall?.color,
+          ),
           const SizedBox(height: 10),
-          Text('Aún no hay relaciones corporativas', style: theme.textTheme.bodyMedium),
+          Text(
+            context.l10n.relationshipsEmpty,
+            style: theme.textTheme.bodyMedium,
+          ),
           const SizedBox(height: 4),
-          Text('Inicia la primera con "Nueva Relación"', style: theme.textTheme.bodySmall),
+          Text(
+            context.l10n.relationshipsEmptyHint,
+            style: theme.textTheme.bodySmall,
+          ),
         ],
       ),
     );

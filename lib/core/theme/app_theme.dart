@@ -23,32 +23,58 @@ abstract final class AppTheme {
       error: AppColors.danger,
       onError: Colors.white,
       surface: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-      onSurface: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-      surfaceContainerHighest:
-          isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurfaceMuted,
+      onSurface: isDark
+          ? AppColors.darkTextPrimary
+          : AppColors.lightTextPrimary,
+      surfaceContainerHighest: isDark
+          ? AppColors.darkSurfaceElevated
+          : AppColors.lightSurfaceMuted,
       outline: isDark ? AppColors.darkBorder : AppColors.lightBorder,
     );
 
-    final baseTextTheme = GoogleFonts.interTextTheme(
-      ThemeData(brightness: brightness).textTheme,
-    ).apply(
-      bodyColor: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-      displayColor: isDark ? AppColors.darkTextPrimary : AppColors.lightTextPrimary,
-    );
+    final baseTextTheme =
+        GoogleFonts.interTextTheme(ThemeData(brightness: brightness).textTheme)
+            .apply(
+              bodyColor: isDark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary,
+              displayColor: isDark
+                  ? AppColors.darkTextPrimary
+                  : AppColors.lightTextPrimary,
+            );
 
     final textTheme = baseTextTheme.copyWith(
-      displayLarge: baseTextTheme.displayLarge?.copyWith(letterSpacing: -1.2, fontWeight: FontWeight.w600),
-      headlineLarge: baseTextTheme.headlineLarge?.copyWith(letterSpacing: -0.8, fontWeight: FontWeight.w600),
-      headlineMedium: baseTextTheme.headlineMedium?.copyWith(letterSpacing: -0.6, fontWeight: FontWeight.w600),
-      titleLarge: baseTextTheme.titleLarge?.copyWith(letterSpacing: -0.4, fontWeight: FontWeight.w600),
-      titleMedium: baseTextTheme.titleMedium?.copyWith(letterSpacing: -0.2, fontWeight: FontWeight.w500),
+      displayLarge: baseTextTheme.displayLarge?.copyWith(
+        letterSpacing: -1.2,
+        fontWeight: FontWeight.w600,
+      ),
+      headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+        letterSpacing: -0.8,
+        fontWeight: FontWeight.w600,
+      ),
+      headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+        letterSpacing: -0.6,
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: baseTextTheme.titleLarge?.copyWith(
+        letterSpacing: -0.4,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: baseTextTheme.titleMedium?.copyWith(
+        letterSpacing: -0.2,
+        fontWeight: FontWeight.w500,
+      ),
       bodySmall: baseTextTheme.bodySmall?.copyWith(
-        color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+        color: isDark
+            ? AppColors.darkTextSecondary
+            : AppColors.lightTextSecondary,
       ),
     );
 
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
-    final fieldFill = isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurface;
+    final fieldFill = isDark
+        ? AppColors.darkSurfaceElevated
+        : AppColors.lightSurface;
 
     final inputBorder = OutlineInputBorder(
       borderRadius: BorderRadius.circular(_radius),
@@ -61,12 +87,15 @@ abstract final class AppTheme {
       colorScheme: colorScheme,
       fontFamily: GoogleFonts.inter().fontFamily,
       textTheme: textTheme,
-      scaffoldBackgroundColor:
-          isDark ? AppColors.darkBackground : AppColors.lightBackground,
+      scaffoldBackgroundColor: isDark
+          ? AppColors.darkBackground
+          : AppColors.lightBackground,
       dividerColor: borderColor,
       splashFactory: InkRipple.splashFactory,
       appBarTheme: AppBarTheme(
-        backgroundColor: isDark ? AppColors.darkBackground : AppColors.lightBackground,
+        backgroundColor: isDark
+            ? AppColors.darkBackground
+            : AppColors.lightBackground,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -81,14 +110,23 @@ abstract final class AppTheme {
           side: BorderSide(color: borderColor),
         ),
       ),
-      dividerTheme: DividerThemeData(color: borderColor, thickness: 1, space: 1),
+      dividerTheme: DividerThemeData(
+        color: borderColor,
+        thickness: 1,
+        space: 1,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: fieldFill,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         hintStyle: TextStyle(
           fontSize: 14,
-          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+          color: isDark
+              ? AppColors.darkTextSecondary
+              : AppColors.lightTextSecondary,
         ),
         border: inputBorder,
         enabledBorder: inputBorder,
@@ -107,7 +145,9 @@ abstract final class AppTheme {
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
           minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_radius),
+          ),
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
         ),
       ),
@@ -115,7 +155,9 @@ abstract final class AppTheme {
         style: ElevatedButton.styleFrom(
           elevation: 0,
           minimumSize: const Size.fromHeight(48),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_radius),
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -125,22 +167,30 @@ abstract final class AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurfaceMuted,
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.lightSurfaceMuted,
         side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         labelStyle: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w500,
-          color: isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary,
+          color: isDark
+              ? AppColors.darkTextSecondary
+              : AppColors.lightTextSecondary,
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isDark ? AppColors.darkSurfaceElevated : AppColors.lightTextPrimary,
+        backgroundColor: isDark
+            ? AppColors.darkSurfaceElevated
+            : AppColors.lightTextPrimary,
         contentTextStyle: TextStyle(
           color: isDark ? AppColors.darkTextPrimary : AppColors.lightSurface,
         ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(_radius)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(_radius),
+        ),
       ),
     );
   }

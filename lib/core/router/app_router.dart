@@ -5,7 +5,9 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/two_factor_page.dart';
 import '../../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../../features/corporate_relationships/presentation/pages/corporate_relationships_page.dart';
+import '../../features/departments/presentation/pages/department_detail_page.dart';
 import '../../features/departments/presentation/pages/departments_page.dart';
+import '../../features/employees/presentation/pages/employee_detail_page.dart';
 import '../../features/employees/presentation/pages/employees_list_page.dart';
 import '../../features/parties/presentation/pages/parties_list_page.dart';
 import '../../features/parties/presentation/pages/party_detail_page.dart';
@@ -72,9 +74,8 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: ':id',
                     name: 'partyDetail',
-                    builder: (context, state) => PartyDetailPage(
-                      partyId: state.pathParameters['id']!,
-                    ),
+                    builder: (context, state) =>
+                        PartyDetailPage(partyId: state.pathParameters['id']!),
                   ),
                 ],
               ),
@@ -86,6 +87,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: BranchRoutes.employees,
                 name: 'employees',
                 builder: (context, state) => const EmployeesListPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'employeeDetail',
+                    builder: (context, state) => EmployeeDetailPage(
+                      employeeId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -95,6 +105,15 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: BranchRoutes.departments,
                 name: 'departments',
                 builder: (context, state) => const DepartmentsPage(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'departmentDetail',
+                    builder: (context, state) => DepartmentDetailPage(
+                      departmentId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

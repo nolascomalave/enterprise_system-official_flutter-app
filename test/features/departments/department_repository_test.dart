@@ -9,8 +9,9 @@ import '../../helpers/mock_dio.dart';
 void main() {
   late MockAdapter adapter;
 
-  Dio buildDio() => Dio(BaseOptions(baseUrl: 'http://test.local/api/v1'))
-    ..httpClientAdapter = adapter;
+  Dio buildDio() =>
+      Dio(BaseOptions(baseUrl: 'http://test.local/api/v1'))
+        ..httpClientAdapter = adapter;
 
   group('DepartmentRepositoryImpl.getDepartments', () {
     test('parsea la lista plana y construye el árbol jerárquico', () async {
@@ -23,6 +24,7 @@ void main() {
               'name': 'Tecnología',
               'code': 'TECH',
               'unit_type': 'DIVISION',
+              'created_at': '2024-03-01T10:00:00Z',
             },
             {
               'id': 'd2',
@@ -47,6 +49,7 @@ void main() {
 
       expect(departments, hasLength(3));
       expect(departments.first.unitType, DepartmentUnitType.division);
+      expect(departments.first.createdAt, '2024-03-01T10:00:00Z');
       expect(departments[1].parentDepartmentId, 'd1');
       expect(departments[1].managerPartyId, 'p1');
 

@@ -85,7 +85,9 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
     if (!_hasContent) {
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Center(child: Tooltip(message: widget.node.name, child: iconWidget)),
+        child: Center(
+          child: Tooltip(message: widget.node.name, child: iconWidget),
+        ),
       );
     }
 
@@ -114,7 +116,10 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
               for (final option in options)
                 PopupMenuItem<String>(
                   value: option.route,
-                  child: Text(option.name, style: const TextStyle(fontSize: 13)),
+                  child: Text(
+                    option.name,
+                    style: const TextStyle(fontSize: 13),
+                  ),
                 ),
             ];
           },
@@ -126,20 +131,31 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
 
   Widget _buildExpanded(ThemeData theme, bool isDark, Color primary) {
     final indent = 12.0 + widget.level * 12.0;
-    final activeText = isDark ? const Color(0xFFFAFAFA) : const Color(0xFF09090B);
+    final activeText = isDark
+        ? const Color(0xFFFAFAFA)
+        : const Color(0xFF09090B);
     final idleText = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: EdgeInsets.only(left: indent - 8, right: 4, top: 1, bottom: 1),
+          padding: EdgeInsets.only(
+            left: indent - 8,
+            right: 4,
+            top: 1,
+            bottom: 1,
+          ),
           child: Material(
-            color: _isActive ? primary.withValues(alpha: 0.10) : Colors.transparent,
+            color: _isActive
+                ? primary.withValues(alpha: 0.10)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             child: InkWell(
               borderRadius: BorderRadius.circular(8),
-              onTap: _hasContent ? () => setState(() => _expanded = !_expanded) : null,
+              onTap: _hasContent
+                  ? () => setState(() => _expanded = !_expanded)
+                  : null,
               hoverColor: isDark
                   ? Colors.white.withValues(alpha: 0.04)
                   : Colors.black.withValues(alpha: 0.04),
@@ -161,7 +177,10 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
                       ),
                     ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
                     child: Row(
                       children: [
                         Icon(
@@ -177,8 +196,9 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               fontSize: 13.5,
-                              fontWeight:
-                                  _isActive ? FontWeight.w600 : FontWeight.w500,
+                              fontWeight: _isActive
+                                  ? FontWeight.w600
+                                  : FontWeight.w500,
                               color: _isActive ? activeText : idleText,
                               letterSpacing: -0.1,
                             ),
@@ -204,8 +224,9 @@ class _SidebarMenuItemState extends State<SidebarMenuItem> {
         ),
         AnimatedCrossFade(
           duration: const Duration(milliseconds: 200),
-          crossFadeState:
-              _expanded ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+          crossFadeState: _expanded
+              ? CrossFadeState.showFirst
+              : CrossFadeState.showSecond,
           firstChild: _buildChildren(primary),
           secondChild: const SizedBox(width: double.infinity),
         ),
@@ -257,7 +278,9 @@ class _OptionTile extends StatelessWidget {
     final isActive = option.route == currentPath;
     final indent = 12.0 + level * 12.0;
     final idleText = isDark ? const Color(0xFFA1A1AA) : const Color(0xFF52525B);
-    final activeText = isDark ? const Color(0xFFFAFAFA) : const Color(0xFF09090B);
+    final activeText = isDark
+        ? const Color(0xFFFAFAFA)
+        : const Color(0xFF09090B);
 
     return Padding(
       padding: EdgeInsets.only(left: indent - 8, right: 4, top: 1, bottom: 1),
@@ -288,13 +311,20 @@ class _OptionTile extends StatelessWidget {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 7,
+                ),
                 child: Row(
                   children: [
                     Icon(
-                      menuIconForCode(option.icon.isNotEmpty ? option.icon : option.code),
+                      menuIconForCode(
+                        option.icon.isNotEmpty ? option.icon : option.code,
+                      ),
                       size: 15,
-                      color: isActive ? primary : idleText.withValues(alpha: 0.9),
+                      color: isActive
+                          ? primary
+                          : idleText.withValues(alpha: 0.9),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -304,7 +334,9 @@ class _OptionTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                          fontWeight: isActive
+                              ? FontWeight.w600
+                              : FontWeight.w400,
                           color: isActive ? activeText : idleText,
                         ),
                       ),

@@ -10,6 +10,16 @@ class GetEmployeesUseCase {
   Future<List<Employee>> call() => _repository.getEmployees();
 }
 
+/// Caso de uso: obtener un empleado por su party ID.
+class GetEmployeeByIdUseCase {
+  const GetEmployeeByIdUseCase(this._repository);
+
+  final EmployeesRepository _repository;
+
+  Future<Employee> call(String employeeId) =>
+      _repository.getEmployeeById(employeeId);
+}
+
 /// Caso de uso: crear un empleado.
 class CreateEmployeeUseCase {
   const CreateEmployeeUseCase(this._repository);

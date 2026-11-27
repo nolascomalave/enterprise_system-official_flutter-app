@@ -6,6 +6,7 @@ import '../../../../core/i18n/generated/app_localizations.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../providers/login_notifier.dart';
+import '../state/login_error_l10n.dart';
 import '../state/login_state.dart';
 import '../widgets/auth_shell.dart';
 
@@ -32,7 +33,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _submit() {
     FocusScope.of(context).unfocus();
-    ref.read(loginProvider.notifier).login(
+    ref
+        .read(loginProvider.notifier)
+        .login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
           tenantId: _tenantController.text.trim(),
@@ -44,7 +47,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(loginProvider);
     final isLoading = state is LoginLoading;
-    final errorMessage = state is LoginError ? state.message : null;
+    final errorMessage = state is LoginError
+        ? state.localizedMessage(context)
+        : null;
 
     ref.listen<LoginState>(loginProvider, (previous, next) {
       if (next is LoginSuccess) {
@@ -75,12 +80,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     colors: [AppColors.indigo, AppColors.purple],
                   ),
                 ),
-                child: const Icon(Icons.apartment_rounded, color: Colors.white, size: 18),
+                child: const Icon(
+                  Icons.apartment_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
               ),
               const SizedBox(width: 10),
               Text(
                 'Enterprise App',
-                style: theme.textTheme.titleMedium?.copyWith(letterSpacing: -0.4),
+                style: theme.textTheme.titleMedium?.copyWith(
+                  letterSpacing: -0.4,
+                ),
               ),
             ],
           ),
@@ -98,7 +109,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
             textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(hintText: 'nombre@empresa.com'),
+            decoration: InputDecoration(hintText: l10n.emailHint),
           ),
           const SizedBox(height: 16),
 
@@ -107,15 +118,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             children: [
               Text(l10n.passwordLabel, style: theme.textTheme.labelLarge),
               TextButton(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.comingSoon)),
-                ),
+                onPressed: () =>
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text(l10n.comingSoon))),
                 style: TextButton.styleFrom(
                   minimumSize: Size.zero,
                   padding: EdgeInsets.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                child: Text(l10n.forgotPassword, style: const TextStyle(fontSize: 12)),
+                child: Text(
+                  l10n.forgotPassword,
+                  style: const TextStyle(fontSize: 12),
+                ),
               ),
             ],
           ),
@@ -130,7 +144,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             decoration: InputDecoration(
               hintText: '••••••••',
               suffixIcon: IconButton(
-                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                onPressed: () =>
+                    setState(() => _obscurePassword = !_obscurePassword),
                 icon: Icon(
                   _obscurePassword
                       ? Icons.visibility_outlined
@@ -165,9 +180,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ],
           const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.comingSoon)),
-            ),
+            onPressed: () =>
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(SnackBar(content: Text(l10n.comingSoon))),
             icon: const Icon(Icons.add_business_outlined, size: 16),
             label: Text(l10n.registerCompany),
             style: OutlinedButton.styleFrom(

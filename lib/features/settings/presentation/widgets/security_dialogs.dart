@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/i18n/l10n_ext.dart';
 import '../../domain/entities/security_settings.dart';
 import '../providers/security_settings_notifier.dart';
 
@@ -38,7 +39,7 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
   Future<void> _verify() async {
     final code = _codeController.text.trim();
     if (code.length != 6) {
-      setState(() => _error = 'Introduce el código de 6 dígitos.');
+      setState(() => _error = context.l10n.invalidCode);
       return;
     }
     setState(() {
@@ -56,7 +57,9 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
       if (!mounted) return;
       setState(() {
         _verifying = false;
-        _error = error is ApiException ? error.message : 'Código inválido.';
+        _error = error is ApiException
+            ? error.message
+            : context.l10n.invalidCode;
       });
     }
   }
@@ -77,7 +80,9 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
         constraints: const BoxConstraints(maxWidth: 480),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: _backupCodes == null ? _buildSetup(theme, isDark) : _buildSuccess(theme),
+          child: _backupCodes == null
+              ? _buildSetup(theme, isDark)
+              : _buildSuccess(theme),
         ),
       ),
     );
@@ -89,12 +94,14 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'Configurar app autenticadora',
-          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+          context.l10n.totpConfigTitle,
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 6),
         Text(
-          'Escanea el código QR con Google Authenticator, 1Password o similar.',
+          context.l10n.totpScan,
           style: TextStyle(
             fontSize: 13,
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
@@ -127,7 +134,7 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
         ),
         const SizedBox(height: 16),
         Text(
-          '¿No puedes escanear? Introduce este secreto manualmente:',
+          context.l10n.totpManual,
           style: TextStyle(
             fontSize: 12,
             color: isDark ? const Color(0xFFA1A1AA) : const Color(0xFF71717A),
@@ -152,7 +159,14 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
           ),
         ),
         const SizedBox(height: 20),
-        Text('Código de verificación', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: theme.textTheme.bodySmall?.color)),
+        Text(
+          context.l10n.codeLabel,
+          style: TextStyle(
+            fontSize: 12.5,
+            fontWeight: FontWeight.w500,
+            color: theme.textTheme.bodySmall?.color,
+          ),
+        ),
         const SizedBox(height: 6),
         TextField(
           key: const Key('totp_code'),
@@ -163,21 +177,33 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
           maxLength: 6,
           textAlign: TextAlign.center,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600, letterSpacing: 8),
-          decoration: const InputDecoration(counterText: '', hintText: '000000'),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 8,
+          ),
+          decoration: const InputDecoration(
+            counterText: '',
+            hintText: '000000',
+          ),
           onSubmitted: (_) => _verify(),
         ),
         if (_error != null) ...[
           const SizedBox(height: 8),
-          Text(_error!, style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444))),
+          Text(
+            _error!,
+            style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+          ),
         ],
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              onPressed: _verifying ? null : () => Navigator.of(context).maybePop(),
-              child: const Text('Cancelar'),
+              onPressed: _verifying
+                  ? null
+                  : () => Navigator.of(context).maybePop(),
+              child: Text(context.l10n.cancel),
             ),
             const SizedBox(width: 8),
             ClipRRect(
@@ -187,7 +213,9 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
                 child: Ink(
                   height: 42,
                   decoration: const BoxDecoration(
-                    gradient: LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)]),
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
+                    ),
                   ),
                   child: InkWell(
                     onTap: _verifying ? null : _verify,
@@ -198,11 +226,18 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
-                            : const Text(
-                                'Verificar',
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
+                            : Text(
+                                context.l10n.verify,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                       ),
                     ),
@@ -223,11 +258,17 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
       children: [
         Row(
           children: [
-            const Icon(Icons.verified_outlined, color: Color(0xFF10B981), size: 22),
+            const Icon(
+              Icons.verified_outlined,
+              color: Color(0xFF10B981),
+              size: 22,
+            ),
             const SizedBox(width: 8),
             Text(
-              '2FA activado',
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              context.l10n.twoFactorActivated,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),
@@ -240,7 +281,7 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
             border: Border.all(color: const Color(0x33F59E0B)),
           ),
           child: Text(
-            'Guarda estos 8 códigos de respaldo en un lugar seguro. No volverán a mostrarse.',
+            context.l10n.backupWarning,
             style: TextStyle(
               fontSize: 12,
               height: 1.5,
@@ -282,7 +323,10 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
           contentPadding: EdgeInsets.zero,
           controlAffinity: ListTileControlAffinity.leading,
           dense: true,
-          title: const Text('He guardado mis códigos de respaldo', style: TextStyle(fontSize: 13)),
+          title: Text(
+            context.l10n.backupAck,
+            style: const TextStyle(fontSize: 13),
+          ),
         ),
         const SizedBox(height: 8),
         Align(
@@ -290,7 +334,7 @@ class _TotpSetupDialogState extends State<TotpSetupDialog> {
           child: FilledButton(
             key: const Key('totp_close'),
             onPressed: _acknowledged ? () => Navigator.of(context).pop() : null,
-            child: const Text('Cerrar'),
+            child: Text(context.l10n.close),
           ),
         ),
       ],
@@ -351,8 +395,9 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
       if (!mounted) return;
       setState(() {
         _requesting = false;
-        _requestError =
-            error is ApiException ? error.message : 'No se pudo enviar el código.';
+        _requestError = error is ApiException
+            ? error.message
+            : context.l10n.couldNotSendCode;
       });
     }
   }
@@ -360,7 +405,7 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
   Future<void> _confirm() async {
     final code = _codeController.text.trim();
     if (code.isEmpty) {
-      setState(() => _error = 'Introduce el código recibido.');
+      setState(() => _error = context.l10n.invalidCode);
       return;
     }
     setState(() {
@@ -379,7 +424,9 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
       if (!mounted) return;
       setState(() {
         _submitting = false;
-        _error = error is ApiException ? error.message : 'Código inválido.';
+        _error = error is ApiException
+            ? error.message
+            : context.l10n.invalidCode;
       });
     }
   }
@@ -404,7 +451,9 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
             children: [
               Text(
                 widget.title,
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: 8),
               if (_requesting)
@@ -421,12 +470,18 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
               else if (_requestError != null) ...[
                 Text(
                   _requestError!,
-                  style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444)),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFFEF4444),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: TextButton(onPressed: _request, child: const Text('Reintentar')),
+                  child: TextButton(
+                    onPressed: _request,
+                    child: Text(context.l10n.retry),
+                  ),
                 ),
               ] else ...[
                 Text(
@@ -447,21 +502,36 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
                   textAlign: TextAlign.center,
                   maxLength: 8,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 6),
-                  decoration: const InputDecoration(counterText: '', hintText: '000000'),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 6,
+                  ),
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    hintText: '000000',
+                  ),
                   onSubmitted: (_) => _confirm(),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 8),
-                  Text(_error!, style: const TextStyle(fontSize: 12, color: Color(0xFFEF4444))),
+                  Text(
+                    _error!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFEF4444),
+                    ),
+                  ),
                 ],
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: _submitting ? null : () => Navigator.of(context).maybePop(),
-                      child: const Text('Cancelar'),
+                      onPressed: _submitting
+                          ? null
+                          : () => Navigator.of(context).maybePop(),
+                      child: Text(context.l10n.cancel),
                     ),
                     const SizedBox(width: 8),
                     FilledButton(
@@ -473,7 +543,7 @@ class _OtpStepUpDialogState extends State<OtpStepUpDialog> {
                               height: 14,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Confirmar'),
+                          : Text(context.l10n.confirmAction),
                     ),
                   ],
                 ),
@@ -496,7 +566,8 @@ Future<void> showTotpSetupDialog(
     context: context,
     builder: (dialogContext) => TotpSetupDialog(
       setup: setup,
-      onVerify: (code) => ref.read(securitySettingsProvider.notifier).verifyTotp(code: code),
+      onVerify: (code) =>
+          ref.read(securitySettingsProvider.notifier).verifyTotp(code: code),
     ),
   );
 }
@@ -507,12 +578,11 @@ Future<void> showDisableMfaDialog(BuildContext context, WidgetRef ref) {
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => OtpStepUpDialog(
-      title: 'Desactivar 2FA',
-      description:
-          'Hemos enviado un código de seguridad a tu contacto principal. Introdúcelo para confirmar la desactivación.',
+      title: context.l10n.disableMfaTitle,
+      description: context.l10n.disableMfaDesc,
       requestOtp: () => notifier.requestOtp(MfaAction.disableMfa),
       onConfirm: (code) => notifier.disableMfa(otpCode: code),
-      successMessage: '2FA desactivado',
+      successMessage: context.l10n.mfaDisabled,
     ),
   );
 }
@@ -523,12 +593,11 @@ Future<void> showEnableEmailOtpDialog(BuildContext context, WidgetRef ref) {
   return showDialog<void>(
     context: context,
     builder: (dialogContext) => OtpStepUpDialog(
-      title: 'Activar código por correo',
-      description:
-          'Hemos enviado un código de seguridad a tu correo. Introdúcelo para activar EMAIL_OTP.',
+      title: context.l10n.enableEmailTitle,
+      description: context.l10n.enableEmailDesc,
       requestOtp: () => notifier.requestOtp(MfaAction.enableMfa),
       onConfirm: (code) => notifier.enableEmailOtp(otpCode: code),
-      successMessage: '2FA activado (código al correo)',
+      successMessage: context.l10n.mfaEmailEnabled,
     ),
   );
 }

@@ -9,15 +9,14 @@ List<MenuNode> buildFallbackMenu() {
     required String route,
     int sortOrder = 1,
     String icon = 'circle',
-  }) =>
-      MenuOption(
-        id: id,
-        code: code,
-        name: name,
-        icon: icon,
-        route: route,
-        sortOrder: sortOrder,
-      );
+  }) => MenuOption(
+    id: id,
+    code: code,
+    name: name,
+    icon: icon,
+    route: route,
+    sortOrder: sortOrder,
+  );
 
   return [
     MenuNode(
@@ -26,7 +25,13 @@ List<MenuNode> buildFallbackMenu() {
       name: 'Inicio',
       sortOrder: 1,
       options: [
-        option(id: 'home.dashboard', code: 'dashboard', name: 'Dashboard', route: '/dashboard', icon: 'dashboard'),
+        option(
+          id: 'home.dashboard',
+          code: 'dashboard',
+          name: 'Dashboard',
+          route: '/dashboard',
+          icon: 'dashboard',
+        ),
       ],
     ),
     MenuNode(
@@ -41,8 +46,20 @@ List<MenuNode> buildFallbackMenu() {
           name: 'Listado',
           sortOrder: 1,
           options: [
-            option(id: 'party.list.all', code: 'parties.all', name: 'Parties', route: '/parties', icon: 'groups'),
-            option(id: 'party.list.types', code: 'parties.types', name: 'Tipos de Party', route: '/party-types', icon: 'sell'),
+            option(
+              id: 'party.list.all',
+              code: 'parties.all',
+              name: 'Parties',
+              route: '/parties',
+              icon: 'groups',
+            ),
+            option(
+              id: 'party.list.types',
+              code: 'parties.types',
+              name: 'Tipos de Party',
+              route: '/party-types',
+              icon: 'sell',
+            ),
           ],
         ),
       ],
@@ -53,8 +70,20 @@ List<MenuNode> buildFallbackMenu() {
       name: 'Empleados',
       sortOrder: 3,
       options: [
-        option(id: 'employees.all', code: 'employees.all', name: 'Empleados', route: '/employees', icon: 'badge'),
-        option(id: 'employees.jobs', code: 'employees.jobs', name: 'Puestos', route: '/jobs', icon: 'work'),
+        option(
+          id: 'employees.all',
+          code: 'employees.all',
+          name: 'Empleados',
+          route: '/employees',
+          icon: 'badge',
+        ),
+        option(
+          id: 'employees.jobs',
+          code: 'employees.jobs',
+          name: 'Puestos',
+          route: '/jobs',
+          icon: 'work',
+        ),
       ],
     ),
     MenuNode(
@@ -63,8 +92,20 @@ List<MenuNode> buildFallbackMenu() {
       name: 'Departamentos',
       sortOrder: 4,
       options: [
-        option(id: 'departments.all', code: 'departments.all', name: 'Departamentos', route: '/departments', icon: 'business'),
-        option(id: 'departments.groups', code: 'departments.groups', name: 'Grupos corporativos', route: '/corporate-groups', icon: 'hub'),
+        option(
+          id: 'departments.all',
+          code: 'departments.all',
+          name: 'Departamentos',
+          route: '/departments',
+          icon: 'business',
+        ),
+        option(
+          id: 'departments.groups',
+          code: 'departments.groups',
+          name: 'Grupos corporativos',
+          route: '/corporate-groups',
+          icon: 'hub',
+        ),
       ],
     ),
     MenuNode(
@@ -73,7 +114,13 @@ List<MenuNode> buildFallbackMenu() {
       name: 'Relaciones Corporativas',
       sortOrder: 5,
       options: [
-        option(id: 'corporate-relationships.all', code: 'corporate-relationships.all', name: 'Holding-Filial', route: '/corporate-relationships', icon: 'hub'),
+        option(
+          id: 'corporate-relationships.all',
+          code: 'corporate-relationships.all',
+          name: 'Holding-Filial',
+          route: '/corporate-relationships',
+          icon: 'hub',
+        ),
       ],
     ),
     MenuNode(
@@ -82,9 +129,27 @@ List<MenuNode> buildFallbackMenu() {
       name: 'Configuración',
       sortOrder: 6,
       options: [
-        option(id: 'settings.catalogs', code: 'settings.catalogs', name: 'Catálogos', route: '/settings', icon: 'category'),
-        option(id: 'settings.oauth', code: 'settings.oauth', name: 'Aplicaciones cliente', route: '/client-applications', icon: 'apps'),
-        option(id: 'settings.mfa', code: 'settings.mfa', name: 'Seguridad y MFA', route: '/mfa-preferences', icon: 'security'),
+        option(
+          id: 'settings.catalogs',
+          code: 'settings.catalogs',
+          name: 'Catálogos',
+          route: '/settings',
+          icon: 'category',
+        ),
+        option(
+          id: 'settings.oauth',
+          code: 'settings.oauth',
+          name: 'Aplicaciones cliente',
+          route: '/client-applications',
+          icon: 'apps',
+        ),
+        option(
+          id: 'settings.mfa',
+          code: 'settings.mfa',
+          name: 'Seguridad y MFA',
+          route: '/mfa-preferences',
+          icon: 'security',
+        ),
       ],
     ),
   ];

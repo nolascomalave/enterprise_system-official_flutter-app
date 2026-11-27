@@ -1,0 +1,62 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'notifications_notifier.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Carga la primera página, escucha el SSE y reconecta con backoff exponencial.
+
+@ProviderFor(NotificationsNotifier)
+final notificationsProvider = NotificationsNotifierProvider._();
+
+/// Carga la primera página, escucha el SSE y reconecta con backoff exponencial.
+final class NotificationsNotifierProvider
+    extends $AsyncNotifierProvider<NotificationsNotifier, NotificationsState> {
+  /// Carga la primera página, escucha el SSE y reconecta con backoff exponencial.
+  NotificationsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'notificationsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$notificationsNotifierHash();
+
+  @$internal
+  @override
+  NotificationsNotifier create() => NotificationsNotifier();
+}
+
+String _$notificationsNotifierHash() =>
+    r'23dcfe641b9a05c82c89d76db0dc746e27d605e3';
+
+/// Carga la primera página, escucha el SSE y reconecta con backoff exponencial.
+
+abstract class _$NotificationsNotifier
+    extends $AsyncNotifier<NotificationsState> {
+  FutureOr<NotificationsState> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<NotificationsState>, NotificationsState>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<NotificationsState>, NotificationsState>,
+              AsyncValue<NotificationsState>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

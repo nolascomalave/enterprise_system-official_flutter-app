@@ -1,3 +1,5 @@
+import 'package:enterprise_app/core/i18n/app_localizations_delegates.dart';
+
 import 'package:enterprise_app/core/menu/models/menu_tree.dart';
 import 'package:enterprise_app/core/ui/sidebar_menu_item.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +29,11 @@ void main() {
 
   Widget buildWidget({ValueChanged<String>? onSelected}) {
     return MaterialApp(
-      theme: ThemeData.dark(useMaterial3: true).copyWith(splashFactory: InkRipple.splashFactory),
+      locale: const Locale('es'),
+      localizationsDelegates: appLocalizationsDelegates,
+      supportedLocales: appSupportedLocales,
+      theme: ThemeData.dark(useMaterial3: true)
+          .copyWith(splashFactory: InkRipple.splashFactory),
       home: Scaffold(
         body: SidebarMenuItem(
           node: node,
@@ -38,10 +44,8 @@ void main() {
     );
   }
 
-  AnimatedCrossFade crossFadeAt(WidgetTester tester, int index) =>
-      tester.widget<AnimatedCrossFade>(
-        find.byType(AnimatedCrossFade).at(index),
-      );
+  AnimatedCrossFade crossFadeAt(WidgetTester tester, int index) => tester
+      .widget<AnimatedCrossFade>(find.byType(AnimatedCrossFade).at(index));
 
   testWidgets('renderiza el hijo al expandir el nodo', (tester) async {
     await tester.pumpWidget(buildWidget());
@@ -67,7 +71,9 @@ void main() {
 
   testWidgets('emite la ruta de la opción seleccionada', (tester) async {
     String? selectedRoute;
-    await tester.pumpWidget(buildWidget(onSelected: (route) => selectedRoute = route));
+    await tester.pumpWidget(
+      buildWidget(onSelected: (route) => selectedRoute = route),
+    );
 
     await tester.tap(find.text('Party'));
     await tester.pumpAndSettle();

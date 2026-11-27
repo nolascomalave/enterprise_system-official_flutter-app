@@ -49,9 +49,8 @@ class AssignDepartmentToGroupUseCase {
   Future<void> call({
     required String departmentId,
     required String corporateGroupId,
-  }) =>
-      _repository.assignDepartmentToGroup(
-        departmentId: departmentId,
-        corporateGroupId: corporateGroupId,
-      );
+  }) => _repository.assignDepartmentToGroup(
+    departmentId: departmentId,
+    corporateGroupId: corporateGroupId,
+  );
 }

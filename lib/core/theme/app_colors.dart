@@ -6,8 +6,12 @@ import 'package:material_ui/material_ui.dart';
 abstract final class AppColors {
   // --- Marca / acento ---
   static const Color indigo = Color(0xFF6366F1); // indigo-500 (dark accent)
-  static const Color indigoStrong = Color(0xFF4F46E5); // indigo-600 (light accent)
-  static const Color indigoSoft = Color(0xFF818CF8); // indigo-400 (dark text accent)
+  static const Color indigoStrong = Color(
+    0xFF4F46E5,
+  ); // indigo-600 (light accent)
+  static const Color indigoSoft = Color(
+    0xFF818CF8,
+  ); // indigo-400 (dark text accent)
   static const Color violet = Color(0xFF8B5CF6); // violet-500
   static const Color purple = Color(0xFF9333EA); // purple-600
 
@@ -37,15 +41,35 @@ abstract final class AppColors {
 abstract final class AppShadows {
   /// Light: `0 0 0 1px rgba(0,0,0,.03), 0 2px 4px rgba(0,0,0,.05), 0 12px 24px rgba(0,0,0,.05)`
   static const List<BoxShadow> premiumLight = [
-    BoxShadow(offset: Offset.zero, blurRadius: 0, spreadRadius: 1, color: Color(0x08000000)),
+    BoxShadow(
+      offset: Offset.zero,
+      blurRadius: 0,
+      spreadRadius: 1,
+      color: Color(0x08000000),
+    ),
     BoxShadow(offset: Offset(0, 2), blurRadius: 4, color: Color(0x0D000000)),
     BoxShadow(offset: Offset(0, 12), blurRadius: 24, color: Color(0x0D000000)),
   ];
 
   /// Dark: `inset 0 1px 0 white/5, 0 0 0 1px white/5, 0 20px 40px -10px black/50`
   static const List<BoxShadow> premiumDark = [
-    BoxShadow(offset: Offset(0, 1), blurRadius: 0, spreadRadius: 0, color: Color(0x0DFFFFFF)),
-    BoxShadow(offset: Offset.zero, blurRadius: 0, spreadRadius: 1, color: Color(0x0DFFFFFF)),
-    BoxShadow(offset: Offset(0, 20), blurRadius: 40, spreadRadius: -10, color: Color(0x80000000)),
+    BoxShadow(
+      offset: Offset(0, 1),
+      blurRadius: 0,
+      spreadRadius: 0,
+      color: Color(0x0DFFFFFF),
+    ),
+    BoxShadow(
+      offset: Offset.zero,
+      blurRadius: 0,
+      spreadRadius: 1,
+      color: Color(0x0DFFFFFF),
+    ),
+    BoxShadow(
+      offset: Offset(0, 20),
+      blurRadius: 40,
+      spreadRadius: -10,
+      color: Color(0x80000000),
+    ),
   ];
 }

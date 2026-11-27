@@ -4,6 +4,7 @@ import '../../../../core/network/dio_client.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/login_usecase.dart';
+import '../../domain/usecases/logout_usecase.dart';
 import '../../domain/usecases/verify_two_factor_usecase.dart';
 
 /// Repositorio de autenticación (implementación real).
@@ -18,8 +19,14 @@ final loginUseCaseProvider = FutureProvider<LoginUseCase>((ref) async {
   return LoginUseCase(repository);
 });
 
-final verifyTwoFactorUseCaseProvider =
-    FutureProvider<VerifyTwoFactorUseCase>((ref) async {
+final verifyTwoFactorUseCaseProvider = FutureProvider<VerifyTwoFactorUseCase>((
+  ref,
+) async {
   final repository = await ref.watch(authRepositoryProvider.future);
   return VerifyTwoFactorUseCase(repository);
+});
+
+final logoutUseCaseProvider = FutureProvider<LogoutUseCase>((ref) async {
+  final repository = await ref.watch(authRepositoryProvider.future);
+  return LogoutUseCase(repository);
 });

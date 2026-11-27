@@ -20,12 +20,16 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
       final data = response.data?['data'];
       if (data is! List) {
         throw const ApiException(
-            'Respuesta de departamentos inválida del servidor.');
+          'Respuesta de departamentos inválida del servidor.',
+        );
       }
       return data
           .whereType<Map>()
-          .map((json) =>
-              DepartmentDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                DepartmentDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -49,7 +53,9 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
       );
       final data = response.data?['data'];
       if (data is! Map) {
-        throw const ApiException('Respuesta de creación inválida del servidor.');
+        throw const ApiException(
+          'Respuesta de creación inválida del servidor.',
+        );
       }
       return DepartmentDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
     } on DioException catch (error) {
@@ -60,16 +66,22 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
   @override
   Future<List<CorporateGroup>> getCorporateGroups() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/corporate-groups');
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/corporate-groups',
+      );
       final data = response.data?['data'];
       if (data is! List) {
         throw const ApiException(
-            'Respuesta de grupos corporativos inválida del servidor.');
+          'Respuesta de grupos corporativos inválida del servidor.',
+        );
       }
       return data
           .whereType<Map>()
-          .map((json) =>
-              CorporateGroupDto.fromJson(Map<String, dynamic>.from(json)).toEntity())
+          .map(
+            (json) =>
+                CorporateGroupDto.fromJson(Map<String, dynamic>.from(json))
+                    .toEntity(),
+          )
           .toList();
     } on DioException catch (error) {
       throw _toApiException(error);
@@ -91,9 +103,12 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
       );
       final data = response.data?['data'];
       if (data is! Map) {
-        throw const ApiException('Respuesta de creación inválida del servidor.');
+        throw const ApiException(
+          'Respuesta de creación inválida del servidor.',
+        );
       }
-      return CorporateGroupDto.fromJson(Map<String, dynamic>.from(data)).toEntity();
+      return CorporateGroupDto.fromJson(Map<String, dynamic>.from(data))
+          .toEntity();
     } on DioException catch (error) {
       throw _toApiException(error);
     }
